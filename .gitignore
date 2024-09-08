@@ -1,0 +1,17 @@
+# Compiled object files
+*.o
+
+# Executables
+*.exe
+*.out
+
+# Libraries
+*.a
+*.lib
+
+# IDE files
+.vscode/
+.idea/
+
+mp1/src/lexer
+mp1/src/parser
