@@ -40,6 +40,7 @@ typedef enum {
 	ILLEGAL_STR_CHAR,
 	EOF_IN_STRING,
 	EOF_IN_COMMENT,
+    UNMATCHED_COMMENT,
 	UNRECOGNIZED_CHAR
 } cool_lex_error_t;
 
@@ -58,8 +59,8 @@ int ret_err(cool_lex_error_t err);
 
 digit       [0-9]
 hexdigit    [0-9a-fA-F]
-letter      [a-zA-Z]
-identifier  [a-zA-Z0-9]*
+letter      [a-zA-Z_]
+identifier  [a-zA-Z0-9_]*
 uppercase    [A-Z]
 lowercase    [a-z]
 
@@ -151,8 +152,7 @@ OF 			   (?i:of)
     if(str_buf_ptr - str_buf + 1 >  STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
     /* String normal termination. Add the string to the string table */
     BEGIN(INITIAL);
-    yytext[strlen(yytext) - 1] = '\0';  /* Remove closing quote */
-    yylval.symbol = stringtable.add_string(yytext + 1);  /* Remove opening quote */
+    yylval.symbol = stringtable.add_string(str_buf);  /* Remove opening quote */
     return STR_CONST;
 }
 <STRING>\n {
@@ -207,8 +207,7 @@ OF 			   (?i:of)
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
     /* String normal termination. Add the string to the string table */
     BEGIN(INITIAL);
-    yytext[strlen(yytext) - 3] = '\0';  /* Remove the closing triple quotes */
-    yylval.symbol = stringtable.add_string(yytext + 3);  /* Remove the opening triple quotes */
+    yylval.symbol = stringtable.add_string(str_buf); 
     return STR_CONST;
 }
 <MULTILINE_STRING>\n {
@@ -250,12 +249,14 @@ OF 			   (?i:of)
 "--".*\n      { curr_lineno++; } /* Skip single-line comment and track newline */
 "(*"           { BEGIN(COMMENT); comment_level = 1; }
 <COMMENT>"(*"  { comment_level++; }
-<COMMENT>")*"  { if (--comment_level == 0) BEGIN(INITIAL); }
+<COMMENT>"*)"  { if (--comment_level == 0) BEGIN(INITIAL); }
 <COMMENT>.     { /* Ignore other characters inside comment */ }
 <COMMENT>\n    { curr_lineno++; } /* Track newlines inside comments */
 <COMMENT><<EOF>> { 
     return ret_err(EOF_IN_COMMENT);  /* Handle EOF inside unclosed multi-line comment */
 }
+
+"*)"         { return ret_err(UNMATCHED_COMMENT); }
 
 [ \t\r\v\f]+       { /* Ignore spaces, tabs, and carriage returns */ } /* Ignore whitespace */
 \n             { curr_lineno++; } /* Increment line number on newline */
@@ -287,8 +288,11 @@ int ret_err(cool_lex_error_t err) {
         case EOF_IN_COMMENT:
             cool_yylval.error_msg = "EOF in comment";
             break;
+        case UNMATCHED_COMMENT:
+            cool_yylval.error_msg = "Unmatched *)";
+            break;
         case UNRECOGNIZED_CHAR:
-            sprintf((char*)cool_yylval.error_msg, "Unrecognized token: %s", strdup(yytext));
+            cool_yylval.error_msg = strdup(yytext);
             break;
         default:
             cool_yylval.error_msg = "Unknown error";
