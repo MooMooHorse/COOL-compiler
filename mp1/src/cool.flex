@@ -59,7 +59,7 @@ int ret_err(cool_lex_error_t err);
 digit       [0-9]
 hexdigit    [0-9a-fA-F]
 letter      [a-zA-Z]
-identifier  [a-zA-Z_][a-zA-Z0-9_]*
+identifier  [a-zA-Z0-9]*
 uppercase    [A-Z]
 lowercase    [a-z]
 
@@ -80,6 +80,7 @@ ESAC       (?i:esac)
 NEW        (?i:new)
 ISVOID     (?i:isvoid)
 NOT        (?i:not)
+OF 			   (?i:of)
 
 
 %%
@@ -100,10 +101,8 @@ NOT        (?i:not)
 {NEW}           { return NEW; }
 {ISVOID}        { return ISVOID; }
 {NOT}           { return NOT; }
-"true"          { 
-	yylval.boolean = true; 
-	return BOOL_CONST; 
-}
+{OF}            { return OF; }
+"true"          { yylval.boolean = true; return BOOL_CONST; }
 "false"         { yylval.boolean = false; return BOOL_CONST; }
 {uppercase}{identifier} { 
     yylval.symbol = idtable.add_string(yytext);
@@ -132,8 +131,7 @@ NOT        (?i:not)
 ":"             { return ':'; }
 "@"             { return '@'; }
 "~"             { return '~'; }
-[ \t\r]+       { /* Ignore spaces, tabs, and carriage returns */ }
-\n             { curr_lineno++; } /* Increment line number on newline */
+
 {digit}+        { 
     yylval.symbol = inttable.add_string(yytext); 
     return INT_CONST; 
@@ -258,6 +256,10 @@ NOT        (?i:not)
 <COMMENT><<EOF>> { 
     return ret_err(EOF_IN_COMMENT);  /* Handle EOF inside unclosed multi-line comment */
 }
+
+[ \t\r\v\f]+       { /* Ignore spaces, tabs, and carriage returns */ } /* Ignore whitespace */
+\n             { curr_lineno++; } /* Increment line number on newline */
+
 .              {
     return ret_err(UNRECOGNIZED_CHAR);
 }
