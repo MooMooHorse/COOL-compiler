@@ -97,18 +97,17 @@ extern int VERBOSE_ERRORS;
 %type <feature> feature
 %type <formal> formal
 %type <formals> formal_list
+%type <formals> formal_list_nonempty
 %type <expression> expr
 %type <expressions> expr_list
 %type <case_> case
 %type <cases> case_list 
+%type <expressions> expr_list_nonempty
 /* not so sure about the following */
 %type <expression> optional_assign
 %type <expressions> expr_seq
-%type <expressions> let_bindings_list
- 
+%type <expression> let_bindings_list
 
-/* You will want to change the following line. */
-%type <features> dummy_feature_list
 
 /* Precedence declarations go here. */
 %left IN
@@ -172,8 +171,8 @@ feature:
             $$ = method(
                 $1, /* Method name */
                 $3, /* Formals */
-                $5, /* Return type */
-                $7  /* Method body */
+                $6, /* Return type */
+                $8  /* Method body */
             );
         }
   | OBJECTID ':' TYPEID optional_assign
@@ -206,7 +205,7 @@ formal:
 
 /* reference cool manual section 10, figure 1 */
 expr:
-    ASSIGN expr
+    OBJECTID ASSIGN expr
         { $$ = assign($1, $3); }
     | expr '@' TYPEID '.' OBJECTID '(' expr_list ')'  /* Static dispatch */
         { $$ = static_dispatch($1, $3, $5, $7); }
@@ -270,7 +269,7 @@ expr:
 
 
 let_bindings_list :
-      OBJECTID ':' TYPEID optional_assign IN expression
+      OBJECTID ':' TYPEID optional_assign IN expr
         { $$ = let($1, $3, $4, $6); }
       | 
       OBJECTID ':' TYPEID optional_assign ',' let_bindings_list
