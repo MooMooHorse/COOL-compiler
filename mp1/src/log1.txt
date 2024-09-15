@@ -1,137 +1,488 @@
-#13
+ERROR "["
+#59 ERROR "]"
+#59 #73
 _program
-  #13
+  #73
   _class
     CellularAutomaton
     IO
     "bison_test.cl"
     (
-    #12
+    #3
+    _attr
+      population_map
+      String
+      #3
+      _no_expr
+      : _no_type
+    #10
     _method
-      cell_at_next_evolution
-      #2
+      init
+      #5
+      _formal
+        map
+        String
+      SELF_TYPE
+      #9
+      _block
+        #7
+        _assign
+          population_map
+          #7
+          _object
+            map
+          : _no_type
+        : _no_type
+        #8
+        _object
+          self
+        : _no_type
+      : _no_type
+    #17
+    _method
+      print
+      SELF_TYPE
+      #16
+      _block
+        #14
+        _dispatch
+          #14
+          _object
+            self
+          : _no_type
+          out_string
+          (
+          #14
+          _dispatch
+            #14
+            _object
+              population_map
+            : _no_type
+            concat
+            (
+            #14
+            _string
+              "\n"
+            : _no_type
+            )
+          : _no_type
+          )
+        : _no_type
+        #15
+        _object
+          self
+        : _no_type
+      : _no_type
+    #21
+    _method
+      num_cells
+      Int
+      #20
+      _dispatch
+        #20
+        _object
+          population_map
+        : _no_type
+        length
+        (
+        )
+      : _no_type
+    #25
+    _method
+      cell
+      #23
       _formal
         position
         Int
       String
-      #11
+      #24
+      _dispatch
+        #24
+        _object
+          population_map
+        : _no_type
+        substr
+        (
+        #24
+        _object
+          position
+        : _no_type
+        #24
+        _int
+          1
+        : _no_type
+        )
+      : _no_type
+    #33
+    _method
+      cell_left_neighbor
+      #27
+      _formal
+        position
+        Int
+      String
+      #32
       _cond
-        #6
+        #28
         _eq
-          #6
+          #28
+          _object
+            position
+          : _no_type
+          #28
+          _int
+            0
+          : _no_type
+        : _no_type
+        #29
+        _dispatch
+          #29
+          _object
+            self
+          : _no_type
+          cell
+          (
+          #29
+          _sub
+            #29
+            _dispatch
+              #29
+              _object
+                self
+              : _no_type
+              num_cells
+              (
+              )
+            : _no_type
+            #29
+            _int
+              1
+            : _no_type
+          : _no_type
+          )
+        : _no_type
+        #31
+        _dispatch
+          #31
+          _object
+            self
+          : _no_type
+          cell
+          (
+          #31
+          _sub
+            #31
+            _object
+              position
+            : _no_type
+            #31
+            _int
+              1
+            : _no_type
+          : _no_type
+          )
+        : _no_type
+      : _no_type
+    #41
+    _method
+      cell_right_neighbor
+      #35
+      _formal
+        position
+        Int
+      String
+      #40
+      _cond
+        #36
+        _eq
+          #36
+          _object
+            position
+          : _no_type
+          #36
+          _sub
+            #36
+            _dispatch
+              #36
+              _object
+                self
+              : _no_type
+              num_cells
+              (
+              )
+            : _no_type
+            #36
+            _int
+              1
+            : _no_type
+          : _no_type
+        : _no_type
+        #37
+        _dispatch
+          #37
+          _object
+            self
+          : _no_type
+          cell
+          (
+          #37
+          _int
+            0
+          : _no_type
+          )
+        : _no_type
+        #39
+        _dispatch
+          #39
+          _object
+            self
+          : _no_type
+          cell
+          (
+          #39
           _plus
-            #5
+            #39
+            _object
+              position
+            : _no_type
+            #39
+            _int
+              1
+            : _no_type
+          : _no_type
+          )
+        : _no_type
+      : _no_type
+    #55
+    _method
+      cell_at_next_evolution
+      #45
+      _formal
+        position
+        Int
+      String
+      #54
+      _cond
+        #49
+        _eq
+          #49
+          _plus
+            #48
             _plus
-              #3
+              #46
               _cond
-                #3
+                #46
                 _eq
-                  #3
+                  #46
                   _dispatch
-                    #3
+                    #46
                     _object
                       self
                     : _no_type
                     cell
                     (
-                    #3
+                    #46
                     _object
                       position
                     : _no_type
                     )
                   : _no_type
-                  #3
+                  #46
                   _string
                     "X"
                   : _no_type
                 : _no_type
-                #3
+                #46
                 _int
                   1
                 : _no_type
-                #3
+                #46
                 _int
                   0
                 : _no_type
               : _no_type
-              #4
+              #47
               _cond
-                #4
+                #47
                 _eq
-                  #4
+                  #47
                   _dispatch
-                    #4
+                    #47
                     _object
                       self
                     : _no_type
                     cell_left_neighbor
                     (
-                    #4
+                    #47
                     _object
                       position
                     : _no_type
                     )
                   : _no_type
-                  #4
+                  #47
                   _string
                     "X"
                   : _no_type
                 : _no_type
-                #4
+                #47
                 _int
                   1
                 : _no_type
-                #4
+                #47
                 _int
                   0
                 : _no_type
               : _no_type
             : _no_type
-            #5
+            #48
             _cond
-              #5
+              #48
               _eq
-                #5
+                #48
                 _dispatch
-                  #5
+                  #48
                   _object
                     self
                   : _no_type
                   cell_right_neighbor
                   (
-                  #5
+                  #48
                   _object
                     position
                   : _no_type
                   )
                 : _no_type
-                #5
+                #48
                 _string
                   "X"
                 : _no_type
               : _no_type
-              #5
+              #48
               _int
                 1
               : _no_type
-              #5
+              #48
               _int
                 0
               : _no_type
             : _no_type
           : _no_type
-          #6
+          #49
           _int
             1
           : _no_type
         : _no_type
-        #8
+        #51
         _string
           "X"
         : _no_type
-        #10
+        #53
         _string
           "."
+        : _no_type
+      : _no_type
+    #72
+    _method
+      evolve
+      SELF_TYPE
+      #71
+      _let
+        position
+        Int
+        #58
+        _no_expr
+        : _no_type
+        #71
+        _let
+          num
+          Int
+          #59
+          _object
+            num_cells
+          : _no_type
+          #71
+          _let
+            temp
+            String
+            #60
+            _no_expr
+            : _no_type
+            #70
+            _block
+              #67
+              _loop
+                #62
+                _lt
+                  #62
+                  _object
+                    position
+                  : _no_type
+                  #62
+                  _object
+                    num
+                  : _no_type
+                : _no_type
+                #66
+                _block
+                  #64
+                  _assign
+                    temp
+                    #64
+                    _dispatch
+                      #64
+                      _object
+                        temp
+                      : _no_type
+                      concat
+                      (
+                      #64
+                      _dispatch
+                        #64
+                        _object
+                          self
+                        : _no_type
+                        cell_at_next_evolution
+                        (
+                        #64
+                        _object
+                          position
+                        : _no_type
+                        )
+                      : _no_type
+                      )
+                    : _no_type
+                  : _no_type
+                  #65
+                  _assign
+                    position
+                    #65
+                    _plus
+                      #65
+                      _object
+                        position
+                      : _no_type
+                      #65
+                      _int
+                        1
+                      : _no_type
+                    : _no_type
+                  : _no_type
+                : _no_type
+              : _no_type
+              #68
+              _assign
+                population_map
+                #68
+                _object
+                  temp
+                : _no_type
+              : _no_type
+              #69
+              _object
+                self
+              : _no_type
+            : _no_type
+          : _no_type
         : _no_type
       : _no_type
     )
