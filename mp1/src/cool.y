@@ -10,7 +10,6 @@
 
 /* Add your own C declarations here */
 
-
 /************************************************************************/
 /*                DONT CHANGE ANYTHING IN THIS SECTION                  */
 
@@ -111,14 +110,15 @@ extern int VERBOSE_ERRORS;
 
 /* Precedence declarations go here. */
 %left IN
-%left '.' '@'
+%right ASSIGN
+%right NOT
+%nonassoc LE '<' '='
 %left '+' '-'
 %left '*' '/'
-%left LE '<' '='
 %left ISVOID
 %right '~' /* Unary negation */
-%right NOT
-%right ASSIGN
+%left '@'
+%left '.' 
 
 %%
 /* 
