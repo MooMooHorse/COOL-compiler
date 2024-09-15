@@ -100,8 +100,12 @@ extern int VERBOSE_ERRORS;
 %type <expression> expr
 %type <expressions> expr_list
 %type <case_> case
-%type <cases> case_list
-
+%type <cases> case_list 
+/* not so sure about the following */
+%type <expression> optional_assign
+%type <expressions> expr_seq
+%type <expressions> let_bindings_list
+ 
 
 /* You will want to change the following line. */
 %type <features> dummy_feature_list
@@ -200,12 +204,13 @@ formal:
         { $$ = formal($1, $3); }
     ;
 
-
-
-
-
+/* reference cool manual section 10, figure 1 */
 expr:
-    expr '.' OBJECTID '(' expr_list ')'   /* Dispatch */
+    ASSIGN expr
+        { $$ = assign($1, $3); }
+    | expr '@' TYPEID '.' OBJECTID '(' expr_list ')'  /* Static dispatch */
+        { $$ = static_dispatch($1, $3, $5, $7); }
+    | expr '.' OBJECTID '(' expr_list ')'   /* Dispatch */
         { $$ = dispatch($1, $3, $5); }
     | OBJECTID '(' expr_list ')'            /* Implicit dispatch (self) */
         {
@@ -215,17 +220,20 @@ expr:
                 $3  /* Arguments */
             );
         }
-    | expr '@' TYPEID '.' OBJECTID '(' expr_list ')'  /* Static dispatch */
-        { $$ = static_dispatch($1, $3, $5, $7); }
-
     | IF expr THEN expr ELSE expr FI
         { $$ = cond($2, $4, $6); }
     | WHILE expr LOOP expr POOL
         { $$ = loop($2, $4); }
+    | '{' expr_seq '}'
+        { $$ = block($2); }
     | LET let_bindings_list 
         { $$ = $2; }
     | CASE expr OF case_list ESAC
         { $$ = typcase($2, $4); }
+    | NEW TYPEID
+        { $$ = new_($2); }
+    | ISVOID expr
+        { $$ = isvoid($2); }
     | expr '+' expr
         { $$ = plus($1, $3); }
     | expr '-' expr
@@ -242,26 +250,18 @@ expr:
         { $$ = leq($1, $3); }
     | expr '=' expr
         { $$ = eq($1, $3); }
-    | NOT expr
+    | NOT expr /* logical negation: complement */
         { $$ = comp($2); }
     | '(' expr ')'
         { $$ = $2; }
+    | OBJECTID
+        { $$ = object($1); }
     | INT_CONST
         { $$ = int_const($1); }
     | STR_CONST
         { $$ = string_const($1); }
     | BOOL_CONST
         { $$ = bool_const($1); }
-    | OBJECTID
-        { $$ = object($1); }
-    | NEW TYPEID
-        { $$ = new_($2); }
-    | ISVOID expr
-        { $$ = isvoid($2); }
-    | '{' expr_seq '}'
-        { $$ = block($2); }
-    | ASSIGN expr
-        { $$ = assign($1, $3); }
     | ERROR
         {   yyerrok;
             $$ = object(idtable.add_string("_error_"));
