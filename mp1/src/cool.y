@@ -107,11 +107,15 @@ extern int VERBOSE_ERRORS;
 %type <features> dummy_feature_list
 
 /* Precedence declarations go here. */
+%left IN
+%left '.' '@'
 %left '+' '-'
 %left '*' '/'
 %left LE '<' '='
+%left ISVOID
 %right '~' /* Unary negation */
 %right NOT
+%right ASSIGN
 
 %%
 /* 
@@ -218,12 +222,9 @@ expr:
         { $$ = cond($2, $4, $6); }
     | WHILE expr LOOP expr POOL
         { $$ = loop($2, $4); }
-    |  LET error IN expression
-    |  LET OBJECTID ':' TYPEID ASSIGN expression IN expression %prec LET
-        {
-            $$ = let($2, $4, $6, $8);
-        }
-    |  CASE expr OF case_list ESAC
+    | LET let_bindings_list 
+        { $$ = $2; }
+    | CASE expr OF case_list ESAC
         { $$ = typcase($2, $4); }
     | expr '+' expr
         { $$ = plus($1, $3); }
@@ -265,6 +266,18 @@ expr:
         {   yyerrok;
             $$ = object(idtable.add_string("_error_"));
         }
+    ;
+
+
+let_bindings_list :
+      OBJECTID ':' TYPEID optional_assign IN expression
+        { $$ = let($1, $3, $4, $6); }
+      | 
+      OBJECTID ':' TYPEID optional_assign ',' let_bindings_list
+        { $$ = let($1, $3, $4, $6); }
+      |
+      error ',' let_bindings_list
+        {}
     ;
 
 /* Dispatch list */
@@ -311,6 +324,8 @@ optional_assign:
   | ASSIGN expr
         { $$ = $2; }
     ;
+
+
 
 /* end of grammar */
 %%
