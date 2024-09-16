@@ -39,16 +39,12 @@ class TestClass {
 
     -- Test a case statement with formals
     method_case_test(param : Int) : Int {
-        let x : Int <- 0 in (
-            let y: Int <- 1 in (
-                let z: Int <- 2 in (
-                    case param of
-                        x : Int => 1;
-                        y : Int => 2;
-                        z : Int => 3;
-                    esac
-                )
-            )
+        let x : Int <- 0, y:  <- 1, z : Int <- 2 in (
+            case param of
+                x : => 1;
+                y : Int => 2;
+                z : Int => 3;
+            esac
         )
     };
     

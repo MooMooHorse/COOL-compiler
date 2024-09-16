@@ -102,7 +102,6 @@ extern int VERBOSE_ERRORS;
 %type <case_> case
 %type <cases> case_list 
 %type <expressions> expr_list_nonempty
-/* not so sure about the following */
 %type <expression> optional_assign
 %type <expressions> expr_seq
 %type <expression> let_bindings_list
@@ -132,6 +131,14 @@ class_list
                 { $$ = single_Classes($1); }
         | class_list class /* several classes */
                 { $$ = append_Classes($1,single_Classes($2)); }
+        | class_list error ';' /* Error handling for class definitions */
+                {
+                    $$ = $1;  /* Skip the erroneous class and continue */
+                }
+        | error class 
+                {
+                    $$ = single_Classes($2);  /* Skip the erroneous class and continue */
+                }
         ;
 
 /* If no parent is specified, the class inherits from the Object class. */
@@ -161,8 +168,12 @@ class:
 feature_list:
     /* Empty feature list */
         { $$ = nil_Features(); }
-  | feature_list feature ';'
+    | feature_list feature ';'
         { $$ = append_Features($1, single_Features($2)); }
+    | feature_list error ';'
+        {
+            $$ = $1;  /* Skip the erroneous feature and continue */
+        }
     ;
 
 feature:
@@ -187,15 +198,19 @@ feature:
 
 formal_list:
     /* Empty formal list */
-        { $$ = nil_Formals(); }
-  | formal_list_nonempty { $$ = $1; }
+    { $$ = nil_Formals(); }
+    | formal_list_nonempty { $$ = $1; }
     ;
 
 formal_list_nonempty:
     formal
         { $$ = single_Formals($1); }
-  | formal_list_nonempty ',' formal
+    | formal_list_nonempty ',' formal
         { $$ = append_Formals($1, single_Formals($3)); }
+    | formal_list_nonempty ',' error
+        {
+            $$ = $1;  /* Skip the erroneous formal and continue */
+        }
     ;
 
 formal:
@@ -261,10 +276,6 @@ expr:
         { $$ = string_const($1); }
     | BOOL_CONST
         { $$ = bool_const($1); }
-    | ERROR
-        {   yyerrok;
-            $$ = object(idtable.add_string("_error_"));
-        }
     ;
 
 
@@ -275,8 +286,7 @@ let_bindings_list :
       OBJECTID ':' TYPEID optional_assign ',' let_bindings_list
         { $$ = let($1, $3, $4, $6); }
       |
-      ERROR ',' let_bindings_list
-        {}
+      error ',' let_bindings_list {}
     ;
 
 /* Dispatch list */
@@ -284,15 +294,19 @@ let_bindings_list :
 expr_list:
     /* Empty expression list */
         { $$ = nil_Expressions(); }
-  | expr_list_nonempty
+    | expr_list_nonempty
         { $$ = $1; }
     ;
 
 expr_list_nonempty:
     expr
         { $$ = single_Expressions($1); }
-  | expr_list_nonempty ',' expr
+    | expr_list_nonempty ',' expr
         { $$ = append_Expressions($1, single_Expressions($3)); }
+    | expr_list_nonempty ',' error
+        {
+            $$ = $1;  /* Skip the erroneous expression and continue */
+        }
     ;
 
 /* Case list */
@@ -301,19 +315,30 @@ case_list:
         { $$ = single_Cases($1); }
     | case_list case
         { $$ = append_Cases($1, single_Cases($2)); }
+    | case_list error
+        {
+            $$ = $1;  /* Skip the erroneous case and continue */
+        }
+    | error case
+        {
+            $$ = single_Cases($2);  /* Skip the erroneous case and continue */
+        }
     ;
 
 case:
     OBJECTID ':' TYPEID DARROW expr ';' /* not sure about the semicolon */
         { $$ = branch($1, $3, $5); }
-    ;
 
 /* Sequence of expressions */
 expr_seq:
     expr ';'
         { $$ = single_Expressions($1); }
-  | expr_seq expr ';'
+    | expr_seq expr ';'
         { $$ = append_Expressions($1, single_Expressions($2)); }
+    | expr_seq error ';'
+        {
+            $$ = $1; /* Skip the erroneous expression and continue */
+        }
     ;
 
 /* Optional assignment */
