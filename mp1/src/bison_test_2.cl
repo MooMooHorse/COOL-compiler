@@ -22,7 +22,7 @@ class TestClass {
     };
     
     -- Method with optional initialization
-    method_with_init(param : Int <- 10) : Int {
+    method_with_init(param : Int) : Int {
         param * 2
     };
     
@@ -39,11 +39,17 @@ class TestClass {
 
     -- Test a case statement with formals
     method_case_test(param : Int) : Int {
-        case param of
-            0 : Int => 1;
-            1 : Int => 2;
-            2 : Int => 3;
-        esac
+        let x : Int <- 0 in (
+            let y: Int <- 1 in (
+                let z: Int <- 2 in (
+                    case param of
+                        x : Int => 1;
+                        y : Int => 2;
+                        z : Int => 3;
+                    esac
+                )
+            )
+        )
     };
     
     -- Method with a complex expression and feature interaction

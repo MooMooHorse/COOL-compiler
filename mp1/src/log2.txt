@@ -1,193 +1,307 @@
-#name "bison_test_2.cl"
-#1 CLASS
-#1 TYPEID TestClass
-#1 '{'
-#4 OBJECTID attribute_no_init
-#4 ':'
-#4 TYPEID Int
-#4 ';'
-#7 OBJECTID attribute_with_init
-#7 ':'
-#7 TYPEID String
-#7 ASSIGN
-#7 STR_CONST "Hello"
-#7 ';'
-#10 OBJECTID method_no_params
-#10 '('
-#10 ')'
-#10 ':'
-#10 TYPEID Int
-#10 '{'
-#11 INT_CONST 42
-#12 '}'
-#12 ';'
-#15 OBJECTID method_one_param
-#15 '('
-#15 OBJECTID param
-#15 ':'
-#15 TYPEID String
-#15 ')'
-#15 ':'
-#15 TYPEID String
-#15 '{'
-#16 OBJECTID param
-#16 '.'
-#16 OBJECTID concat
-#16 '('
-#16 STR_CONST " World!"
-#16 ')'
-#17 '}'
-#17 ';'
-#20 OBJECTID method_multiple_params
-#20 '('
-#20 OBJECTID param1
-#20 ':'
-#20 TYPEID Int
-#20 ','
-#20 OBJECTID param2
-#20 ':'
-#20 TYPEID Int
-#20 ','
-#20 OBJECTID param3
-#20 ':'
-#20 TYPEID Int
-#20 ')'
-#20 ':'
-#20 TYPEID Int
-#20 '{'
-#21 OBJECTID param1
-#21 '+'
-#21 OBJECTID param2
-#21 '+'
-#21 OBJECTID param3
-#22 '}'
-#22 ';'
-#25 OBJECTID method_with_init
-#25 '('
-#25 OBJECTID param
-#25 ':'
-#25 TYPEID Int
-#25 ASSIGN
-#25 INT_CONST 10
-#25 ')'
-#25 ':'
-#25 TYPEID Int
-#25 '{'
-#26 OBJECTID param
-#26 '*'
-#26 INT_CONST 2
-#27 '}'
-#27 ';'
-#30 OBJECTID method_nested_calls
-#30 '('
-#30 ')'
-#30 ':'
-#30 TYPEID String
-#30 '{'
-#31 OBJECTID method_one_param
-#31 '('
-#31 STR_CONST "Nested"
-#31 ')'
-#31 '.'
-#31 OBJECTID concat
-#31 '('
-#31 STR_CONST " Calls"
-#31 ')'
-#32 '}'
-#32 ';'
-#35 OBJECTID method_let_binding_test
-#35 '('
-#35 ')'
-#35 ':'
-#35 TYPEID Int
-#35 '{'
-#36 LET
-#36 OBJECTID x
-#36 ':'
-#36 TYPEID Int
-#36 ASSIGN
-#36 INT_CONST 5
-#36 ','
-#36 OBJECTID y
-#36 ':'
-#36 TYPEID Int
-#36 ASSIGN
-#36 OBJECTID x
-#36 '+'
-#36 INT_CONST 3
-#36 IN
-#37 OBJECTID x
-#37 '+'
-#37 OBJECTID y
-#38 '}'
-#38 ';'
-#41 OBJECTID method_case_test
-#41 '('
-#41 OBJECTID param
-#41 ':'
-#41 TYPEID Int
-#41 ')'
-#41 ':'
-#41 TYPEID Int
-#41 '{'
-#42 CASE
-#42 OBJECTID param
-#42 OF
-#43 INT_CONST 0
-#43 ':'
-#43 TYPEID Int
-#43 DARROW
-#43 INT_CONST 1
-#43 ';'
-#44 INT_CONST 1
-#44 ':'
-#44 TYPEID Int
-#44 DARROW
-#44 INT_CONST 2
-#44 ';'
-#45 INT_CONST 2
-#45 ':'
-#45 TYPEID Int
-#45 DARROW
-#45 INT_CONST 3
-#45 ';'
-#46 ESAC
-#47 '}'
-#47 ';'
-#50 OBJECTID complex_method
-#50 '('
-#50 OBJECTID param1
-#50 ':'
-#50 TYPEID Int
-#50 ','
-#50 OBJECTID param2
-#50 ':'
-#50 TYPEID Int
-#50 ')'
-#50 ':'
-#50 TYPEID Int
-#50 '{'
-#51 IF
-#51 OBJECTID param1
-#51 '<'
-#51 OBJECTID param2
-#51 THEN
-#52 OBJECTID method_multiple_params
-#52 '('
-#52 OBJECTID param1
-#52 ','
-#52 OBJECTID param2
-#52 ','
-#52 OBJECTID param1
-#52 '+'
-#52 OBJECTID param2
-#52 ')'
-#53 ELSE
-#54 OBJECTID param1
-#54 '-'
-#54 OBJECTID param2
-#55 FI
-#56 '}'
-#56 ';'
-#58 '}'
-#58 ';'
+#64
+_program
+  #64
+  _class
+    TestClass
+    Object
+    "bison_test_2.cl"
+    (
+    #4
+    _attr
+      attribute_no_init
+      Int
+      #4
+      _no_expr
+      : _no_type
+    #7
+    _attr
+      attribute_with_init
+      String
+      #7
+      _string
+        "Hello"
+      : _no_type
+    #12
+    _method
+      method_no_params
+      Int
+      #11
+      _int
+        42
+      : _no_type
+    #17
+    _method
+      method_one_param
+      #15
+      _formal
+        param
+        String
+      String
+      #16
+      _dispatch
+        #16
+        _object
+          param
+        : _no_type
+        concat
+        (
+        #16
+        _string
+          " World!"
+        : _no_type
+        )
+      : _no_type
+    #22
+    _method
+      method_multiple_params
+      #20
+      _formal
+        param1
+        Int
+      #20
+      _formal
+        param2
+        Int
+      #20
+      _formal
+        param3
+        Int
+      Int
+      #22
+      _plus
+        #21
+        _plus
+          #21
+          _object
+            param1
+          : _no_type
+          #21
+          _object
+            param2
+          : _no_type
+        : _no_type
+        #22
+        _object
+          param3
+        : _no_type
+      : _no_type
+    #27
+    _method
+      method_with_init
+      #25
+      _formal
+        param
+        Int
+      Int
+      #27
+      _mul
+        #26
+        _object
+          param
+        : _no_type
+        #26
+        _int
+          2
+        : _no_type
+      : _no_type
+    #32
+    _method
+      method_nested_calls
+      String
+      #31
+      _dispatch
+        #31
+        _dispatch
+          #31
+          _object
+            self
+          : _no_type
+          method_one_param
+          (
+          #31
+          _string
+            "Nested"
+          : _no_type
+          )
+        : _no_type
+        concat
+        (
+        #31
+        _string
+          " Calls"
+        : _no_type
+        )
+      : _no_type
+    #38
+    _method
+      method_let_binding_test
+      Int
+      #38
+      _let
+        x
+        Int
+        #36
+        _int
+          5
+        : _no_type
+        #38
+        _let
+          y
+          Int
+          #36
+          _plus
+            #36
+            _object
+              x
+            : _no_type
+            #36
+            _int
+              3
+            : _no_type
+          : _no_type
+          #38
+          _plus
+            #37
+            _object
+              x
+            : _no_type
+            #38
+            _object
+              y
+            : _no_type
+          : _no_type
+        : _no_type
+      : _no_type
+    #53
+    _method
+      method_case_test
+      #41
+      _formal
+        param
+        Int
+      Int
+      #53
+      _let
+        x
+        Int
+        #42
+        _int
+          0
+        : _no_type
+        #52
+        _let
+          y
+          Int
+          #43
+          _int
+            1
+          : _no_type
+          #51
+          _let
+            z
+            Int
+            #44
+            _int
+              2
+            : _no_type
+            #49
+            _typcase
+              #45
+              _object
+                param
+              : _no_type
+              #46
+              _branch
+                x
+                Int
+                #46
+                _int
+                  1
+                : _no_type
+              #47
+              _branch
+                y
+                Int
+                #47
+                _int
+                  2
+                : _no_type
+              #48
+              _branch
+                z
+                Int
+                #48
+                _int
+                  3
+                : _no_type
+            : _no_type
+          : _no_type
+        : _no_type
+      : _no_type
+    #62
+    _method
+      complex_method
+      #56
+      _formal
+        param1
+        Int
+      #56
+      _formal
+        param2
+        Int
+      Int
+      #61
+      _cond
+        #57
+        _lt
+          #57
+          _object
+            param1
+          : _no_type
+          #57
+          _object
+            param2
+          : _no_type
+        : _no_type
+        #58
+        _dispatch
+          #58
+          _object
+            self
+          : _no_type
+          method_multiple_params
+          (
+          #58
+          _object
+            param1
+          : _no_type
+          #58
+          _object
+            param2
+          : _no_type
+          #58
+          _plus
+            #58
+            _object
+              param1
+            : _no_type
+            #58
+            _object
+              param2
+            : _no_type
+          : _no_type
+          )
+        : _no_type
+        #61
+        _sub
+          #60
+          _object
+            param1
+          : _no_type
+          #61
+          _object
+            param2
+          : _no_type
+        : _no_type
+      : _no_type
+    )
