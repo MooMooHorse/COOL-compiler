@@ -1,0 +1,33 @@
+#name "bison_test_bad.cl"
+#11 CLASS
+#11 TYPEID A
+#11 '{'
+#12 '}'
+#12 ';'
+#15 CLASS
+#15 OBJECTID b
+#15 INHERITS
+#15 TYPEID A
+#15 '{'
+#16 '}'
+#16 ';'
+#19 CLASS
+#19 TYPEID C
+#19 INHERITS
+#19 OBJECTID a
+#19 '{'
+#20 '}'
+#20 ';'
+#23 CLASS
+#23 TYPEID D
+#23 OBJECTID inherts
+#23 TYPEID A
+#23 '{'
+#24 '}'
+#24 ';'
+#27 CLASS
+#27 TYPEID E
+#27 INHERITS
+#27 TYPEID A
+#27 '{'
+#28 ';'

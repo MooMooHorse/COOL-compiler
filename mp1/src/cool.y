@@ -131,14 +131,6 @@ class_list
                 { $$ = single_Classes($1); }
         | class_list class /* several classes */
                 { $$ = append_Classes($1,single_Classes($2)); }
-        | class_list error ';' /* Error handling for class definitions */
-                {
-                    $$ = $1;  /* Skip the erroneous class and continue */
-                }
-        | error ';' class 
-                {
-                    $$ = single_Classes($3);  /* Skip the erroneous class and continue */
-                }
         ;
 
 /* If no parent is specified, the class inherits from the Object class. */
@@ -152,7 +144,7 @@ class:
                 stringtable.add_string(curr_filename) /* Filename */
             );
         }
-  | CLASS TYPEID INHERITS TYPEID '{' feature_list '}' ';'
+    | CLASS TYPEID INHERITS TYPEID '{' feature_list '}' ';'
         {
             $$ = class_(
                 $2, /* Class name */
@@ -161,6 +153,7 @@ class:
                 stringtable.add_string(curr_filename) /* Filename */
             );
         }
+    | error ';' {}
     ;
 
 
