@@ -152,6 +152,7 @@ OF 			   (?i:of)
     if(str_buf_ptr - str_buf + 1 >  STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
     /* String normal termination. Add the string to the string table */
     BEGIN(INITIAL);
+    *str_buf_ptr = '\0';  /* Null-terminate the string */
     yylval.symbol = stringtable.add_string(str_buf);  /* Remove opening quote */
     return STR_CONST;
 }
@@ -207,6 +208,7 @@ OF 			   (?i:of)
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
     /* String normal termination. Add the string to the string table */
     BEGIN(INITIAL);
+    *str_buf_ptr = '\0';  /* Null-terminate the string */
     yylval.symbol = stringtable.add_string(str_buf); 
     return STR_CONST;
 }

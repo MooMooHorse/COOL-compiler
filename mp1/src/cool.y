@@ -275,7 +275,7 @@ let_bindings_list :
       OBJECTID ':' TYPEID optional_assign ',' let_bindings_list
         { $$ = let($1, $3, $4, $6); }
       |
-      error ',' let_bindings_list
+      ERROR ',' let_bindings_list
         {}
     ;
 

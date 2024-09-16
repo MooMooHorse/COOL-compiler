@@ -679,10 +679,10 @@ static const flex_int16_t yy_rule_linenum[76] =
        98,   99,  100,  101,  102,  103,  104,  105,  106,  107,
       108,  112,  116,  117,  118,  119,  120,  121,  122,  123,
       124,  125,  126,  127,  128,  129,  130,  131,  132,  133,
-      134,  136,  140,  147,  151,  158,  166,  170,  173,  178,
-      183,  188,  193,  198,  202,  206,  213,  220,  223,  227,
-      231,  235,  239,  243,  248,  249,  250,  251,  252,  253,
-      254,  259,  261,  262,  264
+      134,  136,  140,  147,  151,  159,  167,  171,  174,  179,
+      184,  189,  194,  199,  203,  207,  215,  222,  225,  229,
+      233,  237,  241,  245,  250,  251,  252,  253,  254,  255,
+      256,  261,  263,  264,  266
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -1356,6 +1356,7 @@ YY_RULE_SETUP
     if(str_buf_ptr - str_buf + 1 >  STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
     /* String normal termination. Add the string to the string table */
     BEGIN(INITIAL);
+    *str_buf_ptr = '\0';  /* Null-terminate the string */
     yylval.symbol = stringtable.add_string(str_buf);  /* Remove opening quote */
     return STR_CONST;
 }
@@ -1363,21 +1364,21 @@ YY_RULE_SETUP
 case 46:
 /* rule 46 can match eol */
 YY_RULE_SETUP
-#line 158 "cool.flex"
+#line 159 "cool.flex"
 {
     curr_lineno++;  /* Increase line number as strings can span multiple lines */
     return ret_err(UNTERMINATED_STRING);
 }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 162 "cool.flex"
+#line 163 "cool.flex"
 {
     return ret_err(STRING_EXCEED_FILE_BOUNDS);
 }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 166 "cool.flex"
+#line 167 "cool.flex"
 {
     return ret_err(EOF_IN_STRING);
 }
@@ -1385,7 +1386,7 @@ YY_RULE_SETUP
 case 48:
 /* rule 48 can match eol */
 YY_RULE_SETUP
-#line 170 "cool.flex"
+#line 171 "cool.flex"
 {
     curr_lineno++;  /* Increase line number as strings can span multiple lines */
 }
@@ -1393,7 +1394,7 @@ YY_RULE_SETUP
 case 49:
 /* rule 49 can match eol */
 YY_RULE_SETUP
-#line 173 "cool.flex"
+#line 174 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = yytext[1];  /* Add the escaped character to the buffer */
@@ -1401,7 +1402,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 178 "cool.flex"
+#line 179 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = '\b';  /* Add the escaped character to the buffer */
@@ -1409,7 +1410,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 183 "cool.flex"
+#line 184 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = '\t';  /* Add the escaped character to the buffer */
@@ -1417,7 +1418,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 188 "cool.flex"
+#line 189 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = '\n';  /* Add the escaped character to the buffer */
@@ -1425,7 +1426,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 193 "cool.flex"
+#line 194 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = '\f';  /* Add the escaped character to the buffer */
@@ -1433,7 +1434,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 198 "cool.flex"
+#line 199 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = yytext[0];  /* Add the character to the buffer */
@@ -1441,7 +1442,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 202 "cool.flex"
+#line 203 "cool.flex"
 { 
     BEGIN(MULTILINE_STRING); 
     str_buf_ptr = str_buf;  /* Reset the buffer pointer */
@@ -1449,11 +1450,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 206 "cool.flex"
+#line 207 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
     /* String normal termination. Add the string to the string table */
     BEGIN(INITIAL);
+    *str_buf_ptr = '\0';  /* Null-terminate the string */
     yylval.symbol = stringtable.add_string(str_buf); 
     return STR_CONST;
 }
@@ -1461,21 +1463,21 @@ YY_RULE_SETUP
 case 57:
 /* rule 57 can match eol */
 YY_RULE_SETUP
-#line 213 "cool.flex"
+#line 215 "cool.flex"
 {
     curr_lineno++;  /* Increment line number */
     *str_buf_ptr++ = '\n';  /* Add newline to the buffer */
 }
 	YY_BREAK
 case YY_STATE_EOF(MULTILINE_STRING):
-#line 217 "cool.flex"
+#line 219 "cool.flex"
 {
     return ret_err(STRING_EXCEED_FILE_BOUNDS);
 }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 220 "cool.flex"
+#line 222 "cool.flex"
 {
     return ret_err(EOF_IN_STRING);
 }
@@ -1483,7 +1485,7 @@ YY_RULE_SETUP
 case 59:
 /* rule 59 can match eol */
 YY_RULE_SETUP
-#line 223 "cool.flex"
+#line 225 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = yytext[1];  /* Add the escaped character to the buffer */
@@ -1491,7 +1493,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 227 "cool.flex"
+#line 229 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = '\b';  /* Add the escaped character to the buffer */
@@ -1499,7 +1501,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 231 "cool.flex"
+#line 233 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = '\t';  /* Add the escaped character to the buffer */
@@ -1507,7 +1509,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 235 "cool.flex"
+#line 237 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = '\n';  /* Add the escaped character to the buffer */
@@ -1515,7 +1517,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 239 "cool.flex"
+#line 241 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = '\f';  /* Add the escaped character to the buffer */
@@ -1523,7 +1525,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 243 "cool.flex"
+#line 245 "cool.flex"
 {
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = yytext[0];  /* Add the character to the buffer */
@@ -1531,76 +1533,76 @@ YY_RULE_SETUP
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 248 "cool.flex"
+#line 250 "cool.flex"
 { /* Skip single-line comments */ }
 	YY_BREAK
 case 66:
 /* rule 66 can match eol */
 YY_RULE_SETUP
-#line 249 "cool.flex"
+#line 251 "cool.flex"
 { curr_lineno++; } /* Skip single-line comment and track newline */
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 250 "cool.flex"
+#line 252 "cool.flex"
 { BEGIN(COMMENT); comment_level = 1; }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 251 "cool.flex"
+#line 253 "cool.flex"
 { comment_level++; }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 252 "cool.flex"
+#line 254 "cool.flex"
 { if (--comment_level == 0) BEGIN(INITIAL); }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 253 "cool.flex"
+#line 255 "cool.flex"
 { /* Ignore other characters inside comment */ }
 	YY_BREAK
 case 71:
 /* rule 71 can match eol */
 YY_RULE_SETUP
-#line 254 "cool.flex"
+#line 256 "cool.flex"
 { curr_lineno++; } /* Track newlines inside comments */
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 255 "cool.flex"
+#line 257 "cool.flex"
 { 
     return ret_err(EOF_IN_COMMENT);  /* Handle EOF inside unclosed multi-line comment */
 }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 259 "cool.flex"
+#line 261 "cool.flex"
 { return ret_err(UNMATCHED_COMMENT); }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 261 "cool.flex"
+#line 263 "cool.flex"
 { /* Ignore spaces, tabs, and carriage returns */ } /* Ignore whitespace */
 	YY_BREAK
 case 74:
 /* rule 74 can match eol */
 YY_RULE_SETUP
-#line 262 "cool.flex"
+#line 264 "cool.flex"
 { curr_lineno++; } /* Increment line number on newline */
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 264 "cool.flex"
+#line 266 "cool.flex"
 {
     return ret_err(UNRECOGNIZED_CHAR);
 }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 267 "cool.flex"
+#line 269 "cool.flex"
 ECHO;
 	YY_BREAK
-#line 1604 "cool.flex.cc"
+#line 1606 "cool.flex.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2749,7 +2751,7 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 267 "cool.flex"
+#line 269 "cool.flex"
 
 
 

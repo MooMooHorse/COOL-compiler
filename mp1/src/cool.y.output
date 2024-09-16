@@ -58,7 +58,7 @@ Grammar
 
    41 let_bindings_list: OBJECTID ':' TYPEID optional_assign IN expr
    42                  | OBJECTID ':' TYPEID optional_assign ',' let_bindings_list
-   43                  | error ',' let_bindings_list
+   43                  | ERROR ',' let_bindings_list
 
    44 expr_list: ε
    45          | expr_list_nonempty
@@ -97,7 +97,7 @@ Terminals, with rules where they appear
     '{' (123) 4 5 8 21
     '}' (125) 4 5 8 21
     '~' (126) 30
-    error (256) 43
+    error (256)
     CLASS (258) 4 5
     ELSE (259) 19
     FI (260) 19
@@ -124,7 +124,7 @@ Terminals, with rules where they appear
     NOT (281) 34
     LE (282) 32
     FOR (283)
-    ERROR (284) 40
+    ERROR (284) 40 43
 
 
 Nonterminals, with rules where they appear
@@ -517,8 +517,8 @@ State 37
 
    22 expr: LET • let_bindings_list
 
-    error     shift, and go to state 54
-    OBJECTID  shift, and go to state 55
+    OBJECTID  shift, and go to state 54
+    ERROR     shift, and go to state 55
 
     let_bindings_list  go to state 56
 
@@ -792,17 +792,17 @@ State 53
 
 State 54
 
-   43 let_bindings_list: error • ',' let_bindings_list
+   41 let_bindings_list: OBJECTID • ':' TYPEID optional_assign IN expr
+   42                  | OBJECTID • ':' TYPEID optional_assign ',' let_bindings_list
 
-    ','  shift, and go to state 79
+    ':'  shift, and go to state 79
 
 
 State 55
 
-   41 let_bindings_list: OBJECTID • ':' TYPEID optional_assign IN expr
-   42                  | OBJECTID • ':' TYPEID optional_assign ',' let_bindings_list
+   43 let_bindings_list: ERROR • ',' let_bindings_list
 
-    ':'  shift, and go to state 80
+    ','  shift, and go to state 80
 
 
 State 56
@@ -1281,20 +1281,20 @@ State 78
 
 State 79
 
-   43 let_bindings_list: error ',' • let_bindings_list
+   41 let_bindings_list: OBJECTID ':' • TYPEID optional_assign IN expr
+   42                  | OBJECTID ':' • TYPEID optional_assign ',' let_bindings_list
 
-    error     shift, and go to state 54
-    OBJECTID  shift, and go to state 55
-
-    let_bindings_list  go to state 102
+    TYPEID  shift, and go to state 102
 
 
 State 80
 
-   41 let_bindings_list: OBJECTID ':' • TYPEID optional_assign IN expr
-   42                  | OBJECTID ':' • TYPEID optional_assign ',' let_bindings_list
+   43 let_bindings_list: ERROR ',' • let_bindings_list
 
-    TYPEID  shift, and go to state 103
+    OBJECTID  shift, and go to state 54
+    ERROR     shift, and go to state 55
+
+    let_bindings_list  go to state 103
 
 
 State 81
@@ -1672,13 +1672,6 @@ State 101
 
 State 102
 
-   43 let_bindings_list: error ',' let_bindings_list •
-
-    $default  reduce using rule 43 (let_bindings_list)
-
-
-State 103
-
    41 let_bindings_list: OBJECTID ':' TYPEID • optional_assign IN expr
    42                  | OBJECTID ':' TYPEID • optional_assign ',' let_bindings_list
 
@@ -1687,6 +1680,13 @@ State 103
     $default  reduce using rule 53 (optional_assign)
 
     optional_assign  go to state 115
+
+
+State 103
+
+   43 let_bindings_list: ERROR ',' let_bindings_list •
+
+    $default  reduce using rule 43 (let_bindings_list)
 
 
 State 104
@@ -1969,8 +1969,8 @@ State 125
 
    42 let_bindings_list: OBJECTID ':' TYPEID optional_assign ',' • let_bindings_list
 
-    error     shift, and go to state 54
-    OBJECTID  shift, and go to state 55
+    OBJECTID  shift, and go to state 54
+    ERROR     shift, and go to state 55
 
     let_bindings_list  go to state 131
 
