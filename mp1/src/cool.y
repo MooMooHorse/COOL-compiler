@@ -135,9 +135,9 @@ class_list
                 {
                     $$ = $1;  /* Skip the erroneous class and continue */
                 }
-        | error class 
+        | error ';' class 
                 {
-                    $$ = single_Classes($2);  /* Skip the erroneous class and continue */
+                    $$ = single_Classes($3);  /* Skip the erroneous class and continue */
                 }
         ;
 
@@ -211,6 +211,10 @@ formal_list_nonempty:
         {
             $$ = $1;  /* Skip the erroneous formal and continue */
         }
+    | error ',' formal
+        {
+            $$ = single_Formals($3);  /* Skip the erroneous formal and continue */
+        }
     ;
 
 formal:
@@ -282,11 +286,10 @@ expr:
 let_bindings_list :
       OBJECTID ':' TYPEID optional_assign IN expr
         { $$ = let($1, $3, $4, $6); }
-      | 
-      OBJECTID ':' TYPEID optional_assign ',' let_bindings_list
+    | OBJECTID ':' TYPEID optional_assign ',' let_bindings_list
         { $$ = let($1, $3, $4, $6); }
-      |
-      error ',' let_bindings_list {}
+    | error ',' let_bindings_list 
+        { $$ = $3; }
     ;
 
 /* Dispatch list */
@@ -307,6 +310,10 @@ expr_list_nonempty:
         {
             $$ = $1;  /* Skip the erroneous expression and continue */
         }
+    | error ',' expr
+        {
+            $$ = single_Expressions($3);
+        }
     ;
 
 /* Case list */
@@ -315,13 +322,13 @@ case_list:
         { $$ = single_Cases($1); }
     | case_list case
         { $$ = append_Cases($1, single_Cases($2)); }
-    | case_list error
+    | case_list error ';'
         {
             $$ = $1;  /* Skip the erroneous case and continue */
         }
-    | error case
+    | error ';' case
         {
-            $$ = single_Cases($2);  /* Skip the erroneous case and continue */
+            $$ = single_Cases($3);  /* Skip the erroneous case and continue */
         }
     ;
 
@@ -338,6 +345,10 @@ expr_seq:
     | expr_seq error ';'
         {
             $$ = $1; /* Skip the erroneous expression and continue */
+        }
+    | error ';' expr ';'
+        {
+            $$ = single_Expressions($3); /* Skip the erroneous expression and continue */
         }
     ;
 
