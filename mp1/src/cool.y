@@ -41,7 +41,6 @@ void yyerror(const char *s);
    of your grade will be for good quality error messages.
 */
 extern int VERBOSE_ERRORS;
-
 %}
 
 /* A union of all the types that can be the result of parsing actions. */
@@ -127,15 +126,15 @@ program : class_list { ast_root = program($1); }
         ;
 
 class_list
-        : class            /* single class */
+        : class ';'           /* single class */
                 { $$ = single_Classes($1); }
-        | class_list class /* several classes */
+        | class_list class ';'/* several classes */
                 { $$ = append_Classes($1,single_Classes($2)); }
         ;
 
 /* If no parent is specified, the class inherits from the Object class. */
 class:
-    CLASS TYPEID '{' feature_list '}' ';'
+    CLASS TYPEID '{' feature_list '}'
         {
             $$ = class_(
                 $2, /* Class name */
@@ -144,7 +143,7 @@ class:
                 stringtable.add_string(curr_filename) /* Filename */
             );
         }
-    | CLASS TYPEID INHERITS TYPEID '{' feature_list '}' ';'
+    | CLASS TYPEID INHERITS TYPEID '{' feature_list '}'
         {
             $$ = class_(
                 $2, /* Class name */
@@ -153,7 +152,10 @@ class:
                 stringtable.add_string(curr_filename) /* Filename */
             );
         }
-    | error ';' {}
+    | CLASS error '{' feature_list '}'
+        {
+            yyerrok;
+        } 
     ;
 
 
@@ -165,7 +167,8 @@ feature_list:
         { $$ = append_Features($1, single_Features($2)); }
     | feature_list error ';'
         {
-            $$ = $1;  /* Skip the erroneous feature and continue */
+            yyerrok;
+            $$ = $1;
         }
     ;
 
@@ -202,10 +205,12 @@ formal_list_nonempty:
         { $$ = append_Formals($1, single_Formals($3)); }
     | formal_list_nonempty ',' error
         {
+            yyerrok;
             $$ = $1;  /* Skip the erroneous formal and continue */
         }
     | error ',' formal
         {
+            yyerrok;
             $$ = single_Formals($3);  /* Skip the erroneous formal and continue */
         }
     ;
@@ -282,7 +287,7 @@ let_bindings_list :
     | OBJECTID ':' TYPEID optional_assign ',' let_bindings_list
         { $$ = let($1, $3, $4, $6); }
     | error ',' let_bindings_list 
-        { $$ = $3; }
+        { yyerrok; $$ = $3; }
     ;
 
 /* Dispatch list */
@@ -337,10 +342,12 @@ expr_seq:
         { $$ = append_Expressions($1, single_Expressions($2)); }
     | expr_seq error ';'
         {
+            yyerrok;
             $$ = $1; /* Skip the erroneous expression and continue */
         }
     | error ';' expr ';'
         {
+            yyerrok;
             $$ = single_Expressions($3); /* Skip the erroneous expression and continue */
         }
     ;

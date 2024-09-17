@@ -27,3 +27,6 @@ Class D inherts A {
 Class E inherits A {
 ;
 
+(* error:  keyword inherits is misspelled *)
+Class D inherts A {
+};
