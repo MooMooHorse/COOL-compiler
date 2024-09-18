@@ -306,10 +306,12 @@ expr_list_nonempty:
         { $$ = append_Expressions($1, single_Expressions($3)); }
     | expr_list_nonempty ',' error
         {
+            yyerrok;
             $$ = $1;  /* Skip the erroneous expression and continue */
         }
     | error ',' expr
         {
+            yyerrok;
             $$ = single_Expressions($3);
         }
     ;
@@ -322,10 +324,12 @@ case_list:
         { $$ = append_Cases($1, single_Cases($2)); }
     | case_list error ';'
         {
+            yyerrok;
             $$ = $1;  /* Skip the erroneous case and continue */
         }
     | error ';' case
         {
+            yyerrok;
             $$ = single_Cases($3);  /* Skip the erroneous case and continue */
         }
     ;

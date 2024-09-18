@@ -81,7 +81,7 @@ ESAC       (?i:esac)
 NEW        (?i:new)
 ISVOID     (?i:isvoid)
 NOT        (?i:not)
-OF 			   (?i:of)
+OF 		   (?i:of)
 
 
 %%
@@ -105,6 +105,9 @@ OF 			   (?i:of)
 {OF}            { return OF; }
 "true"          { yylval.boolean = true; return BOOL_CONST; }
 "false"         { yylval.boolean = false; return BOOL_CONST; }
+
+
+
 {uppercase}{identifier} { 
     yylval.symbol = idtable.add_string(yytext);
     return TYPEID;    
@@ -149,7 +152,7 @@ OF 			   (?i:of)
     str_buf_ptr = str_buf;  /* Reset the buffer pointer */
 }
 <STRING>\" { 
-    if(str_buf_ptr - str_buf + 1 >  STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
+    if(str_buf_ptr - str_buf >  STR_MAX_LEN)  return ret_err(STR_MAX_LEN_ERROR);
     /* String normal termination. Add the string to the string table */
     BEGIN(INITIAL);
     *str_buf_ptr = '\0';  /* Null-terminate the string */
@@ -172,40 +175,40 @@ OF 			   (?i:of)
     curr_lineno++;  /* Increase line number as strings can span multiple lines */
 }
 <STRING>\\[^btnf] {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
-    *str_buf_ptr++ = yytext[1];  /* Add the escaped character to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1) 
+        *str_buf_ptr++ = yytext[1];  /* Add the escaped character to the buffer */
 }
 
 <STRING>\\[b] {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
-    *str_buf_ptr++ = '\b';  /* Add the escaped character to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1)  
+        *str_buf_ptr++ = '\b';  /* Add the escaped character to the buffer */
 }
 
 <STRING>\\[t] {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
-    *str_buf_ptr++ = '\t';  /* Add the escaped character to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1)  
+        *str_buf_ptr++ = '\t';  /* Add the escaped character to the buffer */
 }
 
 <STRING>\\[n] {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
-    *str_buf_ptr++ = '\n';  /* Add the escaped character to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1) 
+        *str_buf_ptr++ = '\n';  /* Add the escaped character to the buffer */
 }
 
 <STRING>\\[f] {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
-    *str_buf_ptr++ = '\f';  /* Add the escaped character to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1) 
+        *str_buf_ptr++ = '\f';  /* Add the escaped character to the buffer */
 }
 
 <STRING>. {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
-    *str_buf_ptr++ = yytext[0];  /* Add the character to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1) 
+        *str_buf_ptr++ = yytext[0];  /* Add the character to the buffer */
 }
 \"\"\" { 
     BEGIN(MULTILINE_STRING); 
     str_buf_ptr = str_buf;  /* Reset the buffer pointer */
 }
 <MULTILINE_STRING>\"\"\" {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
+    if(str_buf_ptr - str_buf > STR_MAX_LEN) return ret_err(STR_MAX_LEN_ERROR);
     /* String normal termination. Add the string to the string table */
     BEGIN(INITIAL);
     *str_buf_ptr = '\0';  /* Null-terminate the string */
@@ -223,28 +226,28 @@ OF 			   (?i:of)
     return ret_err(EOF_IN_STRING);
 }
 <MULTILINE_STRING>\\[^btnf] {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
-    *str_buf_ptr++ = yytext[1];  /* Add the escaped character to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1) 
+        *str_buf_ptr++ = yytext[1];  /* Add the escaped character to the buffer */
 }
 <MULTILINE_STRING>\\[b] {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
-    *str_buf_ptr++ = '\b';  /* Add the escaped character to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1)
+        *str_buf_ptr++ = '\b';  /* Add the escaped character to the buffer */
 }
 <MULTILINE_STRING>\\[t] {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
-    *str_buf_ptr++ = '\t';  /* Add the escaped character to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1)
+        *str_buf_ptr++ = '\t';  /* Add the escaped character to the buffer */
 }
 <MULTILINE_STRING>\\[n] {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
-    *str_buf_ptr++ = '\n';  /* Add the escaped character to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1) 
+        *str_buf_ptr++ = '\n';  /* Add the escaped character to the buffer */
 }
 <MULTILINE_STRING>\\[f] {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
-    *str_buf_ptr++ = '\f';  /* Add the escaped character to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1) 
+        *str_buf_ptr++ = '\f';  /* Add the escaped character to the buffer */
 }
 <MULTILINE_STRING>. {
-    if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1) return ret_err(STR_MAX_LEN_ERROR);
-    *str_buf_ptr++ = yytext[0];  /* Add the character to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1) 
+        *str_buf_ptr++ = yytext[0];  /* Add the character to the buffer */
 }
 
 "--".*        { /* Skip single-line comments */ }
@@ -302,3 +305,4 @@ int ret_err(cool_lex_error_t err) {
     }
     return ERROR;
 }
+
