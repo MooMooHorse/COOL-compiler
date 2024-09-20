@@ -1,2 +1,0 @@
-#name "flex_crazy.cl"
-#3 STR_CONST "\n    abc\n"

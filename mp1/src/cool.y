@@ -278,16 +278,20 @@ expr:
         { $$ = string_const($1); }
     | BOOL_CONST
         { $$ = bool_const($1); }
-    | for_expr
-        { $$ = $1; }
+    | FOR '(' for_expr
+        { $$ = $3; }
     ;
 
 for_expr: 
-    OBJECTID ':' TYPEID optional_assign  ';' expr ';' expr ')' '{' expr_seq '}'
-        { $$ = let($1, $3, $4, loop($6, block(append_Expressions(single_Expressions($8), $11)))); }
+    OBJECTID ':' TYPEID optional_assign  ';' expr ';' expr ')' '{' expr '}'
+        { $$ = let($1, $3, $4, loop($6, block(append_Expressions(single_Expressions($11), single_Expressions($8))))); }
     | OBJECTID ':' TYPEID optional_assign ',' for_expr
         { $$ = let($1, $3, $4, $6); }
-
+    | error ',' for_expr
+        { yyerrok; $$ = $3; }
+    | error ';' expr ';' expr ')' '{' expr '}'
+        { yyerrok; $$ = loop($3, block(append_Expressions(single_Expressions($8), single_Expressions($5)))); }
+    ;
 
 let_bindings_list :
       OBJECTID ':' TYPEID optional_assign IN expr
@@ -295,6 +299,8 @@ let_bindings_list :
     | OBJECTID ':' TYPEID optional_assign ',' let_bindings_list
         { $$ = let($1, $3, $4, $6); }
     | error ',' let_bindings_list 
+        { yyerrok; $$ = $3; }
+    | error IN expr
         { yyerrok; $$ = $3; }
     ;
 
