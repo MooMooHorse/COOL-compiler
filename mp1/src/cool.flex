@@ -140,13 +140,11 @@ OF 		   (?i:of)
     yylval.symbol = inttable.add_string(yytext); 
     return INT_CONST; 
 }
-0x{hexdigit}+   { 
-    int value = (int)strtol(yytext, NULL, 16); 
-    char buffer[32];
-    sprintf((char*)buffer, "%d", value);
-    yylval.symbol = inttable.add_string(buffer);
+0x{hexdigit}+   {
+    yylval.symbol = inttable.add_string(hex2dec(yytext));
     return INT_CONST;
 }
+
 \" { 
     BEGIN(STRING); 
     str_buf_ptr = str_buf;  /* Reset the buffer pointer */
@@ -160,7 +158,7 @@ OF 		   (?i:of)
     return STR_CONST;
 }
 <STRING>\n {
-    curr_lineno++;  /* Increase line number as strings can span multiple lines */
+    curr_lineno++;  
     return ret_err(UNTERMINATED_STRING);
 }
 <STRING><<EOF>> {
@@ -173,6 +171,8 @@ OF 		   (?i:of)
 
 <STRING>\\\n {
     curr_lineno++;  /* Increase line number as strings can span multiple lines */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1) 
+        *str_buf_ptr++ = '\n';  /* Add newline to the buffer */
 }
 <STRING>\\[^btnf] {
     if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1) 
@@ -217,7 +217,8 @@ OF 		   (?i:of)
 }
 <MULTILINE_STRING>\n {
     curr_lineno++;  /* Increment line number */
-    *str_buf_ptr++ = '\n';  /* Add newline to the buffer */
+    if(str_buf_ptr - str_buf + 1 <= STR_MAX_LEN + 1) 
+        *str_buf_ptr++ = '\n';  /* Add newline to the buffer */
 }
 <MULTILINE_STRING><<EOF>> {
     return ret_err(STRING_EXCEED_FILE_BOUNDS);

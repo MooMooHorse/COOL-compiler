@@ -104,7 +104,7 @@ extern int VERBOSE_ERRORS;
 %type <expression> optional_assign
 %type <expressions> expr_seq
 %type <expression> let_bindings_list
-
+%type <expression> for_expr
 
 /* Precedence declarations go here. */
 %left IN
@@ -278,7 +278,15 @@ expr:
         { $$ = string_const($1); }
     | BOOL_CONST
         { $$ = bool_const($1); }
+    | for_expr
+        { $$ = $1; }
     ;
+
+for_expr: 
+    OBJECTID ':' TYPEID optional_assign  ';' expr ';' expr ')' '{' expr_seq '}'
+        { $$ = let($1, $3, $4, loop($6, block(append_Expressions(single_Expressions($8), $11)))); }
+    | OBJECTID ':' TYPEID optional_assign ',' for_expr
+        { $$ = let($1, $3, $4, $6); }
 
 
 let_bindings_list :
