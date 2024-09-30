@@ -1,6 +1,6 @@
 # multi-line string generation prompt
-
-```
+LLM setup: GPT4-o1 preview
+### Q
 This is a normal flex string handling for the following spec
 
 10.2 Strings
@@ -19,7 +19,7 @@ A string may not contain EOF. A string may not contain the null (character \0). 
 may be included in a string. Strings cannot cross file boundaries.
 
 
-
+```
 /* --- Strings --- */
 /* Start of a string, enter the STRING state */
 \" { 
@@ -86,7 +86,7 @@ may be included in a string. Strings cannot cross file boundaries.
     if(str_buf_ptr - str_buf + 1 > STR_MAX_LEN + 1)  return ret_err(STR_MAX_LEN_ERROR);
     *str_buf_ptr++ = yytext[0];  /* Add the character to the buffer */
 }
-
+```
 Now I want to support a python style multi-line string
 Python-style multi-line string delimited by 3 double quotes """ on each side.
 • All the character escaping requirements of Cool’s single-line string still apply, except that unescaped
@@ -94,10 +94,9 @@ newline character is accepted in multi-line strings.
 • Unlike multi-line comments in Cool, multi-line strings will not be nested.
 This change is to be handled in your lexer only.
 
-
 Continue my work below:
 
-
+```
 /* --- Python-style Multi-line String Handling (MULTILINE_STRING state) --- */
 
 \"\"\" { 
