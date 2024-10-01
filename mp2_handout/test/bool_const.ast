@@ -1,0 +1,17 @@
+#5
+_program
+  #5
+  _class
+    Main
+    Object
+    "bool_const.cl"
+    (
+    #4
+    _method
+      main
+      Bool
+      #3
+      _bool
+        0
+      : Bool
+    )

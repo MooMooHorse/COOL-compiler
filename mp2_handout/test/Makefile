@@ -19,6 +19,7 @@ ifeq ($(mp3),true)
   COOLRT = ../reference-binaries/coolrt.o
 else
   CGEN = cgen-1
+  CGENREF = ../reference-binaries/cgen-1
   COOLRT =
 endif
 
@@ -45,6 +46,9 @@ cgen-2:
 
 %.ll: %.ast $(CGEN)
 	$(proj_dir)/$(CGEN) $(CGENOPTS) < $< > $@
+
+%.refll : %.ast $(CGENREF)
+	$(CGENREF) $(CGENOPTS) < $< > $@
 
 %-o3.ll: %.ll
 	$(OPT) -O3 -S $< -f -o $*-o3.ll
