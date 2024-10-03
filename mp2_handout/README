@@ -91,3 +91,23 @@ From the support code:
     // ...
   }
   ```
+
+## Roadmap
+
+- Implement virtual function that calls Main.main() in `cgen.cc`.
+
+- Implement the Int and Bool constant classes in `cgen.cc`. (This implies calling `this->expr->code()` in `method_class::code()`)
+
+- Implement arithmetic, comparison, and block expressions in `cgen.cc`. (tested for constant operations, need to test comparision & block) [Thursday]
+
+- Implement let (make_alloc & code) [Friday night]
+
+- Implement object and no_expr  [Saturday]
+
+- Implement assignment (symbol tables, many testing until stable) [Saturday]
+
+- Implement loop and if-else [Monday]
+
+- Implement error handling (runtime, divide by zero) [Monday]
+
+- Check [Rest of the next week]

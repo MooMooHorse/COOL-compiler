@@ -1,0 +1,24 @@
+#5
+_program
+  #5
+  _class
+    Main
+    Object
+    "add.cl"
+    (
+    #4
+    _method
+      main
+      Int
+      #4
+      _plus
+        #3
+        _int
+          3
+        : Int
+        #3
+        _int
+          2
+        : Int
+      : Int
+    )

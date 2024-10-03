@@ -1,0 +1,74 @@
+#12
+_program
+  #12
+  _class
+    Main
+    Object
+    "let.cl"
+    (
+    #11
+    _method
+      main
+      Int
+      #11
+      _let
+        x
+        Int
+        #3
+        _int
+          3
+        : Int
+        #11
+        _let
+          y
+          Int
+          #3
+          _int
+            2
+          : Int
+          #10
+          _block
+            #6
+            _let
+              x
+              Int
+              #4
+              _int
+                2
+              : Int
+              #6
+              _plus
+                #5
+                _object
+                  x
+                : Int
+                #6
+                _object
+                  y
+                : Int
+              : Int
+            : Int
+            #9
+            _let
+              y
+              Int
+              #7
+              _int
+                2
+              : Int
+              #9
+              _plus
+                #8
+                _object
+                  x
+                : Int
+                #9
+                _object
+                  y
+                : Int
+              : Int
+            : Int
+          : Int
+        : Int
+      : Int
+    )

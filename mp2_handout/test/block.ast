@@ -1,0 +1,85 @@
+#13
+_program
+  #13
+  _class
+    Main
+    Object
+    "block.cl"
+    (
+    #12
+    _method
+      main
+      Int
+      #11
+      _block
+        #4
+        _comp
+          #4
+          _bool
+            1
+          : Bool
+        : Bool
+        #5
+        _neg
+          #5
+          _int
+            1
+          : Int
+        : Int
+        #6
+        _leq
+          #6
+          _int
+            3
+          : Int
+          #6
+          _int
+            2
+          : Int
+        : Bool
+        #7
+        _lt
+          #7
+          _int
+            3
+          : Int
+          #7
+          _int
+            2
+          : Int
+        : Bool
+        #8
+        _sub
+          #8
+          _int
+            3
+          : Int
+          #8
+          _int
+            2
+          : Int
+        : Int
+        #9
+        _eq
+          #9
+          _int
+            3
+          : Int
+          #9
+          _int
+            2
+          : Int
+        : Bool
+        #10
+        _mul
+          #10
+          _int
+            4
+          : Int
+          #10
+          _int
+            2
+          : Int
+        : Int
+      : Int
+    )

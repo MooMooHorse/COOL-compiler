@@ -1,0 +1,24 @@
+#5
+_program
+  #5
+  _class
+    Main
+    Object
+    "div.cl"
+    (
+    #4
+    _method
+      main
+      Int
+      #4
+      _divide
+        #3
+        _int
+          4
+        : Int
+        #3
+        _int
+          2
+        : Int
+      : Int
+    )
