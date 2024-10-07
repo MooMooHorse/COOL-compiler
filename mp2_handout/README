@@ -106,6 +106,8 @@ From the support code:
 
 - Implement assignment (symbol tables, many testing until stable) [Saturday]
 
+<- at this point right now.
+
 - Implement loop and if-else [Monday]
 
 - Implement error handling (runtime, divide by zero) [Monday]

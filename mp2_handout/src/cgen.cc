@@ -708,20 +708,65 @@ operand assign_class::code(CgenEnvironment *env)
 
 operand cond_class::code(CgenEnvironment *env)
 {
+    ValuePrinter vp(*env->cur_stream);
     if (cgen_debug)
         std::cerr << "cond" << std::endl;
 
-    // TODO: add code here and replace `return operand()`
-    return operand();
+    operand* result = env->remove_alloca();
+
+    operand cond = this->pred->code(env);
+
+    // Create the blocks
+    std::string then_label = env->new_label("then", true);
+    std::string else_label = env->new_label("else", true);
+    std::string merge_label = env->new_label("ifcont", true);
+
+    // Branch based on the condition
+    vp.branch_cond(cond, then_label, else_label);
+
+    // Emit the 'then' code
+    vp.begin_block(else_label);
+    operand els = this->else_exp->code(env);
+    vp.store(els, *result);
+    vp.branch_uncond(merge_label);
+
+    vp.begin_block(then_label);
+    operand then = this->then_exp->code(env);
+    vp.store(then, *result);
+    vp.branch_uncond(merge_label);
+
+    vp.begin_block(merge_label);
+    operand loaded_result = vp.load(result->get_type().get_deref_type(), *result);
+
+    return loaded_result;
 }
 
 operand loop_class::code(CgenEnvironment *env)
 {
+    ValuePrinter vp(*env->cur_stream);
     if (cgen_debug)
         std::cerr << "loop" << std::endl;
 
-    // TODO: add code here and replace `return operand()`
-    return operand();
+    std::string header_label = env->new_label("loop", true);
+    std::string body_label = env->new_label("loop.body", true);
+    std::string end_label = env->new_label("loop.end", true);
+
+    vp.branch_uncond(header_label);
+
+    vp.begin_block(header_label);
+    operand cond = this->pred->code(env);
+    vp.branch_cond(cond, body_label, end_label);
+
+    vp.begin_block(body_label);
+    operand body = this->body->code(env);
+    vp.branch_uncond(header_label);
+
+    vp.begin_block(end_label);
+
+    // For MP2 the return value of loop  is i32 0
+    operand result = const_value(op_type(INT32), "0", true);
+
+    return result;
 }
 
 operand block_class::code(CgenEnvironment *env)
@@ -1084,10 +1129,15 @@ void assign_class::make_alloca(CgenEnvironment *env)
 
 void cond_class::make_alloca(CgenEnvironment *env)
 {
+    ValuePrinter vp(*env->cur_stream);
     if (cgen_debug)
         std::cerr << "cond" << std::endl;
     
-    // TODO     : add code here
+    // MP2 assumes the branches to be of the same type
+    op_type _type = op_type(_optype_name_to_op_type_id(this->then_exp->get_type()->get_string()));
+    operand* _alloca = new operand(_type.get_ptr_type(), env->new_name());
+    vp.alloca_mem(*env->cur_stream, _type, *_alloca); // emit an alloca command
+    env->add_alloca(_alloca);
 
     this->pred->make_alloca(env);
     this->then_exp->make_alloca(env);
@@ -1111,7 +1161,7 @@ void block_class::make_alloca(CgenEnvironment *env)
         std::cerr << "block" << std::endl;
 
 
-    for (int i = body->first(); body->more(i); i = body->next(i))
+    for (int i = this->body->first(); this->body->more(i); i = this->body->next(i))
     {
         this->body->nth(i)->make_alloca(env);
     }
