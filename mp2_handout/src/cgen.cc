@@ -764,9 +764,7 @@ operand loop_class::code(CgenEnvironment *env)
     vp.begin_block(end_label);
 
     // For MP2 the return value of loop  is i32 0
-    operand result = const_value(op_type(INT32), "0", true);
-
-    return result;
+    return int_value(0);
 }
 
 operand block_class::code(CgenEnvironment *env)
@@ -859,11 +857,18 @@ operand divide_class::code(CgenEnvironment *env)
     ValuePrinter vp(*env->cur_stream);
     operand lhs = this->e1->code(env);
     operand rhs = this->e2->code(env);
-    operand result = vp.div(lhs, rhs);
 
     if (cgen_debug)
         std::cerr << "div" << std::endl;
+    std::string no_abort = env->new_ok_label();
+    // if division by zero, abort
+    operand zero = int_value(0);
+    operand cond = vp.icmp(EQ, rhs, zero);
+    vp.branch_cond(cond, "abort", no_abort);
 
+    vp.begin_block(no_abort);
+    operand result = vp.div(lhs, rhs);
+    
     return result;
 }
 
