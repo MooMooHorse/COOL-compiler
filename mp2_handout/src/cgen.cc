@@ -939,8 +939,8 @@ operand int_const_class::code(CgenEnvironment *env)
     ValuePrinter vp(*env->cur_stream);
     if (cgen_debug)
         std::cerr << "Integer Constant" << std::endl;
-
-    return int_value(std::stoi(token->get_string()));
+    
+    return int_value(std::stoll(token->get_string()));
 }
 
 operand bool_const_class::code(CgenEnvironment *env)
