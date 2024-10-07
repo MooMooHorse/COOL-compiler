@@ -5,7 +5,22 @@ declare i8* @malloc(i32)
 define i32 @Main.main() {
 
 entry:
-	ret i1 true
+	%tmp.0 = alloca i32
+	%tmp.1 = alloca i32
+	store i32 3, i32* %tmp.0
+	store i32 2, i32* %tmp.1
+	%tmp.2 = load i32, i32* %tmp.0
+	%tmp.3 = load i32, i32* %tmp.0
+	%tmp.4 = load i32, i32* %tmp.1
+	%tmp.5 = add i32 %tmp.3, %tmp.4
+	store i32 %tmp.5, i32* %tmp.0
+	%tmp.6 = add i32 %tmp.2, %tmp.5
+	store i32 %tmp.6, i32* %tmp.1
+	%tmp.7 = load i32, i32* %tmp.0
+	%tmp.8 = load i32, i32* %tmp.1
+	%tmp.9 = add i32 %tmp.7, %tmp.8
+	store i32 %tmp.9, i32* %tmp.1
+	ret i32 %tmp.9
 
 abort:
 	call void @abort(  )

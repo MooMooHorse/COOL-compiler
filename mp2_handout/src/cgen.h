@@ -17,6 +17,7 @@
 #include "symtab.h"
 #include "value_printer.h"
 #include <map>
+#include <queue>
 
 class CgenNode;
 
@@ -151,7 +152,7 @@ public:
   // constructor.
   CgenEnvironment(std::ostream &stream, CgenNode *cur_class)
       : var_table(), cur_class(cur_class), block_count(0), tmp_count(0),
-        ok_count(0), cur_stream(&stream) {
+        ok_count(0), alloca_queue(), cur_stream(&stream) {
     var_table.enterscope();
     // TODO: add code here
   }
@@ -178,15 +179,31 @@ public:
   void open_scope() { var_table.enterscope(); }
   void close_scope() { var_table.exitscope(); }
 
-  // TODO: Add more functions as necessary.
+  // TODO: Add more functions as necessary
 
+  /**
+   * Add an alloca instruction to the queue
+   * @param op the alloca instruction to add (must be allocated in heap)
+   */
+  void add_alloca(operand *op) { alloca_queue.push(op); }
+
+  /**
+   * Remove the next alloca instruction from the queue
+   * @return the next alloca instruction
+   * @note caller MUST free the returned operand after using it.
+   */
+  operand* remove_alloca() { 
+    operand* op = alloca_queue.front();
+    alloca_queue.pop();
+    return op;
+  }
 private:
   cool::SymbolTable<operand>
       var_table; // mapping from variable names to memory locations
   CgenNode *cur_class;
   int block_count, tmp_count, ok_count; // Keep counters for unique name
                                         // generation in the current method
-
+  std::queue<operand*> alloca_queue; // Keep track of all alloca instructions
 public:
   std::ostream *cur_stream;
 };

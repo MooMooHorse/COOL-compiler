@@ -1,0 +1,37 @@
+#6
+_program
+  #6
+  _class
+    Main
+    Object
+    "letbool.cl"
+    (
+    #5
+    _method
+      main
+      Int
+      #5
+      _let
+        x
+        Bool
+        #3
+        _bool
+          1
+        : Bool
+        #4
+        _cond
+          #4
+          _object
+            x
+          : Bool
+          #4
+          _int
+            1
+          : Int
+          #4
+          _int
+            0
+          : Int
+        : Int
+      : Int
+    )

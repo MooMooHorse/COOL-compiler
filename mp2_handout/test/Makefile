@@ -53,14 +53,18 @@ cgen-2:
 %-o3.ll: %.ll
 	$(OPT) -O3 -S $< -f -o $*-o3.ll
 
+
 %.bin: %-o3.ll $(COOLRT)
 	$(CLANG) -g $+ -o $@
+
 
 %.verify: %.ll
 	$(OPT) -S -verify $<
 
+
 %.out: %.bin
 	./$< > $@ || true
+
 
 %.check: %.out
 	diff -u $< $(<:%.out=%.refout)
