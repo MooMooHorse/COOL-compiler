@@ -7,19 +7,31 @@ define i32 @Main.main() {
 entry:
 	%tmp.0 = alloca i32
 	%tmp.1 = alloca i32
-	store i32 3, i32* %tmp.0
-	store i32 2, i32* %tmp.1
-	%vtpm.0 = load i32, i32* %tmp.0
-	%vtpm.1 = load i32, i32* %tmp.0
+	%tmp.2 = alloca i32
+	%tmp.3 = alloca i32
+	store i32 1, i32* %tmp.0
+	store i32 999, i32* %tmp.1
+	store i32 1, i32* %tmp.2
+	store i32 1, i32* %tmp.3
+	br label %loop0
+
+loop0:
+	%vtpm.0 = load i32, i32* %tmp.2
+	%vtpm.1 = icmp sle i32 %vtpm.0, 10
+	br i1 %vtpm.1, label %loop.body1, label %loop.end2
+
+loop.body1:
 	%vtpm.2 = load i32, i32* %tmp.1
-	%vtpm.3 = add i32 %vtpm.1, %vtpm.2
-	store i32 %vtpm.3, i32* %tmp.0
-	%vtpm.4 = add i32 %vtpm.0, %vtpm.3
-	store i32 %vtpm.4, i32* %tmp.1
-	%vtpm.5 = load i32, i32* %tmp.0
+	%vtpm.3 = add i32 %vtpm.2, 1
+	store i32 %vtpm.3, i32* %tmp.1
+	%vtpm.4 = load i32, i32* %tmp.2
+	%vtpm.5 = add i32 %vtpm.4, 1
+	store i32 %vtpm.5, i32* %tmp.2
+	br label %loop0
+
+loop.end2:
 	%vtpm.6 = load i32, i32* %tmp.1
-	%vtpm.7 = add i32 %vtpm.5, %vtpm.6
-	store i32 %vtpm.7, i32* %tmp.1
+	%vtpm.7 = sub i32 0, %vtpm.6
 	ret i32 %vtpm.7
 
 abort:

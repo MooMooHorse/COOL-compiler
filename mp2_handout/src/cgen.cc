@@ -1,6 +1,8 @@
 /*********************************************************************
  Intermediate code generator for COOL: SKELETON
 
+ The following code is assisted by Github Copilot.
+
  Read the comments carefully and add code to build an LLVM program
 *********************************************************************/
 

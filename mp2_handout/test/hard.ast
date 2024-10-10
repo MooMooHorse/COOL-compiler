@@ -1,0 +1,109 @@
+#12
+_program
+  #12
+  _class
+    Main
+    Object
+    "hard.cl"
+    (
+    #11
+    _method
+      main
+      Int
+      #10
+      _block
+        #9
+        _let
+          x
+          Int
+          #4
+          _int
+            1
+          : Int
+          #9
+          _let
+            z
+            Int
+            #4
+            _int
+              999
+            : Int
+            #9
+            _block
+              #7
+              _let
+                x
+                Int
+                #5
+                _int
+                  1
+                : Int
+                #7
+                _let
+                  y
+                  Int
+                  #5
+                  _int
+                    1
+                  : Int
+                  #7
+                  _loop
+                    #5
+                    _leq
+                      #5
+                      _object
+                        x
+                      : Int
+                      #5
+                      _int
+                        10
+                      : Int
+                    : Bool
+                    #7
+                    _block
+                      #7
+                      _assign
+                        z
+                        #7
+                        _plus
+                          #6
+                          _object
+                            z
+                          : Int
+                          #6
+                          _int
+                            1
+                          : Int
+                        : Int
+                      : Int
+                      #5
+                      _assign
+                        x
+                        #5
+                        _plus
+                          #5
+                          _object
+                            x
+                          : Int
+                          #5
+                          _int
+                            1
+                          : Int
+                        : Int
+                      : Int
+                    : Int
+                  : Object
+                : Object
+              : Object
+              #8
+              _neg
+                #8
+                _object
+                  z
+                : Int
+              : Int
+            : Int
+          : Int
+        : Int
+      : Int
+    )

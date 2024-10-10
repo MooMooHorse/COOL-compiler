@@ -47,8 +47,8 @@ cgen-2:
 %.ll: %.ast $(CGEN)
 	$(proj_dir)/$(CGEN) $(CGENOPTS) < $< > $@
 
-%.refll : %.ast $(CGENREF)
-	$(CGENREF) $(CGENOPTS) < $< > $@
+# %.ll : %.ast $(CGENREF)
+# 	$(CGENREF) $(CGENOPTS) < $< > $@
 
 %-o3.ll: %.ll
 	$(OPT) -O3 -S $< -f -o $*-o3.ll
