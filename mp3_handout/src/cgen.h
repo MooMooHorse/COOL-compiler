@@ -18,8 +18,10 @@
 #include "value_printer.h"
 #include <map>
 #include <queue>
+#define MP3
 
 class CgenNode;
+
 
 // CgenClassTable represents the top level of a Cool program, which is
 // basically a list of classes. The class table is used to look up classes

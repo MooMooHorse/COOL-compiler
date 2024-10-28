@@ -11,7 +11,6 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#define MP3
 
 extern int cgen_debug, curr_lineno;
 
@@ -543,11 +542,24 @@ void CgenNode::setup(int tag, int depth)
 }
 
 #ifdef MP3
+
+
 // Laying out the features involves creating a Function for each method
 // and assigning each attribute a slot in the class structure.
 void CgenNode::layout_features()
 {
+    ValuePrinter vp(*ct_stream);
     // TODO: add code here
+    for(int _feature = features->first(); features->more(_feature); _feature = features->next(_feature)) {
+        method_class* method = (method_class *)features->nth(_feature);
+        op_type func_ret_type(method->get_return_type()->get_string());
+        std::vector<op_type> func_args;
+        for (auto formal: method->get_formals()) {
+            func_args.push_back(op_type(formal->get_type_decl()->get_string()));
+        }
+        vp.declare(func_ret_type, method->get_name()->get_string(), func_args);
+    }
+
 }
 
 // Class codegen. This should performed after every class has been setup.
@@ -976,6 +988,12 @@ operand no_expr_class::code(CgenEnvironment *env)
     return operand();
 }
 
+using std::string;
+using std::cerr;
+using std::endl;
+
+
+#ifdef WORKING_ON_COND
 // Retrieve the class tag from an object record.
 // src is the object we need the tag from.
 // src_class is the CgenNode for the *static* class of the expression.
@@ -1204,6 +1222,8 @@ void branch_class::make_alloca(CgenEnvironment *env)
         cerr << "Done branch_class::make_alloca()" << endl;
 #endif
 }
+
+#endif
 
 //*****************************************************************
 // The next few functions are for node types not supported in Phase 1

@@ -88,7 +88,9 @@ typedef Cases_class *Cases;
   void code(CgenEnvironment *env);
 
 #define method_EXTRAS                                                          \
-  virtual Symbol get_return_type() { return return_type; }
+  virtual Symbol get_return_type() { return return_type; }                     \
+  virtual Symbol get_name() { return name; }                                   \
+  virtual Formals get_formals() { return formals; }                            
 
 #define Formal_EXTRAS                                                          \
   virtual Symbol get_type_decl() = 0; /* ## */                                 \
