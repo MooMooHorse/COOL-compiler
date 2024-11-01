@@ -94,13 +94,14 @@ public:
       std::string name;
       VtableEntry(Symbol name) : name(name->get_string()) {}
       VtableEntry(std::string name) : name(name) {}
+      virtual ~VtableEntry() = default;
   };
 
   class ConstEntry: public VtableEntry {
     public:
       op_type type;
-      operand value;
-      ConstEntry(std::string name, op_type type, operand value) : VtableEntry(name), type(type), value(value) {}
+      const_value value;
+      ConstEntry(std::string name, op_type type, const_value value) : VtableEntry(name), type(type), value(value) {}
   };
 
   class MethodEntry: public VtableEntry {
@@ -108,8 +109,8 @@ public:
       method_class* method;
       std::vector<operand> args;
       op_type ret_type;
-      operand init;
-      MethodEntry(method_class* method, std::vector<operand> args, op_type ret_type, operand init) : VtableEntry(method->get_name()), method(method), args(args), ret_type(ret_type), init(init) {}
+      const_value init;
+      MethodEntry(method_class* method, std::vector<operand> args, op_type ret_type, const_value init) : VtableEntry(method->get_name()), method(method), args(args), ret_type(ret_type), init(init) {}
   };
 
   class AttrEntry: public VtableEntry {
@@ -122,7 +123,6 @@ public:
 
   int get_vtable_entry(Symbol name);
 
-  std::string vtable_type_name;
 
   const int DEFAULT_METHODS = 4; // new, abort, type_name, copy
 

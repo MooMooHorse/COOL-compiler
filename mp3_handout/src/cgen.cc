@@ -576,6 +576,57 @@ void CgenNode::setup(int tag, int depth)
     layout_features();
 
     // TODO: add code here
+    ValuePrinter vp(*ct_stream);
+
+    vp.init_constant("str." + this->name->get_string(), const_value(op_arr_type(INT8, this->name->get_string().length() + 1), this->name->get_string(), true));
+
+    // Define Type for the class (vtable ptr  + attributes)
+    op_type vtable_ptr_type = op_type(this->get_vtable_type_name(), 1);
+    std::vector<op_type> obj_types;
+    obj_types.push_back(vtable_ptr_type);
+    for(auto attr: this->attr_table) {
+        AttrEntry* attr_entry = dynamic_cast<AttrEntry*>(attr);
+        obj_types.push_back(attr_entry->type);
+    }
+    vp.type_define(this->name->get_string(), obj_types);
+
+    // Define Vtable type
+    std::vector<op_type> vtable_types;
+    for(auto entry: this->vtable) {
+        if(dynamic_cast<MethodEntry*>(entry)) {
+            MethodEntry* method_entry = dynamic_cast<MethodEntry*>(entry);
+            std::vector<op_type> func_arg_types;
+            for(const operand& arg: method_entry->args) {
+                func_arg_types.push_back(arg.get_type());
+            }
+            vtable_types.push_back(op_func_type(method_entry->ret_type, func_arg_types));
+        } else if (dynamic_cast<ConstEntry*>(entry)) {
+            ConstEntry* const_entry = dynamic_cast<ConstEntry*>(entry);
+            vtable_types.push_back(const_entry->type);
+        } else{
+            std::cerr << "Unknown entry type in vtable" << std::endl;
+        }
+    }
+    vp.type_define(this->get_vtable_type_name(), vtable_types);
+
+    // Define Vtable (prototype)
+    std::vector<const_value> vtable_vals;
+    for(auto entry: this->vtable) {
+        if(dynamic_cast<MethodEntry*>(entry)) {
+            MethodEntry* method_entry = dynamic_cast<MethodEntry*>(entry);
+            vtable_vals.push_back(method_entry->init);
+        } else if (dynamic_cast<ConstEntry*>(entry)) {
+            ConstEntry* const_entry = dynamic_cast<ConstEntry*>(entry);
+            vtable_vals.push_back(const_entry->value);
+        } else{
+            std::cerr << "Unknown entry type in vtable" << std::endl;
+        }
+    }
+
+    vp.init_struct_constant(
+        global_value(op_type(this->get_vtable_type_name()), this->get_vtable_name()),
+        vtable_types, vtable_vals
+    );
 
 #endif
 }
@@ -593,12 +644,20 @@ int CgenNode::get_vtable_entry(Symbol name) {
 }
 
 op_type CgenNode::symbol2op_type(Symbol s) {
-    if (s->get_string() == "Int") {
+    if(s->get_string() == "int") { // prim_int
         return op_type(INT32);
-    } else if (s->get_string() == "Bool") {
+    } else if (s->get_string() == "Int") { // AST
+        return op_type(INT32);
+    } else if (s->get_string() == "bool") { // prim_bool
+        return op_type(INT1);
+    } else if (s->get_string() == "Bool") { // AST
         return op_type(INT1);
     } else if (s->get_string() == "SELF_TYPE") {
         return op_type(this->get_type_name()).get_ptr_type();
+    } else if (s->get_string() == "sbyte*") { // prim_string
+        return op_type(INT8_PTR);
+    } else if (s->get_string() == "sbyte") { 
+        return op_type(INT8);
     } else { // Pass by Reference for other types
         return op_type(s->get_string()).get_ptr_type();
     }
@@ -633,8 +692,8 @@ void CgenNode::layout_features()
     // install tag, size and name
     op_type i32_type(INT32);
     op_type new_method_type(this->get_type_name() + "* () *");
-    op_type class_name_str_type(op_arr_type(INT8, this->name->get_string().length() + 1));
-    const_value class_name_str(class_name_str_type, "@str." + this->name->get_string(), true);
+    op_type class_name_str_type(INT8_PTR);
+    const_value class_name_str(op_arr_type(INT8, this->name->get_string().length() + 1), "@str." + this->name->get_string(), true);
 
     ConstEntry* tag_entry = new ConstEntry("tag", i32_type, int_value(this->tag));
     ConstEntry* size_entry = new ConstEntry("size", i32_type, const_value(i32_type, "ptrtoint (%" + this->name->get_string() + "* getelementptr (%" + this->name->get_string() + ", %" + this->name->get_string() + "* null, i32 1) to i32)", false)); // global constant because other classes may use it
@@ -644,12 +703,10 @@ void CgenNode::layout_features()
     vtable.push_back(size_entry);
     vtable.push_back(name_entry);
 
-    this->vtable_type_name = "_" + name->get_string() + "_vtable";
-
     // install new method
     ConstEntry* new_entry = new ConstEntry("new", 
         new_method_type, 
-        global_value(new_method_type, this->get_type_name() + "_new")
+        const_value(new_method_type, "@" + this->get_type_name() + "_new", false)
     );
 
     vtable.push_back(new_entry);
@@ -667,10 +724,10 @@ void CgenNode::layout_features()
         Feature feature = features->nth(_feature);
         if(dynamic_cast<method_class*>(feature)) {
             method_class* method = dynamic_cast<method_class*>(feature);
-            std::string global_method_name = this->get_type_name() + "." + method->get_name()->get_string();
+            std::string global_method_name = this->get_type_name() + "_" + method->get_name()->get_string();
 
             const_value init(op_type(global_method_name),  "@" + global_method_name, false);
-            std::vector<operand> func_args;
+            std::vector<operand> func_args = {operand(op_type(this->get_type_name(), 1), "self")};
             
             Formals formals = method->get_formals();
             for (int _formal = formals->first(); formals->more(_formal); _formal = formals->next(_formal)) {
