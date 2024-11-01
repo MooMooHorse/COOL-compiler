@@ -87,10 +87,16 @@ typedef Cases_class *Cases;
   virtual void make_alloca(CgenEnvironment *env);                              \
   void code(CgenEnvironment *env);
 
+#define attr_EXTRAS                                                            \
+  Symbol get_type_decl() { return type_decl; }                                 \
+  Symbol get_name() { return name; }                                           \
+  Expression get_init() { return init; }                                       
+
 #define method_EXTRAS                                                          \
   virtual Symbol get_return_type() { return return_type; }                     \
-  virtual Symbol get_name() { return name; }                                   \
-  virtual Formals get_formals() { return formals; }                            
+  Formals get_formals() { return formals; }                                    \
+  Expression get_expr() { return expr; }                                       \
+  virtual Symbol get_name() { return name; }                                   
 
 #define Formal_EXTRAS                                                          \
   virtual Symbol get_type_decl() = 0; /* ## */                                 \

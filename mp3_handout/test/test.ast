@@ -1,17 +1,107 @@
-#5
+#20
 _program
   #5
   _class
-    Main
+    Toy
     Object
     "test.cl"
     (
     #4
     _method
+      play
+      #2
+      _formal
+        x
+        Int
+      #2
+      _formal
+        y
+        Int
+      Int
+      #4
+      _plus
+        #3
+        _object
+          x
+        : Int
+        #4
+        _object
+          y
+        : Int
+      : Int
+    )
+  #11
+  _class
+    Bear
+    Toy
+    "test.cl"
+    (
+    #10
+    _method
+      eat
+      #8
+      _formal
+        x
+        Int
+      #8
+      _formal
+        y
+        Int
+      Int
+      #10
+      _plus
+        #9
+        _object
+          x
+        : Int
+        #10
+        _object
+          y
+        : Int
+      : Int
+    )
+  #20
+  _class
+    Main
+    Object
+    "test.cl"
+    (
+    #19
+    _method
       main
       Int
-      #3
-      _int
-        3
+      #18
+      _block
+        #16
+        _let
+          toy
+          Toy
+          #16
+          _new
+            Toy
+          : Toy
+          #16
+          _dispatch
+            #16
+            _object
+              toy
+            : Toy
+            play
+            (
+            #16
+            _int
+              5
+            : Int
+            #16
+            _int
+              4
+            : Int
+            )
+          : Int
+        : Int
+        #17
+        _int
+          3
+        : Int
       : Int
     )

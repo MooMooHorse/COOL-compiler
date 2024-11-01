@@ -18,9 +18,13 @@
 #include "value_printer.h"
 #include <map>
 #include <queue>
+
+#ifndef MP3
 #define MP3
+#endif
 
 class CgenNode;
+
 
 
 // CgenClassTable represents the top level of a Cool program, which is
@@ -30,6 +34,7 @@ class CgenNode;
 // code generation for an entire Cool program.
 class CgenClassTable : public cool::SymbolTable<CgenNode> {
 public:
+
   // CgenClassTable constructor begins and ends the code generation process
   CgenClassTable(Classes, std::ostream &str);
 
@@ -82,11 +87,63 @@ public:
 // generating code for each of its methods.
 class CgenNode : public class__class {
 public:
+
+
+  class VtableEntry {
+    public:
+      std::string name;
+      VtableEntry(Symbol name) : name(name->get_string()) {}
+      VtableEntry(std::string name) : name(name) {}
+  };
+
+  class ConstEntry: public VtableEntry {
+    public:
+      op_type type;
+      operand value;
+      ConstEntry(std::string name, op_type type, operand value) : VtableEntry(name), type(type), value(value) {}
+  };
+
+  class MethodEntry: public VtableEntry {
+    public:
+      method_class* method;
+      std::vector<operand> args;
+      op_type ret_type;
+      operand init;
+      MethodEntry(method_class* method, std::vector<operand> args, op_type ret_type, operand init) : VtableEntry(method->get_name()), method(method), args(args), ret_type(ret_type), init(init) {}
+  };
+
+  class AttrEntry: public VtableEntry {
+    public:
+      attr_class* attr;
+      op_type type;
+      Expression init;
+      AttrEntry(attr_class* attr, op_type type, Expression init) : VtableEntry(attr->get_name()), attr(attr), type(type), init(init) {}
+  };
+
+  int get_vtable_entry(Symbol name);
+
+  std::string vtable_type_name;
+
+  const int DEFAULT_METHODS = 4; // new, abort, type_name, copy
+
+  std::vector<VtableEntry*> vtable; // In-memory representation of the vtable
+
+  std::vector<VtableEntry*> attr_table; // In-memory representation of the attr table
+
   enum Basicness { Basic, NotBasic };
   CgenNode(Class_ c, Basicness bstatus, CgenClassTable *class_table)
       : class__class((const class__class &)*c), parentnd(0), children(0),
         basic_status(bstatus), class_table(class_table), tag(-1),
         ct_stream(class_table->ct_stream) {}
+
+  ~CgenNode() {
+    for (auto entry : vtable) {
+      delete entry;
+    }
+    for (auto entry : attr_table) {
+      delete entry;
+    }
+  }
 
   // Relationships with other nodes in the tree
   void set_parent(CgenNode *p) {
@@ -138,6 +195,7 @@ private:
   int tag, max_child;
   std::ostream *ct_stream;
 
+  op_type symbol2op_type(Symbol s);
   // TODO: Add more functions / fields here as necessary.
 };
 

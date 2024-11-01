@@ -78,6 +78,25 @@ static void initialize_constants(void)
     prim_bool = idtable.add_string("bool");
 }
 
+/**
+ * @brief MP2 typeName to op_type_id
+ */
+op_type_id _optype_name_to_op_type_id(const std::string &name)
+{
+    if (name == "Int")
+    {
+        return INT32;
+    }
+    else if (name == "Bool")
+    {
+        return INT1;
+    }
+    else
+    {
+        return VOID;
+    }
+}
+
 /*********************************************************************
 
   CgenClassTable methods
@@ -330,8 +349,28 @@ void CgenClassTable::setup_external_functions()
 
 #ifdef MP3
     // TODO: add code here
+    *ct_stream << R"(declare %Object* @Object_new()
+declare %Object* @Object_abort(%Object*)
+declare %String* @Object_type_name(%Object*)
+declare %Object* @Object_copy(%Object*)
+declare %IO* @IO_new()
+declare %IO* @IO_out_string(%IO*, %String*)
+declare %IO* @IO_out_int(%IO*, i32)
+declare %String* @IO_in_string(%IO*)
+declare i32 @IO_in_int(%IO*)
+declare %String* @String_new()
+declare i32 @String_length(%String*)
+declare %String* @String_concat(%String*, %String*)
+declare %String* @String_substr(%String*, i32, i32)
+declare %Int* @Int_new()
+declare void @Int_init(%Int*, i32)
+declare %Bool* @Bool_new()
+declare void @Bool_init(%Bool*, i1)
+)";
+
 #endif
 }
+
 
 void CgenClassTable::setup_classes(CgenNode *c, int depth)
 {
@@ -544,23 +583,122 @@ void CgenNode::setup(int tag, int depth)
 #ifdef MP3
 
 
+int CgenNode::get_vtable_entry(Symbol name) {
+    for (int i = 0; i < (int)vtable.size(); i++) {
+        if (vtable[i]->name == name->get_string()) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+op_type CgenNode::symbol2op_type(Symbol s) {
+    if (s->get_string() == "Int") {
+        return op_type(INT32);
+    } else if (s->get_string() == "Bool") {
+        return op_type(INT1);
+    } else if (s->get_string() == "SELF_TYPE") {
+        return op_type(this->get_type_name()).get_ptr_type();
+    } else { // Pass by Reference for other types
+        return op_type(s->get_string()).get_ptr_type();
+    }
+}
+
 // Laying out the features involves creating a Function for each method
 // and assigning each attribute a slot in the class structure.
 void CgenNode::layout_features()
 {
-    ValuePrinter vp(*ct_stream);
-    // TODO: add code here
-    for(int _feature = features->first(); features->more(_feature); _feature = features->next(_feature)) {
-        method_class* method = (method_class *)features->nth(_feature);
-        op_type func_ret_type(method->get_return_type()->get_string());
-        std::vector<op_type> func_args;
-        for (auto formal: method->get_formals()) {
-            func_args.push_back(op_type(formal->get_type_decl()->get_string()));
-        }
-        vp.declare(func_ret_type, method->get_name()->get_string(), func_args);
+    /**
+     * vtable for object
+     *  struct _Object_vtable {
+     *   int tag;
+     *   int size;
+     *   const char *name;
+     *   Object *(*abort_object)(Object *self);
+     *   String *(*type_name_object)(Object *self);
+     *   Object *(*copy_object)(Object *self);
+     *   .... // self-defined methods
+     *   };
+     * 
+     * vtable for other classes
+     * struct _ClassName_vtable {
+     *   int tag;
+     *   int size;
+     *   const char *name;
+     *   .... // methods inherited from parent class
+     *   .... // self-defined methods
+     * };
+     */
+
+    // install tag, size and name
+    op_type i32_type(INT32);
+    op_type new_method_type(this->get_type_name() + "* () *");
+    op_type class_name_str_type(op_arr_type(INT8, this->name->get_string().length() + 1));
+    const_value class_name_str(class_name_str_type, "@str." + this->name->get_string(), true);
+
+    ConstEntry* tag_entry = new ConstEntry("tag", i32_type, int_value(this->tag));
+    ConstEntry* size_entry = new ConstEntry("size", i32_type, const_value(i32_type, "ptrtoint (%" + this->name->get_string() + "* getelementptr (%" + this->name->get_string() + ", %" + this->name->get_string() + "* null, i32 1) to i32)", false)); // global constant because other classes may use it
+    ConstEntry* name_entry = new ConstEntry("name", class_name_str_type, class_name_str);
+
+    vtable.push_back(tag_entry);
+    vtable.push_back(size_entry);
+    vtable.push_back(name_entry);
+
+    this->vtable_type_name = "_" + name->get_string() + "_vtable";
+
+    // install new method
+    ConstEntry* new_entry = new ConstEntry("new", 
+        new_method_type, 
+        global_value(new_method_type, this->get_type_name() + "_new")
+    );
+
+    vtable.push_back(new_entry);
+
+    // iterate through parent's vtable & attr_vtable and copy it to current class's vtable
+    for (int i = this->DEFAULT_METHODS; i < (int)parentnd->vtable.size(); i++) {
+        vtable.push_back(parentnd->vtable[i]);
+    }
+    for (int i = 0; i < (int)parentnd->attr_table.size(); i++) {
+        attr_table.push_back(parentnd->attr_table[i]);
     }
 
+
+    for(int _feature = features->first(); features->more(_feature); _feature = features->next(_feature)) {
+        Feature feature = features->nth(_feature);
+        if(dynamic_cast<method_class*>(feature)) {
+            method_class* method = dynamic_cast<method_class*>(feature);
+            std::string global_method_name = this->get_type_name() + "." + method->get_name()->get_string();
+
+            const_value init(op_type(global_method_name),  "@" + global_method_name, false);
+            std::vector<operand> func_args;
+            
+            Formals formals = method->get_formals();
+            for (int _formal = formals->first(); formals->more(_formal); _formal = formals->next(_formal)) {
+                Formal formal = formals->nth(_formal);
+                func_args.push_back(operand(
+                    symbol2op_type(formal->get_type_decl()),
+                    formal->get_name()->get_string())
+                );
+            }
+
+            VtableEntry* entry = new MethodEntry(method, func_args, symbol2op_type(method->get_return_type()), init);
+            int v_ind = get_vtable_entry(method->get_name());
+            if (-1 == v_ind) {
+                vtable.push_back(entry);
+            } else {
+                delete vtable[v_ind];
+                vtable[v_ind] = entry;
+            }
+        } else if(dynamic_cast<attr_class*>(feature)) {
+            attr_class* attr = dynamic_cast<attr_class*>(feature);
+            VtableEntry* entry = new AttrEntry(attr, symbol2op_type(attr->get_type_decl()), attr->get_init());
+            attr_table.push_back(entry);
+        }
+    }
+    std::cerr << "Class" << this->name->get_string() << " vtable size: " << vtable.size() << std::endl;
 }
+
+
 
 // Class codegen. This should performed after every class has been setup.
 // Generate code for each method of the class.
@@ -1353,24 +1491,7 @@ void attr_class::code(CgenEnvironment *env)
  * Definitions of make_alloca
  */
 
-/**
- * @brief at MP2, only support Int and Bool type
- */
-op_type_id _optype_name_to_op_type_id(const std::string &name)
-{
-    if (name == "Int")
-    {
-        return INT32;
-    }
-    else if (name == "Bool")
-    {
-        return INT1;
-    }
-    else
-    {
-        return VOID;
-    }
-}
+
 
 void assign_class::make_alloca(CgenEnvironment *env)
 {

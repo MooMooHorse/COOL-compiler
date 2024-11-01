@@ -45,11 +45,11 @@ cgen-2:
 %.ast: %.cl
 	$(LEXER) $< | $(PARSER) | $(SEMANT) > $@
 
-# %.ll: %.ast $(CGEN)
-# 	$(proj_dir)/$(CGEN) $(CGENOPTS) < $< > $@
+%.ll: %.ast $(CGEN)
+	$(proj_dir)/$(CGEN) $(CGENOPTS) < $< > $@
 
-%.ll : %.ast $(CGENREF)
-	$(CGENREF) $(CGENOPTS) < $< > $@
+# %.ll : %.ast $(CGENREF)
+# 	$(CGENREF) $(CGENOPTS) < $< > $@
 
 %-o3.ll: %.ll
 	$(OPT) -O3 -S $< -f -o $*-o3.ll
@@ -71,4 +71,4 @@ cgen-2:
 	diff -u $< $(<:%.out=%.refout)
 
 clean:
-	-rm -f *.bin *.ll *.out *.ast *.verify
+	-rm -f *.bin *.ll *.out *.ast *.verify ../src/*.o
