@@ -190,7 +190,9 @@ declare void @Bool_init(%Bool*, i1)
 
 @str.Bear = internal constant [5 x i8] c"Bear\00"
 %Bear = type {
-	%_Bear_vtable*
+	%_Bear_vtable*,
+	i32,
+	i32
 }
 
 %_Bear_vtable = type {
@@ -338,6 +340,14 @@ okay:
 	%tmp.11 = getelementptr %Bear, %Bear* %tmp.10, i32 0, i32 0
 	store %_Bear_vtable* @_Bear_vtable_prototype, %_Bear_vtable** %tmp.11
 	store %Bear* %tmp.10, %Bear** %tmp.6
+	%tmp.12 = getelementptr %Bear, %Bear* %tmp.10, i32 0, i32 1
+	store i32 0, i32* %tmp.12
+	%tmp.13 = getelementptr %Bear, %Bear* %tmp.10, i32 0, i32 2
+	store i32 0, i32* %tmp.13
+	%tmp.14 = getelementptr %Bear, %Bear* %tmp.10, i32 0, i32 1
+	store i32 1, i32* %tmp.14
+	%tmp.15 = getelementptr %Bear, %Bear* %tmp.10, i32 0, i32 2
+	store i32 2, i32* %tmp.15
 	ret %Bear* %tmp.10
 
 abort:

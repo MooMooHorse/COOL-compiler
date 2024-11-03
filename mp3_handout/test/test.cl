@@ -5,6 +5,9 @@ class Toy {
 };
 
 class Bear inherits Toy {
+    head: Int <- 1;
+    feet: Int <- 2;
+    undetermined: Int;
     eat(x: Int, y:Int) : Int {
         x + y
     };

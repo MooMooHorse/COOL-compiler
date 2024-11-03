@@ -195,7 +195,6 @@ private:
   int tag, max_child;
   std::ostream *ct_stream;
 
-  op_type symbol2op_type(Symbol s);
   // TODO: Add more functions / fields here as necessary.
 };
 

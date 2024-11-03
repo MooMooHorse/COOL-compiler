@@ -90,7 +90,7 @@ typedef Cases_class *Cases;
 #define attr_EXTRAS                                                            \
   Symbol get_type_decl() { return type_decl; }                                 \
   Symbol get_name() { return name; }                                           \
-  Expression get_init() { return init; }                                       
+  Expression get_init() { return init; }                                                                          
 
 #define method_EXTRAS                                                          \
   virtual Symbol get_return_type() { return return_type; }                     \

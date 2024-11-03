@@ -190,7 +190,10 @@ declare void @Bool_init(%Bool*, i1)
 
 @str.Bear = internal constant [5 x i8] c"Bear\00"
 %Bear = type {
-	%_Bear_vtable*
+	%_Bear_vtable*,
+	i32,
+	i32,
+	i32
 }
 
 %_Bear_vtable = type {
@@ -244,13 +247,205 @@ declare void @Bool_init(%Bool*, i1)
 	i32 (%Main*) * @Main_main
 }
 
-@main.printout.str = internal constant [25 x i8] c"Main.main() returned %d\0A\00"
-define i32 @main() {
+define %Object* @Toy_abort(%Toy* %self) {
+	%vtpm.0 = alloca %Toy*
+	store %Toy* %self, %Toy** %vtpm.0
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define %String* @Toy_type_name(%Toy* %self) {
+	%vtpm.2 = alloca %Toy*
+	store %Toy* %self, %Toy** %vtpm.2
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define %Toy* @Toy_copy(%Toy* %self) {
+	%vtpm.4 = alloca %Toy*
+	store %Toy* %self, %Toy** %vtpm.4
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define i32 @Toy_play(%Toy* %self, i32 %x, i32 %y) {
+	%vtpm.6 = alloca %Toy*
+	store %Toy* %self, %Toy** %vtpm.6
+	%vtpm.7 = alloca i32
+	store i32 %x, i32* %vtpm.7
+	%vtpm.8 = alloca i32
+	store i32 %y, i32* %vtpm.8
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define %Toy* @Toy_new() {
 
 entry:
-	%vtpm.0 = call i32 @Main.main(  )
-	%tpm = getelementptr [25 x i8], [25 x i8]* @main.printout.str, i32 0, i32 0
-	%vtpm.1 = call i32(i8*, ... ) @printf( i8* %tpm, i32 %vtpm.0 )
-	ret i32 0
+	%vtpm.10 = alloca %Toy*
+	%vtpm.11 = getelementptr %_Toy_vtable, %_Toy_vtable* @_Toy_vtable_prototype, i32 0, i32 1
+	%vtpm.12 = load i32, i32* %vtpm.11
+	%vtpm.13 = call i8* @malloc(i32 %vtpm.12)
+	%vtpm.14 = bitcast i8* %vtpm.13 to %Toy*
+	%vtpm.15 = icmp eq %Toy* %vtpm.14, null
+	br i1 %vtpm.15, label %abort, label %ok.0
+
+ok.0:
+	%vtpm.16 = getelementptr %Toy, %Toy* %vtpm.14, i32 0, i32 0
+	store %_Toy_vtable* @_Toy_vtable_prototype, %_Toy_vtable* %vtpm.16
+	store %Toy* %vtpm.14, %Toy** %vtpm.10
+	ret %Toy* %vtpm.14
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define %Object* @Bear_abort(%Bear* %self) {
+	%vtpm.18 = alloca %Bear*
+	store %Bear* %self, %Bear** %vtpm.18
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define %String* @Bear_type_name(%Bear* %self) {
+	%vtpm.20 = alloca %Bear*
+	store %Bear* %self, %Bear** %vtpm.20
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define %Bear* @Bear_copy(%Bear* %self) {
+	%vtpm.22 = alloca %Bear*
+	store %Bear* %self, %Bear** %vtpm.22
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define i32 @Bear_play(%Bear* %self, i32 %x, i32 %y) {
+	%vtpm.24 = alloca %Bear*
+	store %Bear* %self, %Bear** %vtpm.24
+	%vtpm.25 = alloca i32
+	store i32 %x, i32* %vtpm.25
+	%vtpm.26 = alloca i32
+	store i32 %y, i32* %vtpm.26
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define i32 @Bear_eat(%Bear* %self, i32 %x, i32 %y) {
+	%vtpm.28 = alloca %Bear*
+	store %Bear* %self, %Bear** %vtpm.28
+	%vtpm.29 = alloca i32
+	store i32 %x, i32* %vtpm.29
+	%vtpm.30 = alloca i32
+	store i32 %y, i32* %vtpm.30
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define %Bear* @Bear_new() {
+
+entry:
+	%vtpm.32 = alloca %Bear*
+	%vtpm.33 = getelementptr %_Bear_vtable, %_Bear_vtable* @_Bear_vtable_prototype, i32 0, i32 1
+	%vtpm.34 = load i32, i32* %vtpm.33
+	%vtpm.35 = call i8* @malloc(i32 %vtpm.34)
+	%vtpm.36 = bitcast i8* %vtpm.35 to %Bear*
+	%vtpm.37 = icmp eq %Bear* %vtpm.36, null
+	br i1 %vtpm.37, label %abort, label %ok.0
+
+ok.0:
+	%vtpm.38 = getelementptr %Bear, %Bear* %vtpm.36, i32 0, i32 0
+	store %_Bear_vtable* @_Bear_vtable_prototype, %_Bear_vtable* %vtpm.38
+	store %Bear* %vtpm.36, %Bear** %vtpm.32
+	%vtpm.39 = getelementptr %Bear, %Bear* %vtpm.36, i32 0, i32 1
+	store  , i32* %vtpm.39
+	%vtpm.40 = getelementptr %Bear, %Bear* %vtpm.36, i32 0, i32 2
+	store  , i32* %vtpm.40
+	%vtpm.41 = getelementptr %Bear, %Bear* %vtpm.36, i32 0, i32 3
+	store i32 0, i32* %vtpm.41
+	ret %Bear* %vtpm.36
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define %Object* @Main_abort(%Main* %self) {
+	%vtpm.43 = alloca %Main*
+	store %Main* %self, %Main** %vtpm.43
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define %String* @Main_type_name(%Main* %self) {
+	%vtpm.45 = alloca %Main*
+	store %Main* %self, %Main** %vtpm.45
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define %Main* @Main_copy(%Main* %self) {
+	%vtpm.47 = alloca %Main*
+	store %Main* %self, %Main** %vtpm.47
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define i32 @Main_main(%Main* %self) {
+	%vtpm.49 = alloca %Main*
+	store %Main* %self, %Main** %vtpm.49
+	%tmp.0 = alloca %Toy*
+
+abort:
+	call void @abort(  )
+	unreachable
+}
+
+define %Main* @Main_new() {
+
+entry:
+	%vtpm.51 = alloca %Main*
+	%vtpm.52 = getelementptr %_Main_vtable, %_Main_vtable* @_Main_vtable_prototype, i32 0, i32 1
+	%vtpm.53 = load i32, i32* %vtpm.52
+	%vtpm.54 = call i8* @malloc(i32 %vtpm.53)
+	%vtpm.55 = bitcast i8* %vtpm.54 to %Main*
+	%vtpm.56 = icmp eq %Main* %vtpm.55, null
+	br i1 %vtpm.56, label %abort, label %ok.0
+
+ok.0:
+	%vtpm.57 = getelementptr %Main, %Main* %vtpm.55, i32 0, i32 0
+	store %_Main_vtable* @_Main_vtable_prototype, %_Main_vtable* %vtpm.57
+	store %Main* %vtpm.55, %Main** %vtpm.51
+	ret %Main* %vtpm.55
+
+abort:
+	call void @abort(  )
+	unreachable
 }
 

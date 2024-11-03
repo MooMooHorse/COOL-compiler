@@ -413,6 +413,11 @@ void CgenClassTable::code_module()
 void CgenClassTable::code_classes(CgenNode *c)
 {
     // TODO: add code here
+    c->code_class();
+    for (auto child : c->get_children())
+    {
+        code_classes(child);
+    }
 }
 #endif
 
@@ -441,6 +446,18 @@ void CgenClassTable::code_main()
                 ret i32 0
             }
     **/
+    
+#ifdef MP3
+// MP3
+#else
+// MP2
+// Get the address of the string "Main_main() returned %d\n" using
+// getelementptr
+
+// Call printf with the string address of "Main_main() returned %d\n"
+// and the return value of Main_main() as its arguments
+
+// Insert return 0
 
     ValuePrinter vp(*ct_stream);
     op_type i32_type(INT32);
@@ -472,18 +489,6 @@ void CgenClassTable::code_main()
 
     // Step 7: End the block
     vp.end_define();
-
-#ifdef MP3
-// MP3
-#else
-// MP2
-// Get the address of the string "Main_main() returned %d\n" using
-// getelementptr
-
-// Call printf with the string address of "Main_main() returned %d\n"
-// and the return value of Main_main() as its arguments
-
-// Insert return 0
 #endif
 }
 
@@ -643,7 +648,7 @@ int CgenNode::get_vtable_entry(Symbol name) {
     return -1;
 }
 
-op_type CgenNode::symbol2op_type(Symbol s) {
+op_type symbol2op_type(Symbol s, CgenNode* _class) {
     if(s->get_string() == "int") { // prim_int
         return op_type(INT32);
     } else if (s->get_string() == "Int") { // AST
@@ -653,13 +658,26 @@ op_type CgenNode::symbol2op_type(Symbol s) {
     } else if (s->get_string() == "Bool") { // AST
         return op_type(INT1);
     } else if (s->get_string() == "SELF_TYPE") {
-        return op_type(this->get_type_name()).get_ptr_type();
+        return op_type(_class->get_type_name()).get_ptr_type();
     } else if (s->get_string() == "sbyte*") { // prim_string
         return op_type(INT8_PTR);
     } else if (s->get_string() == "sbyte") { 
         return op_type(INT8);
     } else { // Pass by Reference for other types
         return op_type(s->get_string()).get_ptr_type();
+    }
+}
+
+operand default_val(op_type type, ValuePrinter* vp) {
+    switch (type.get_id()) {
+    case INT32:
+        return const_value(type, "0", false);
+    case INT1:
+        return const_value(type, "0", false);
+    case INT8_PTR:
+        return const_value(type, "null", false);
+    default: // default to null
+        return vp->bitcast(operand(op_type(INT8_PTR), "null"), type);
     }
 }
 
@@ -733,12 +751,12 @@ void CgenNode::layout_features()
             for (int _formal = formals->first(); formals->more(_formal); _formal = formals->next(_formal)) {
                 Formal formal = formals->nth(_formal);
                 func_args.push_back(operand(
-                    symbol2op_type(formal->get_type_decl()),
+                    symbol2op_type(formal->get_type_decl(), this),
                     formal->get_name()->get_string())
                 );
             }
 
-            VtableEntry* entry = new MethodEntry(method, func_args, symbol2op_type(method->get_return_type()), init);
+            VtableEntry* entry = new MethodEntry(method, func_args, symbol2op_type(method->get_return_type(), this), init);
             int v_ind = get_vtable_entry(method->get_name());
             if (-1 == v_ind) {
                 vtable.push_back(entry);
@@ -748,11 +766,11 @@ void CgenNode::layout_features()
             }
         } else if(dynamic_cast<attr_class*>(feature)) {
             attr_class* attr = dynamic_cast<attr_class*>(feature);
-            VtableEntry* entry = new AttrEntry(attr, symbol2op_type(attr->get_type_decl()), attr->get_init());
+            VtableEntry* entry = new AttrEntry(attr, symbol2op_type(attr->get_type_decl(), this), attr->get_init());
             attr_table.push_back(entry);
         }
     }
-    std::cerr << "Class" << this->name->get_string() << " vtable size: " << vtable.size() << std::endl;
+    // std::cerr << "Class" << this->name->get_string() << " vtable size: " << vtable.size() << std::endl;
 }
 
 
@@ -766,12 +784,108 @@ void CgenNode::code_class()
     {
         return;
     }
+
+    
     // TODO: add code here
-}
+    CgenEnvironment env(*ct_stream, this);
+    ValuePrinter vp(*ct_stream);
+
+    this->code_init_function(&env);
+    
+    // new function
+    vp.define(op_type(this->get_type_name(), 1), this->get_type_name() + "_new", {});
+
+    std::string okay_label = env.new_ok_label();
+    
+    vp.begin_block("entry");
+
+    operand self_ptr = vp.alloca_mem(op_type(this->get_type_name(), 1));
+    
+    operand size_ptr = vp.getelementptr(
+        this->get_vtable_type_name(),
+        const_value(op_type(this->get_vtable_type_name(), 1), "@" + this->get_vtable_name(), true),
+        int_value(0),
+        int_value(1),
+        op_type(INT32_PTR)
+    );
+    operand size = vp.load(op_type(INT32), size_ptr);
+    operand casted_new_obj_ptr = vp.bitcast(
+        vp.malloc_mem(size),
+        op_type(this->get_type_name(), 1)
+    );
+    vp.branch_cond(
+        vp.icmp(EQ, casted_new_obj_ptr, const_value(op_type("null"), "null", false)), 
+        "abort", 
+        okay_label 
+    );
+    vp.begin_block(okay_label);
+    // assign value to vtable ptr in the new object
+    operand new_obj_vtable_ptr = vp.getelementptr(
+        this->get_type_name(),
+        casted_new_obj_ptr,
+        int_value(0),
+        int_value(0),
+        op_type(this->get_vtable_type_name(), 1)
+    );
+
+    vp.store(
+        global_value(
+            op_type(this->get_vtable_type_name(), 1),
+            this->get_vtable_name()
+        ),
+        new_obj_vtable_ptr
+    );
+
+    vp.store(casted_new_obj_ptr, self_ptr);
+    
+    for(auto entry: this->attr_table) {
+        if(dynamic_cast<AttrEntry*>(entry)) {
+            AttrEntry* attr_entry = dynamic_cast<AttrEntry*>(entry);
+            attr_entry->attr->make_alloca(&env);
+        }
+    }
+
+    int attr_offset = 1; // first one is vtable ptr
+    for(auto entry: this->attr_table) {
+        if(dynamic_cast<AttrEntry*>(entry)) {
+            AttrEntry* attr_entry = dynamic_cast<AttrEntry*>(entry);
+            operand val = attr_entry->init->code(&env);
+            operand attr_ptr = vp.getelementptr(
+                this->get_type_name(),
+                casted_new_obj_ptr,
+                int_value(0),
+                int_value(attr_offset++),
+                attr_entry->type.get_ptr_type()
+            );
+            if(attr_entry->init->no_code()) {
+                vp.store(default_val(attr_entry->type, &vp), attr_ptr);
+            } else {
+                vp.store(conform(val, attr_entry->type, &env), attr_ptr);
+            }
+        }
+    
+    }
+
+    vp.ret(casted_new_obj_ptr);
+
+    vp.begin_block("abort");
+    vp.call({}, op_type(VOID), "abort", true, {});
+    vp.unreachable();
+    vp.end_define();
+}   
 
 void CgenNode::code_init_function(CgenEnvironment *env)
 {
     // TODO: add code here
+    ValuePrinter vp(*env->cur_stream);
+
+    for(auto entry: this->vtable) {
+        if(dynamic_cast<MethodEntry*>(entry)) {
+            MethodEntry* method_entry = dynamic_cast<MethodEntry*>(entry);
+            method_entry->method->code(env);
+        }
+    }
+
 }
 
 #else
@@ -875,21 +989,46 @@ void method_class::code(CgenEnvironment *env)
         std::cerr << "method" << std::endl;
     }
 
-    ValuePrinter vp(*env->cur_stream);
     // TODO: add code here
-
+    ValuePrinter vp(*env->cur_stream);
     op_type i32_type(INT32);
-    // vp.define(i32_type, this->name->get_string(), {});
+    std::string class_name = env->get_class()->get_type_name();
+    std::vector<operand> args({operand(op_type(class_name, 1), "self")});
+    env->open_scope();
 
-    // vp.begin_block("entry");
+    env->add_binding(self, &args[0]);
+
+
+    for (int i = formals->first(); formals->more(i); i = formals->next(i))
+    {
+        Formal formal = formals->nth(i);
+        args.push_back(operand(symbol2op_type(formal->get_type_decl(), env->get_class()), formal->get_name()->get_string()));
+        env->add_binding(formal->get_name(), &args.back());
+    }
+    std::cerr << class_name << " " << this->name->get_string() << std::endl;
+
+    vp.define(symbol2op_type(this->return_type, env->get_class()), class_name + "_" + this->name->get_string(), args);
+
+    for(const operand& arg: args) {
+        // std::cerr << arg.get_type().get_name() << " " << arg.get_name() << std::endl;
+        operand ret = vp.alloca_mem(arg.get_type());
+        vp.store(arg, ret);
+    } 
 
     this->expr->make_alloca(env);
+    // std::cerr << "!" << std::endl;
 
-    operand res = this->expr->code(env);
+    // operand res = this->expr->code(env);
 
-    vp.ret(res);
+    // vp.ret(res);
+    
+    vp.begin_block("abort");
+    vp.call({}, op_type(VOID), "abort", true, {});
+    vp.unreachable();
+    vp.end_define();
 
-    // vp.end_define();
+    env->close_scope();
+
 }
 
 // Codegen for expressions. Note that each expression has a value.
@@ -1168,7 +1307,6 @@ operand object_class::code(CgenEnvironment *env)
         std::cerr << "Object" << std::endl;
 
     operand *rhs = env->find_in_scopes(this->name);
-
     // emit load instruction
     operand result = vp.load(rhs->get_type().get_deref_type(), *rhs);
 
@@ -1604,8 +1742,8 @@ void let_class::make_alloca(CgenEnvironment *env)
         std::cerr << "let" << std::endl;
 
     env->open_scope();
-    operand *_alloca = new operand(op_type(_optype_name_to_op_type_id(this->type_decl->get_string())).get_ptr_type(), env->new_name());
-    vp.alloca_mem(*env->cur_stream, op_type(_optype_name_to_op_type_id(this->type_decl->get_string())), *_alloca); // emit an alloca command
+    operand *_alloca = new operand(symbol2op_type(this->type_decl, env->get_class()).get_ptr_type(), env->new_name());
+    vp.alloca_mem(*env->cur_stream, op_type(symbol2op_type(this->type_decl, env->get_class())), *_alloca); // emit an alloca command
     env->add_alloca(_alloca);
     this->init->make_alloca(env);
     this->body->make_alloca(env);

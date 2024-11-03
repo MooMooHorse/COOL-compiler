@@ -1,4 +1,4 @@
-#20
+#23
 _program
   #5
   _class
@@ -30,76 +30,99 @@ _program
         : Int
       : Int
     )
-  #11
+  #14
   _class
     Bear
     Toy
     "test.cl"
     (
+    #8
+    _attr
+      head
+      Int
+      #8
+      _int
+        1
+      : Int
+    #9
+    _attr
+      feet
+      Int
+      #9
+      _int
+        2
+      : Int
     #10
+    _attr
+      undetermined
+      Int
+      #10
+      _no_expr
+      : _no_type
+    #13
     _method
       eat
-      #8
+      #11
       _formal
         x
         Int
-      #8
+      #11
       _formal
         y
         Int
       Int
-      #10
+      #13
       _plus
-        #9
+        #12
         _object
           x
         : Int
-        #10
+        #13
         _object
           y
         : Int
       : Int
     )
-  #20
+  #23
   _class
     Main
     Object
     "test.cl"
     (
-    #19
+    #22
     _method
       main
       Int
-      #18
+      #21
       _block
-        #16
+        #19
         _let
           toy
           Toy
-          #16
+          #19
           _new
             Toy
           : Toy
-          #16
+          #19
           _dispatch
-            #16
+            #19
             _object
               toy
             : Toy
             play
             (
-            #16
+            #19
             _int
               5
             : Int
-            #16
+            #19
             _int
               4
             : Int
             )
           : Int
         : Int
-        #17
+        #20
         _int
           3
         : Int
