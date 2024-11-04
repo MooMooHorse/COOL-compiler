@@ -74,8 +74,15 @@ _program
       #13
       _plus
         #12
-        _object
-          x
+        _plus
+          #12
+          _object
+            head
+          : Int
+          #12
+          _object
+            x
+          : Int
         : Int
         #13
         _object

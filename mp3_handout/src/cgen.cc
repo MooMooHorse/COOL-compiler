@@ -78,6 +78,8 @@ static void initialize_constants(void)
     prim_bool = idtable.add_string("bool");
 }
 
+CgenNode::MethodEntry* Main_main_method;
+
 /**
  * @brief MP2 typeName to op_type_id
  */
@@ -463,7 +465,7 @@ void CgenClassTable::code_main()
     operand main_obj = vp.call({}, op_type("Main", 1), "Main_new", true, {});
     vp.call(
         {op_type("Main", 1)},
-        i32_type,
+        Main_main_method->ret_type,
         "Main_main",
         true,
         {main_obj}
@@ -709,6 +711,32 @@ op_type symbol2op_type(Symbol s, CgenNode* _class) {
     }
 }
 
+operand find_on_heap(Symbol name, CgenEnvironment* env) {
+    int offset;
+    ValuePrinter vp(*env->cur_stream);
+    CgenNode* _class = env->get_class();
+    CgenNode::AttrEntry* attr_entry;
+    for(offset = 0; offset < (int)_class->attr_table.size(); offset++) {
+        attr_entry = dynamic_cast<CgenNode::AttrEntry*>(_class->attr_table[offset]);
+        if(attr_entry && attr_entry->attr->get_name() == name) {
+            break;
+        }
+    }
+
+    operand* self_ptr = env->find_in_scopes(self);
+
+    operand self_obj = vp.load(self_ptr->get_type().get_deref_type(), *self_ptr);
+
+    return vp.getelementptr(
+        self_obj.get_type().get_deref_type(),
+        self_obj,
+        int_value(0),
+        int_value(offset + 1),
+        attr_entry->type.get_ptr_type()
+    );
+
+}
+
 
 CgenNode* CgenEnvironment::op_type2class(op_type type) {
     while(type.is_ptr()) {
@@ -837,7 +865,10 @@ void CgenNode::layout_features()
                 );
             }
 
-            VtableEntry* entry = new MethodEntry(method, func_args, symbol2op_type(method->get_return_type(), this), init);
+            MethodEntry* entry = new MethodEntry(method, func_args, symbol2op_type(method->get_return_type(), this), init);
+            if(global_method_name == "Main_main") {
+                Main_main_method = entry;
+            }
             int v_ind = get_vtable_entry(method->get_name());
             if (-1 == v_ind) {
                 vtable.push_back(entry);
@@ -1106,7 +1137,11 @@ void method_class::code(CgenEnvironment *env)
     if(res.is_empty()) {
         vp.ret(default_val(symbol2op_type(this->return_type, env->get_class()), &vp));
     } else {
-        vp.ret(res);
+
+        vp.ret(conform(res, 
+            symbol2op_type(this->return_type, env->get_class()),
+            env
+        ));
     }
 
     
@@ -1135,10 +1170,17 @@ operand assign_class::code(CgenEnvironment *env)
 
     operand lhs = this->expr->code(env);
     operand *rhs = env->find_in_scopes(this->name);
-
+    operand attr_ptr;
     if (lhs.is_empty())
     {
-        lhs = const_value(rhs->get_type().get_deref_type(), "0", true);
+        lhs = conform(default_val(rhs->get_type().get_deref_type(), &vp), rhs->get_type().get_deref_type(), env);
+    } else {
+        lhs = conform(lhs, rhs->get_type().get_deref_type(), env);
+    }
+
+    if(!rhs) {
+        attr_ptr = find_on_heap(this->name, env);
+        rhs = &attr_ptr;
     }
 
     vp.store(lhs, *rhs);
@@ -1396,13 +1438,20 @@ operand bool_const_class::code(CgenEnvironment *env)
 operand object_class::code(CgenEnvironment *env)
 {
     ValuePrinter vp(*env->cur_stream);
+    operand attr_ptr;
     if (cgen_debug)
         std::cerr << "Object" << std::endl;
     operand *rhs = env->find_in_scopes(this->name);
+    if(!rhs) { // the find_in_scopes find variable on stack, if not on stack, we need to use self ptr to find it on heap
+        attr_ptr = find_on_heap(this->name, env);
+        rhs = &attr_ptr;
+    }
 
 
     // emit load instruction
     operand result = vp.load(rhs->get_type().get_deref_type(), *rhs);
+
+
     return result;
 }
 

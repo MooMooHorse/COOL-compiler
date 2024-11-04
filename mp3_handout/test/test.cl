@@ -9,7 +9,7 @@ class Bear inherits Toy {
     feet: Int <- 2;
     undetermined: Int;
     eat(x: Int, y:Int) : Int {
-        x + y
+        head + x + y
     };
 };
 

@@ -1,0 +1,144 @@
+#14
+_program
+  #14
+  _class
+    Main
+    IO
+    "basic_funcs.cl"
+    (
+    #13
+    _method
+      main
+      Object
+      #13
+      _block
+        #7
+        _dispatch
+          #7
+          _object
+            self
+          : SELF_TYPE
+          out_string
+          (
+          #7
+          _dispatch
+            #7
+            _object
+              self
+            : SELF_TYPE
+            type_name
+            (
+            )
+          : String
+          )
+        : SELF_TYPE
+        #8
+        _dispatch
+          #8
+          _object
+            self
+          : SELF_TYPE
+          out_int
+          (
+          #8
+          _int
+            879
+          : Int
+          )
+        : SELF_TYPE
+        #9
+        _dispatch
+          #9
+          _object
+            self
+          : SELF_TYPE
+          out_string
+          (
+          #9
+          _dispatch
+            #9
+            _dispatch
+              #9
+              _object
+                self
+              : SELF_TYPE
+              type_name
+              (
+              )
+            : String
+            concat
+            (
+            #9
+            _string
+              "Frugel"
+            : String
+            )
+          : String
+          )
+        : SELF_TYPE
+        #10
+        _dispatch
+          #10
+          _object
+            self
+          : SELF_TYPE
+          out_int
+          (
+          #10
+          _dispatch
+            #10
+            _dispatch
+              #10
+              _object
+                self
+              : SELF_TYPE
+              type_name
+              (
+              )
+            : String
+            length
+            (
+            )
+          : Int
+          )
+        : SELF_TYPE
+        #11
+        _dispatch
+          #11
+          _object
+            self
+          : SELF_TYPE
+          out_string
+          (
+          #11
+          _dispatch
+            #11
+            _dispatch
+              #11
+              _object
+                self
+              : SELF_TYPE
+              type_name
+              (
+              )
+            : String
+            substr
+            (
+            #11
+            _int
+              2
+            : Int
+            #11
+            _int
+              2
+            : Int
+            )
+          : String
+          )
+        : SELF_TYPE
+        #12
+        _object
+          self
+        : SELF_TYPE
+      : SELF_TYPE
+    )

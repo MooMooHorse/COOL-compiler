@@ -316,10 +316,14 @@ entry:
 	store %Bear* %self, %Bear** %tmp.0
 	store i32 %x, i32* %tmp.1
 	store i32 %y, i32* %tmp.2
-	%tmp.3 = load i32, i32* %tmp.1
-	%tmp.4 = load i32, i32* %tmp.2
-	%tmp.5 = add i32 %tmp.3, %tmp.4
-	ret i32 %tmp.5
+	%tmp.3 = load %Bear*, %Bear** %tmp.0
+	%tmp.4 = getelementptr %Bear, %Bear* %tmp.3, i32 0, i32 1
+	%tmp.5 = load i32, i32* %tmp.4
+	%tmp.6 = load i32, i32* %tmp.1
+	%tmp.7 = add i32 %tmp.5, %tmp.6
+	%tmp.8 = load i32, i32* %tmp.2
+	%tmp.9 = add i32 %tmp.7, %tmp.8
+	ret i32 %tmp.9
 
 abort:
 	call void @abort(  )
@@ -329,31 +333,31 @@ abort:
 define %Bear* @Bear_new() {
 
 entry:
-	%tmp.6 = alloca %Bear*
-	%tmp.7 = getelementptr %_Bear_vtable, %_Bear_vtable* @_Bear_vtable_prototype, i32 0, i32 1
-	%tmp.8 = load i32, i32* %tmp.7
-	%tmp.9 = call i8*(i32 ) @malloc( i32 %tmp.8 )
-	%tmp.10 = bitcast i8* %tmp.9 to %Bear*
-	%malloc.null = icmp eq %Bear* %tmp.10, null
+	%tmp.10 = alloca %Bear*
+	%tmp.11 = getelementptr %_Bear_vtable, %_Bear_vtable* @_Bear_vtable_prototype, i32 0, i32 1
+	%tmp.12 = load i32, i32* %tmp.11
+	%tmp.13 = call i8*(i32 ) @malloc( i32 %tmp.12 )
+	%tmp.14 = bitcast i8* %tmp.13 to %Bear*
+	%malloc.null = icmp eq %Bear* %tmp.14, null
 	br i1 %malloc.null, label %abort, label %okay
 
 okay:
-	%tmp.11 = getelementptr %Bear, %Bear* %tmp.10, i32 0, i32 0
-	store %_Bear_vtable* @_Bear_vtable_prototype, %_Bear_vtable** %tmp.11
-	store %Bear* %tmp.10, %Bear** %tmp.6
-	%tmp.12 = getelementptr %Bear, %Bear* %tmp.10, i32 0, i32 1
-	store i32 0, i32* %tmp.12
-	%tmp.13 = getelementptr %Bear, %Bear* %tmp.10, i32 0, i32 2
-	store i32 0, i32* %tmp.13
-	%tmp.14 = getelementptr %Bear, %Bear* %tmp.10, i32 0, i32 3
-	store i32 0, i32* %tmp.14
-	%tmp.15 = getelementptr %Bear, %Bear* %tmp.10, i32 0, i32 1
-	store i32 1, i32* %tmp.15
-	%tmp.16 = getelementptr %Bear, %Bear* %tmp.10, i32 0, i32 2
-	store i32 2, i32* %tmp.16
-	%tmp.17 = getelementptr %Bear, %Bear* %tmp.10, i32 0, i32 3
+	%tmp.15 = getelementptr %Bear, %Bear* %tmp.14, i32 0, i32 0
+	store %_Bear_vtable* @_Bear_vtable_prototype, %_Bear_vtable** %tmp.15
+	store %Bear* %tmp.14, %Bear** %tmp.10
+	%tmp.16 = getelementptr %Bear, %Bear* %tmp.14, i32 0, i32 1
+	store i32 0, i32* %tmp.16
+	%tmp.17 = getelementptr %Bear, %Bear* %tmp.14, i32 0, i32 2
 	store i32 0, i32* %tmp.17
-	ret %Bear* %tmp.10
+	%tmp.18 = getelementptr %Bear, %Bear* %tmp.14, i32 0, i32 3
+	store i32 0, i32* %tmp.18
+	%tmp.19 = getelementptr %Bear, %Bear* %tmp.14, i32 0, i32 1
+	store i32 1, i32* %tmp.19
+	%tmp.20 = getelementptr %Bear, %Bear* %tmp.14, i32 0, i32 2
+	store i32 2, i32* %tmp.20
+	%tmp.21 = getelementptr %Bear, %Bear* %tmp.14, i32 0, i32 3
+	store i32 0, i32* %tmp.21
+	ret %Bear* %tmp.14
 
 abort:
 	call void @abort(  )

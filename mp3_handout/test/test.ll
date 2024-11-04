@@ -396,10 +396,14 @@ define i32 @Bear_eat(%Bear* %self, i32 %x, i32 %y) {
 	store i32 %x, i32* %vtpm.43
 	%vtpm.44 = alloca i32
 	store i32 %y, i32* %vtpm.44
-	%vtpm.45 = load i32, i32* %vtpm.43
-	%vtpm.46 = load i32, i32* %vtpm.44
-	%vtpm.47 = add i32 %vtpm.45, %vtpm.46
-	ret i32 %vtpm.47
+	%vtpm.45 = load %Bear*, %Bear** %vtpm.42
+	%vtpm.46 = getelementptr %Bear, %Bear* %vtpm.45, i32 0, i32 1
+	%vtpm.47 = load i32, i32* %vtpm.46
+	%vtpm.48 = load i32, i32* %vtpm.43
+	%vtpm.49 = add i32 %vtpm.47, %vtpm.48
+	%vtpm.50 = load i32, i32* %vtpm.44
+	%vtpm.51 = add i32 %vtpm.49, %vtpm.50
+	ret i32 %vtpm.51
 
 abort:
 	call void @abort(  )
@@ -409,25 +413,25 @@ abort:
 define %Bear* @Bear_new() {
 
 entry:
-	%vtpm.49 = alloca %Bear*
-	%vtpm.50 = getelementptr %_Bear_vtable, %_Bear_vtable* @_Bear_vtable_prototype, i32 0, i32 1
-	%vtpm.51 = load i32, i32* %vtpm.50
-	%vtpm.52 = call i8* @malloc(i32 %vtpm.51)
-	%vtpm.53 = bitcast i8* %vtpm.52 to %Bear*
-	%vtpm.54 = icmp eq %Bear* %vtpm.53, null
-	br i1 %vtpm.54, label %abort, label %ok.0
+	%vtpm.53 = alloca %Bear*
+	%vtpm.54 = getelementptr %_Bear_vtable, %_Bear_vtable* @_Bear_vtable_prototype, i32 0, i32 1
+	%vtpm.55 = load i32, i32* %vtpm.54
+	%vtpm.56 = call i8* @malloc(i32 %vtpm.55)
+	%vtpm.57 = bitcast i8* %vtpm.56 to %Bear*
+	%vtpm.58 = icmp eq %Bear* %vtpm.57, null
+	br i1 %vtpm.58, label %abort, label %ok.0
 
 ok.0:
-	%vtpm.55 = getelementptr %Bear, %Bear* %vtpm.53, i32 0, i32 0
-	store %_Bear_vtable* @_Bear_vtable_prototype, %_Bear_vtable** %vtpm.55
-	store %Bear* %vtpm.53, %Bear** %vtpm.49
-	%vtpm.56 = getelementptr %Bear, %Bear* %vtpm.53, i32 0, i32 1
-	store i32 1, i32* %vtpm.56
-	%vtpm.57 = getelementptr %Bear, %Bear* %vtpm.53, i32 0, i32 2
-	store i32 2, i32* %vtpm.57
-	%vtpm.58 = getelementptr %Bear, %Bear* %vtpm.53, i32 0, i32 3
-	store i32 0, i32* %vtpm.58
-	ret %Bear* %vtpm.53
+	%vtpm.59 = getelementptr %Bear, %Bear* %vtpm.57, i32 0, i32 0
+	store %_Bear_vtable* @_Bear_vtable_prototype, %_Bear_vtable** %vtpm.59
+	store %Bear* %vtpm.57, %Bear** %vtpm.53
+	%vtpm.60 = getelementptr %Bear, %Bear* %vtpm.57, i32 0, i32 1
+	store i32 1, i32* %vtpm.60
+	%vtpm.61 = getelementptr %Bear, %Bear* %vtpm.57, i32 0, i32 2
+	store i32 2, i32* %vtpm.61
+	%vtpm.62 = getelementptr %Bear, %Bear* %vtpm.57, i32 0, i32 3
+	store i32 0, i32* %vtpm.62
+	ret %Bear* %vtpm.57
 
 abort:
 	call void @abort(  )
@@ -435,10 +439,10 @@ abort:
 }
 
 define %Object* @Main_abort(%Main* %self) {
-	%vtpm.60 = alloca %Main*
-	store %Main* %self, %Main** %vtpm.60
-	%vtpm.61 = bitcast i8* null to %Object*
-	ret %Object* %vtpm.61
+	%vtpm.64 = alloca %Main*
+	store %Main* %self, %Main** %vtpm.64
+	%vtpm.65 = bitcast i8* null to %Object*
+	ret %Object* %vtpm.65
 
 abort:
 	call void @abort(  )
@@ -446,10 +450,10 @@ abort:
 }
 
 define %String* @Main_type_name(%Main* %self) {
-	%vtpm.63 = alloca %Main*
-	store %Main* %self, %Main** %vtpm.63
-	%vtpm.64 = bitcast i8* null to %String*
-	ret %String* %vtpm.64
+	%vtpm.67 = alloca %Main*
+	store %Main* %self, %Main** %vtpm.67
+	%vtpm.68 = bitcast i8* null to %String*
+	ret %String* %vtpm.68
 
 abort:
 	call void @abort(  )
@@ -457,10 +461,10 @@ abort:
 }
 
 define %Main* @Main_copy(%Main* %self) {
-	%vtpm.66 = alloca %Main*
-	store %Main* %self, %Main** %vtpm.66
-	%vtpm.67 = bitcast i8* null to %Main*
-	ret %Main* %vtpm.67
+	%vtpm.70 = alloca %Main*
+	store %Main* %self, %Main** %vtpm.70
+	%vtpm.71 = bitcast i8* null to %Main*
+	ret %Main* %vtpm.71
 
 abort:
 	call void @abort(  )
@@ -468,21 +472,21 @@ abort:
 }
 
 define i32 @Main_main(%Main* %self) {
-	%vtpm.69 = alloca %Main*
-	store %Main* %self, %Main** %vtpm.69
+	%vtpm.73 = alloca %Main*
+	store %Main* %self, %Main** %vtpm.73
 	%tmp.0 = alloca %Toy*
-	%vtpm.70 = call %Toy* @Toy_new(  )
-	store %Toy* %vtpm.70, %Toy** %tmp.0
-	%vtpm.71 = load %Toy*, %Toy** %tmp.0
-	%vtpm.72 = icmp eq %Toy* %vtpm.71, null
-	br i1 %vtpm.72, label %abort, label %ok.0
+	%vtpm.74 = call %Toy* @Toy_new(  )
+	store %Toy* %vtpm.74, %Toy** %tmp.0
+	%vtpm.75 = load %Toy*, %Toy** %tmp.0
+	%vtpm.76 = icmp eq %Toy* %vtpm.75, null
+	br i1 %vtpm.76, label %abort, label %ok.0
 
 ok.0:
-	%vtpm.73 = getelementptr %Toy, %Toy* %vtpm.71, i32 0, i32 0
-	%vtpm.74 = load %_Toy_vtable*, %_Toy_vtable** %vtpm.73
-	%vtpm.75 = getelementptr %_Toy_vtable, %_Toy_vtable* %vtpm.74, i32 0, i32 7
-	%tmp.1 = load i32 (%Toy*,i32,i32) *, i32 (%Toy*,i32,i32) ** %vtpm.75
-	%vtpm.76 = call i32(%Toy*, i32, i32 ) %tmp.1( %Toy* %vtpm.71, i32 5, i32 4 )
+	%vtpm.77 = getelementptr %Toy, %Toy* %vtpm.75, i32 0, i32 0
+	%vtpm.78 = load %_Toy_vtable*, %_Toy_vtable** %vtpm.77
+	%vtpm.79 = getelementptr %_Toy_vtable, %_Toy_vtable* %vtpm.78, i32 0, i32 7
+	%tmp.1 = load i32 (%Toy*,i32,i32) *, i32 (%Toy*,i32,i32) ** %vtpm.79
+	%vtpm.80 = call i32(%Toy*, i32, i32 ) %tmp.1( %Toy* %vtpm.75, i32 5, i32 4 )
 	ret i32 3
 
 abort:
@@ -493,19 +497,19 @@ abort:
 define %Main* @Main_new() {
 
 entry:
-	%vtpm.78 = alloca %Main*
-	%vtpm.79 = getelementptr %_Main_vtable, %_Main_vtable* @_Main_vtable_prototype, i32 0, i32 1
-	%vtpm.80 = load i32, i32* %vtpm.79
-	%vtpm.81 = call i8* @malloc(i32 %vtpm.80)
-	%vtpm.82 = bitcast i8* %vtpm.81 to %Main*
-	%vtpm.83 = icmp eq %Main* %vtpm.82, null
-	br i1 %vtpm.83, label %abort, label %ok.1
+	%vtpm.82 = alloca %Main*
+	%vtpm.83 = getelementptr %_Main_vtable, %_Main_vtable* @_Main_vtable_prototype, i32 0, i32 1
+	%vtpm.84 = load i32, i32* %vtpm.83
+	%vtpm.85 = call i8* @malloc(i32 %vtpm.84)
+	%vtpm.86 = bitcast i8* %vtpm.85 to %Main*
+	%vtpm.87 = icmp eq %Main* %vtpm.86, null
+	br i1 %vtpm.87, label %abort, label %ok.1
 
 ok.1:
-	%vtpm.84 = getelementptr %Main, %Main* %vtpm.82, i32 0, i32 0
-	store %_Main_vtable* @_Main_vtable_prototype, %_Main_vtable** %vtpm.84
-	store %Main* %vtpm.82, %Main** %vtpm.78
-	ret %Main* %vtpm.82
+	%vtpm.88 = getelementptr %Main, %Main* %vtpm.86, i32 0, i32 0
+	store %_Main_vtable* @_Main_vtable_prototype, %_Main_vtable** %vtpm.88
+	store %Main* %vtpm.86, %Main** %vtpm.82
+	ret %Main* %vtpm.86
 
 abort:
 	call void @abort(  )
