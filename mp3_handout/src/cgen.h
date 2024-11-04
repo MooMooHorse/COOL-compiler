@@ -130,6 +130,8 @@ public:
 
   std::vector<VtableEntry*> attr_table; // In-memory representation of the attr table
 
+  
+
   enum Basicness { Basic, NotBasic };
   CgenNode(Class_ c, Basicness bstatus, CgenClassTable *class_table)
       : class__class((const class__class &)*c), parentnd(0), children(0),
@@ -239,6 +241,8 @@ public:
   void close_scope() { var_table.exitscope(); }
 
   // TODO: Add more functions as necessary
+
+  CgenNode* op_type2class(op_type type);
 
   /**
    * Add an alloca instruction to the queue

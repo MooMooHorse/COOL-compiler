@@ -301,6 +301,7 @@ operand ValuePrinter::load(op_type type, operand op) {
   return result;
 }
 
+
 /* store instruction
  * store op1_type op1_name, result_type result_name
  */
