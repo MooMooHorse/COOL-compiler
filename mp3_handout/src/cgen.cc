@@ -1179,7 +1179,6 @@ operand assign_class::code(CgenEnvironment *env)
         rhs = &attr_ptr;
     }
 
-
     if (lhs.is_empty())
     {
         lhs = conform(default_val(rhs->get_type().get_deref_type(), &vp), rhs->get_type().get_deref_type(), env);
@@ -1285,7 +1284,10 @@ operand let_class::code(CgenEnvironment *env)
 
     if (lhs.is_empty())
     {
-        lhs = const_value(rhs->get_type().get_deref_type(), "0", true);
+        // std::cerr << lhs.get_name() << "!!!!!!!!!!!!!!" <<  std::endl;
+        lhs = conform(default_val(rhs->get_type().get_deref_type(), &vp), rhs->get_type().get_deref_type(), env);
+    } else {
+        lhs = conform(lhs, rhs->get_type().get_deref_type(), env);
     }
 
     // store the value of the rhs into the lhs
@@ -1715,9 +1717,21 @@ operand static_dispatch_class::code(CgenEnvironment *env)
     ValuePrinter vp(*env->cur_stream);
 
     operand obj = expr->code(env);
+    CgenNode* _class = env->op_type2class(obj.get_type());
+
+    method_offset = _class->get_vtable_entry(this->name);
+    CgenNode::MethodEntry* method = NULL;
+    if(~method_offset) {
+        method = dynamic_cast<CgenNode::MethodEntry*>(_class->vtable[method_offset]);
+    }
+
+    if(!method) {
+        std::cerr << "Method not found: " << this->name->get_string() << std::endl;
+        exit(1);
+    }
 
     if(obj.get_type().get_id() == INT1 || obj.get_type().get_id() == INT32) {
-        if(obj.get_type().get_id() == INT1 ) {
+        if(obj.get_type().get_id() == INT32 ) {
             obj = conform(obj, op_type("Int", 1), env);
         } else {
             obj = conform(obj, op_type("Bool", 1), env);
@@ -1738,17 +1752,6 @@ operand static_dispatch_class::code(CgenEnvironment *env)
         args.push_back(arg);
     }
 
-    CgenNode* _class = env->op_type2class(obj.get_type());
-    CgenNode::MethodEntry* method = NULL;
-
-    if(~method_offset) {
-        method = dynamic_cast<CgenNode::MethodEntry*>(_class->vtable[method_offset]);
-    }
-
-    if(!method) {
-        std::cerr << "Method not found: " << this->name->get_string() << std::endl;
-        exit(1);
-    }
 
     for(int i = 0; i < (int) args.size(); i++) {
         args[i] = conform(args[i], method->args[i].get_type(), env);
@@ -1807,7 +1810,7 @@ operand dispatch_class::code(CgenEnvironment *env)
 
 
     if(obj.get_type().get_id() == INT1 || obj.get_type().get_id() == INT32) {
-        if(obj.get_type().get_id() == INT1 ) {
+        if(obj.get_type().get_id() == INT32 ) {
             obj = conform(obj, op_type("Int", 1), env);
         } else {
             obj = conform(obj, op_type("Bool", 1), env);
@@ -2231,8 +2234,8 @@ void attr_class::make_alloca(CgenEnvironment *env)
 operand conform(operand src, op_type type, CgenEnvironment *env)
 {
 
-    
-    std::cerr << src.get_name() << " ENTER " << src.get_typename() << " " << type.get_name() <<  std::endl;
+    // TODO: waht if the unattended bitcast are not boxing & unboxing
+    // std::cerr << src.get_name() << " ENTER " << src.get_typename() << " " << type.get_name() <<  std::endl;
 
     
     // TODO: add code here
@@ -2293,6 +2296,10 @@ operand conform(operand src, op_type type, CgenEnvironment *env)
             true,
             {dest_obj, src}
         );
+
+        if(!type.is_int_object()) {
+            dest_obj = vp.bitcast(dest_obj, type);
+        }
         return dest_obj;
     }
 
@@ -2312,6 +2319,9 @@ operand conform(operand src, op_type type, CgenEnvironment *env)
             true,
             {dest_obj, src}
         );
+        if(!type.is_bool_object()) {
+            dest_obj = vp.bitcast(dest_obj, type);
+        }
         return dest_obj;
     }
 

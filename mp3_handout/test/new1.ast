@@ -1,0 +1,25 @@
+#8
+_program
+  #8
+  _class
+    Main
+    Object
+    "new1.cl"
+    (
+    #5
+    _attr
+      x
+      Int
+      #5
+      _new
+        Int
+      : Int
+    #7
+    _method
+      main
+      Object
+      #7
+      _object
+        x
+      : Int
+    )

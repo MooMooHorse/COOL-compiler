@@ -1,0 +1,90 @@
+#18
+_program
+  #4
+  _class
+    A
+    Object
+    "copy_o1.cl"
+    (
+    #2
+    _attr
+      hello
+      String
+      #2
+      _string
+        "Hello!\n"
+      : String
+    #3
+    _method
+      getGreetings
+      String
+      #3
+      _object
+        hello
+      : String
+    )
+  #18
+  _class
+    Main
+    IO
+    "copy_o1.cl"
+    (
+    #16
+    _method
+      main
+      Object
+      #16
+      _let
+        a
+        A
+        #10
+        _new
+          A
+        : A
+        #16
+        _let
+          copy_a
+          A
+          #12
+          _no_expr
+          : _no_type
+          #15
+          _block
+            #13
+            _assign
+              copy_a
+              #13
+              _dispatch
+                #13
+                _object
+                  a
+                : A
+                copy
+                (
+                )
+              : A
+            : A
+            #14
+            _dispatch
+              #14
+              _object
+                self
+              : SELF_TYPE
+              out_string
+              (
+              #14
+              _dispatch
+                #14
+                _object
+                  copy_a
+                : A
+                getGreetings
+                (
+                )
+              : String
+              )
+            : SELF_TYPE
+          : SELF_TYPE
+        : SELF_TYPE
+      : SELF_TYPE
+    )
