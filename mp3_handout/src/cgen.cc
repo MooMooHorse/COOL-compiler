@@ -1176,9 +1176,8 @@ operand assign_class::code(CgenEnvironment *env)
         rhs = &attr_ptr;
     }
 
-    std::cerr << lhs.get_name() << " " << lhs.get_typename() << std::endl;
-    if (lhs.is_empty())
-    {
+    // std::cerr << lhs.get_name() << " " << lhs.get_typename() << std::endl;
+    if (lhs.is_empty()) {
         lhs = conform(default_val(rhs->get_type().get_deref_type(), &vp), rhs->get_type().get_deref_type(), env);
     } else {
         lhs = conform(lhs, rhs->get_type().get_deref_type(), env);
