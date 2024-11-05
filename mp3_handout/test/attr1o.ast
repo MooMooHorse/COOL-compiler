@@ -1,0 +1,42 @@
+#7
+_program
+  #7
+  _class
+    Main
+    IO
+    "attr1o.cl"
+    (
+    #5
+    _attr
+      x
+      Int
+      #5
+      _int
+        247
+      : Int
+    #6
+    _method
+      main
+      Object
+      #6
+      _block
+        #6
+        _dispatch
+          #6
+          _object
+            self
+          : SELF_TYPE
+          out_int
+          (
+          #6
+          _object
+            x
+          : Int
+          )
+        : SELF_TYPE
+        #6
+        _object
+          self
+        : SELF_TYPE
+      : SELF_TYPE
+    )

@@ -1134,6 +1134,8 @@ void method_class::code(CgenEnvironment *env)
 
     operand res = this->expr->code(env);
 
+    std::cerr << "************" << std::endl;
+
     if(res.is_empty()) {
         vp.ret(default_val(symbol2op_type(this->return_type, env->get_class()), &vp));
     } else {
@@ -1171,13 +1173,15 @@ operand assign_class::code(CgenEnvironment *env)
     operand lhs = this->expr->code(env);
     operand *rhs = env->find_in_scopes(this->name);
     operand attr_ptr;
+
     if(!rhs) {
         attr_ptr = find_on_heap(this->name, env);
         rhs = &attr_ptr;
     }
 
-    // std::cerr << lhs.get_name() << " " << lhs.get_typename() << std::endl;
-    if (lhs.is_empty()) {
+
+    if (lhs.is_empty())
+    {
         lhs = conform(default_val(rhs->get_type().get_deref_type(), &vp), rhs->get_type().get_deref_type(), env);
     } else {
         lhs = conform(lhs, rhs->get_type().get_deref_type(), env);
@@ -1713,7 +1717,11 @@ operand static_dispatch_class::code(CgenEnvironment *env)
     operand obj = expr->code(env);
 
     if(obj.get_type().get_id() == INT1 || obj.get_type().get_id() == INT32) {
-        obj = conform(obj, op_type(obj.get_type().get_name(), 1), env);
+        if(obj.get_type().get_id() == INT1 ) {
+            obj = conform(obj, op_type("Int", 1), env);
+        } else {
+            obj = conform(obj, op_type("Bool", 1), env);
+        }
     } else {
         std::string okay_label = env->new_ok_label();
         operand check_null = vp.icmp(EQ, obj, null_value(obj.get_type()));
@@ -1799,13 +1807,18 @@ operand dispatch_class::code(CgenEnvironment *env)
 
 
     if(obj.get_type().get_id() == INT1 || obj.get_type().get_id() == INT32) {
-        obj = conform(obj, op_type(obj.get_type().get_name(), 1), env);
+        if(obj.get_type().get_id() == INT1 ) {
+            obj = conform(obj, op_type("Int", 1), env);
+        } else {
+            obj = conform(obj, op_type("Bool", 1), env);
+        }
     } else {
         std::string okay_label = env->new_ok_label();
         operand check_null = vp.icmp(EQ, obj, null_value(obj.get_type()));
         vp.branch_cond(check_null, "abort", okay_label);
         vp.begin_block(okay_label);
     }
+
 
     operand vtable_ptr = get_class_tag(obj, _class, env); // CRITICAL STEP: dynamic vtable lookup
 
@@ -1817,7 +1830,11 @@ operand dispatch_class::code(CgenEnvironment *env)
         args.push_back(arg);
     }
 
+    // std::cerr << "-------------------" << std::endl;
+    // std::cerr << args.size() << std::endl;
     for(int i = 0; i < (int) args.size(); i++) {
+        
+        // std::cerr << args[i].get_name() << " " << args[i].get_typename() << std::endl;
         args[i] = conform(args[i], method->args[i].get_type(), env);
         arg_types.push_back(args[i].get_type());
     }
@@ -2213,6 +2230,11 @@ void attr_class::make_alloca(CgenEnvironment *env)
 // (It's needed by the supplied code for typecase)
 operand conform(operand src, op_type type, CgenEnvironment *env)
 {
+
+    
+    std::cerr << src.get_name() << " ENTER " << src.get_typename() << " " << type.get_name() <<  std::endl;
+
+    
     // TODO: add code here
     if(src.get_type().get_name() == type.get_name()) {
         return src;
@@ -2224,8 +2246,11 @@ operand conform(operand src, op_type type, CgenEnvironment *env)
         return vp.bitcast(src, type);
     }
 
-    // boxing
-    if(src.get_type().is_ptr() && src.get_type().is_int_object() && type.get_id() == INT32) {
+    // Unboxing
+    if(src.get_type().is_ptr() && type.get_id() == INT32) {
+        if(!src.get_type().is_int_object()) { // first do bitcast
+            src = vp.bitcast(src, op_type("Int", 1));
+        }
         operand dest_ptr = vp.getelementptr(
             src.get_type().get_deref_type(),
             src,
@@ -2236,7 +2261,10 @@ operand conform(operand src, op_type type, CgenEnvironment *env)
         return vp.load(type, dest_ptr);
     }
 
-    if(src.get_type().is_ptr() && src.get_type().is_bool_object() && type.get_id() == INT1) {
+    if(src.get_type().is_ptr() && type.get_id() == INT1) {
+        if(!src.get_type().is_bool_object()) { // first do bitcast
+            src = vp.bitcast(src, op_type("Bool", 1));
+        }
         operand dest_ptr = vp.getelementptr(
             src.get_type().get_deref_type(),
             src,
@@ -2246,12 +2274,20 @@ operand conform(operand src, op_type type, CgenEnvironment *env)
         );
         return vp.load(type, dest_ptr);
     }
+    // std::cerr << (type.is_int_object()) << std::endl;
+    // Boxing
+    if(!src.get_type().is_ptr() && src.get_type().get_id() == INT32) {
+        op_type _type("Int", 1); 
+        operand dest_obj = vp.call(
+            {},
+            _type,
+            "Int_new",
+            true,
+            {}
+        );
 
-    // unboxing
-    if(!src.get_type().is_ptr() && src.get_type().get_id() == INT32 && type.is_int_object()) {
-        operand dest_obj = vp.alloca_mem(type);
         vp.call(
-            {op_type(INT32).get_ptr_type(), op_type(INT32)},
+            {_type, op_type(INT32)},
             op_type(VOID),
             "Int_init",
             true,
@@ -2260,10 +2296,17 @@ operand conform(operand src, op_type type, CgenEnvironment *env)
         return dest_obj;
     }
 
-    if(!src.get_type().is_ptr() && src.get_type().get_id() == INT1 && type.is_bool_object()) {
-        operand dest_obj = vp.alloca_mem(type);
+    if(!src.get_type().is_ptr() && src.get_type().get_id() == INT1) {
+        op_type _type("Bool", 1); 
+        operand dest_obj = vp.call(
+            {},
+            _type,
+            "Bool_new",
+            true,
+            {}
+        );
         vp.call(
-            {op_type(INT1).get_ptr_type(), op_type(INT1)},
+            {_type, op_type(INT1)},
             op_type(VOID),
             "Bool_init",
             true,
@@ -2271,6 +2314,8 @@ operand conform(operand src, op_type type, CgenEnvironment *env)
         );
         return dest_obj;
     }
+
+    std::cerr << src.get_name() << " " << src.get_typename() << " " << type.get_name() <<  std::endl;
 
     std::cerr << "conform error" << std::endl;
 
