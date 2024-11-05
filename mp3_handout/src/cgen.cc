@@ -1171,6 +1171,12 @@ operand assign_class::code(CgenEnvironment *env)
     operand lhs = this->expr->code(env);
     operand *rhs = env->find_in_scopes(this->name);
     operand attr_ptr;
+    if(!rhs) {
+        attr_ptr = find_on_heap(this->name, env);
+        rhs = &attr_ptr;
+    }
+
+    std::cerr << lhs.get_name() << " " << lhs.get_typename() << std::endl;
     if (lhs.is_empty())
     {
         lhs = conform(default_val(rhs->get_type().get_deref_type(), &vp), rhs->get_type().get_deref_type(), env);
@@ -1178,10 +1184,6 @@ operand assign_class::code(CgenEnvironment *env)
         lhs = conform(lhs, rhs->get_type().get_deref_type(), env);
     }
 
-    if(!rhs) {
-        attr_ptr = find_on_heap(this->name, env);
-        rhs = &attr_ptr;
-    }
 
     vp.store(lhs, *rhs);
 

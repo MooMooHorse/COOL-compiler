@@ -75,17 +75,17 @@ declare %Bool* @Bool_new()
 
 define i32 @main() local_unnamed_addr {
 entry:
-  %vtpm.81.i = tail call i8* @malloc(i32 8)
-  %vtpm.83.i = icmp eq i8* %vtpm.81.i, null
-  br i1 %vtpm.83.i, label %abort.i, label %Main_new.exit
+  %vtpm.85.i = tail call i8* @malloc(i32 8)
+  %vtpm.87.i = icmp eq i8* %vtpm.85.i, null
+  br i1 %vtpm.87.i, label %abort.i, label %Main_new.exit
 
 abort.i:                                          ; preds = %entry
   tail call void @abort()
   unreachable
 
 Main_new.exit:                                    ; preds = %entry
-  %vtpm.84.i = bitcast i8* %vtpm.81.i to %_Main_vtable**
-  store %_Main_vtable* @_Main_vtable_prototype, %_Main_vtable** %vtpm.84.i, align 8
+  %vtpm.88.i = bitcast i8* %vtpm.85.i to %_Main_vtable**
+  store %_Main_vtable* @_Main_vtable_prototype, %_Main_vtable** %vtpm.88.i, align 8
   %vtpm.21.i.i = tail call i8* @malloc(i32 8)
   %vtpm.23.i.i = icmp eq i8* %vtpm.21.i.i, null
   br i1 %vtpm.23.i.i, label %abort.i.i, label %Main_main.exit
@@ -159,32 +159,35 @@ define i32 @Bear_play(%Bear* nocapture readnone %self, i32 %x, i32 %y) local_unn
   ret i32 %vtpm.40
 }
 
-; Function Attrs: mustprogress nofree norecurse nosync nounwind readnone willreturn
-define i32 @Bear_eat(%Bear* nocapture readnone %self, i32 %x, i32 %y) #0 {
-  %vtpm.47 = add i32 %y, %x
-  ret i32 %vtpm.47
+; Function Attrs: argmemonly mustprogress nofree norecurse nosync nounwind readonly willreturn
+define i32 @Bear_eat(%Bear* nocapture readonly %self, i32 %x, i32 %y) #1 {
+  %vtpm.46 = getelementptr %Bear, %Bear* %self, i64 0, i32 1
+  %vtpm.47 = load i32, i32* %vtpm.46, align 4
+  %vtpm.49 = add i32 %y, %x
+  %vtpm.51 = add i32 %vtpm.49, %vtpm.47
+  ret i32 %vtpm.51
 }
 
 define %Bear* @Bear_new() {
 entry:
-  %vtpm.52 = tail call i8* @malloc(i32 24)
-  %vtpm.54 = icmp eq i8* %vtpm.52, null
-  br i1 %vtpm.54, label %abort, label %ok.0
+  %vtpm.56 = tail call i8* @malloc(i32 24)
+  %vtpm.58 = icmp eq i8* %vtpm.56, null
+  br i1 %vtpm.58, label %abort, label %ok.0
 
 ok.0:                                             ; preds = %entry
-  %vtpm.53 = bitcast i8* %vtpm.52 to %Bear*
-  %vtpm.55 = bitcast i8* %vtpm.52 to %_Bear_vtable**
-  store %_Bear_vtable* @_Bear_vtable_prototype, %_Bear_vtable** %vtpm.55, align 8
-  %vtpm.56 = getelementptr i8, i8* %vtpm.52, i64 8
-  %0 = bitcast i8* %vtpm.56 to i32*
+  %vtpm.57 = bitcast i8* %vtpm.56 to %Bear*
+  %vtpm.59 = bitcast i8* %vtpm.56 to %_Bear_vtable**
+  store %_Bear_vtable* @_Bear_vtable_prototype, %_Bear_vtable** %vtpm.59, align 8
+  %vtpm.60 = getelementptr i8, i8* %vtpm.56, i64 8
+  %0 = bitcast i8* %vtpm.60 to i32*
   store i32 1, i32* %0, align 4
-  %vtpm.57 = getelementptr i8, i8* %vtpm.52, i64 12
-  %1 = bitcast i8* %vtpm.57 to i32*
+  %vtpm.61 = getelementptr i8, i8* %vtpm.56, i64 12
+  %1 = bitcast i8* %vtpm.61 to i32*
   store i32 2, i32* %1, align 4
-  %vtpm.58 = getelementptr i8, i8* %vtpm.52, i64 16
-  %2 = bitcast i8* %vtpm.58 to i32*
+  %vtpm.62 = getelementptr i8, i8* %vtpm.56, i64 16
+  %2 = bitcast i8* %vtpm.62 to i32*
   store i32 0, i32* %2, align 4
-  ret %Bear* %vtpm.53
+  ret %Bear* %vtpm.57
 
 abort:                                            ; preds = %entry
   tail call void @abort()
@@ -224,15 +227,15 @@ Toy_new.exit:                                     ; preds = %ok.0
 
 define %Main* @Main_new() {
 entry:
-  %vtpm.81 = tail call i8* @malloc(i32 8)
-  %vtpm.83 = icmp eq i8* %vtpm.81, null
-  br i1 %vtpm.83, label %abort, label %ok.1
+  %vtpm.85 = tail call i8* @malloc(i32 8)
+  %vtpm.87 = icmp eq i8* %vtpm.85, null
+  br i1 %vtpm.87, label %abort, label %ok.1
 
 ok.1:                                             ; preds = %entry
-  %vtpm.82 = bitcast i8* %vtpm.81 to %Main*
-  %vtpm.84 = bitcast i8* %vtpm.81 to %_Main_vtable**
-  store %_Main_vtable* @_Main_vtable_prototype, %_Main_vtable** %vtpm.84, align 8
-  ret %Main* %vtpm.82
+  %vtpm.86 = bitcast i8* %vtpm.85 to %Main*
+  %vtpm.88 = bitcast i8* %vtpm.85 to %_Main_vtable**
+  store %_Main_vtable* @_Main_vtable_prototype, %_Main_vtable** %vtpm.88, align 8
+  ret %Main* %vtpm.86
 
 abort:                                            ; preds = %entry
   tail call void @abort()
@@ -240,3 +243,4 @@ abort:                                            ; preds = %entry
 }
 
 attributes #0 = { mustprogress nofree norecurse nosync nounwind readnone willreturn }
+attributes #1 = { argmemonly mustprogress nofree norecurse nosync nounwind readonly willreturn }
