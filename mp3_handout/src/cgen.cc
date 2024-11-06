@@ -1387,6 +1387,8 @@ operand lt_class::code(CgenEnvironment *env)
     ValuePrinter vp(*env->cur_stream);
     operand lhs = this->e1->code(env);
     operand rhs = this->e2->code(env);
+
+    lhs = conform(lhs, rhs.get_type(), env);
     operand result = vp.icmp(LT, lhs, rhs);
 
     if (cgen_debug)
@@ -1400,6 +1402,7 @@ operand eq_class::code(CgenEnvironment *env)
     ValuePrinter vp(*env->cur_stream);
     operand lhs = this->e1->code(env);
     operand rhs = this->e2->code(env);
+    lhs = conform(lhs, rhs.get_type(), env);
     operand result = vp.icmp(EQ, lhs, rhs);
     if (cgen_debug)
         std::cerr << "eq" << std::endl;
@@ -1412,6 +1415,7 @@ operand leq_class::code(CgenEnvironment *env)
     ValuePrinter vp(*env->cur_stream);
     operand lhs = this->e1->code(env);
     operand rhs = this->e2->code(env);
+    lhs = conform(lhs, rhs.get_type(), env);
     operand result = vp.icmp(LE, lhs, rhs);
 
     if (cgen_debug)
