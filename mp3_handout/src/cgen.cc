@@ -1198,7 +1198,6 @@ operand cond_class::code(CgenEnvironment *env)
     if (cgen_debug)
         std::cerr << "cond" << std::endl;
 
-    operand *result = env->remove_alloca();
 
     operand cond = this->pred->code(env);
 
@@ -1207,24 +1206,29 @@ operand cond_class::code(CgenEnvironment *env)
     std::string else_label = env->new_label("else", true);
     std::string merge_label = env->new_label("ifcont", true);
 
+    op_type res_type("Object", 1);
+    operand res = vp.alloca_mem(res_type);
+
+
     // Branch based on the condition
     vp.branch_cond(cond, then_label, else_label);
 
     // Emit the 'then' code
     vp.begin_block(else_label);
     operand els = this->else_exp->code(env);
-    vp.store(els, *result);
+    els = conform(els, res_type, env);
+    vp.store(els, res);
     vp.branch_uncond(merge_label);
 
     vp.begin_block(then_label);
     operand then = this->then_exp->code(env);
-    vp.store(then, *result);
+    then = conform(then, res_type, env);
+    vp.store(then, res);
     vp.branch_uncond(merge_label);
 
     vp.begin_block(merge_label);
-    operand loaded_result = vp.load(result->get_type().get_deref_type(), *result);
-
-    return loaded_result;
+    // TODO: adapt the type uniformation scheme.
+    return vp.load(res_type, res);
 }
 
 operand loop_class::code(CgenEnvironment *env)
@@ -1237,6 +1241,9 @@ operand loop_class::code(CgenEnvironment *env)
     std::string body_label = env->new_label("loop.body", true);
     std::string end_label = env->new_label("loop.end", true);
 
+    op_type res_type("Object", 1);
+    operand res = vp.alloca_mem(res_type);
+
     vp.branch_uncond(header_label);
 
     vp.begin_block(header_label);
@@ -1245,12 +1252,13 @@ operand loop_class::code(CgenEnvironment *env)
 
     vp.begin_block(body_label);
     operand body = this->body->code(env);
+    body = conform(body, res_type, env);
+    vp.store(body, res);
     vp.branch_uncond(header_label);
 
     vp.begin_block(end_label);
-
-    // For MP2 the return value of loop  is i32 0
-    return int_value(0);
+    // TODO: conform it to Object
+    return vp.load(res_type, res);
 }
 
 operand block_class::code(CgenEnvironment *env)
@@ -1987,12 +1995,6 @@ void cond_class::make_alloca(CgenEnvironment *env)
     ValuePrinter vp(*env->cur_stream);
     if (cgen_debug)
         std::cerr << "cond" << std::endl;
-
-    // MP2 assumes the branches to be of the same type
-    op_type _type = op_type(_optype_name_to_op_type_id(this->then_exp->get_type()->get_string()));
-    operand *_alloca = new operand(_type.get_ptr_type(), env->new_name());
-    vp.alloca_mem(*env->cur_stream, _type, *_alloca); // emit an alloca command
-    env->add_alloca(_alloca);
 
     this->pred->make_alloca(env);
     this->then_exp->make_alloca(env);
