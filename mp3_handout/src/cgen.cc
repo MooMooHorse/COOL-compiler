@@ -1316,10 +1316,15 @@ operand plus_class::code(CgenEnvironment *env)
     ValuePrinter vp(*env->cur_stream);
     operand lhs = this->e1->code(env);
     operand rhs = this->e2->code(env);
+
+    lhs = conform(lhs, rhs.get_type(), env);
+    
     operand result = vp.add(lhs, rhs);
 
     if (cgen_debug)
         std::cerr << "plus" << std::endl;
+
+
 
     return result;
 }
@@ -1329,6 +1334,10 @@ operand sub_class::code(CgenEnvironment *env)
     ValuePrinter vp(*env->cur_stream);
     operand lhs = this->e1->code(env);
     operand rhs = this->e2->code(env);
+
+
+    lhs = conform(lhs, rhs.get_type(), env);
+
     operand result = vp.sub(lhs, rhs);
 
     if (cgen_debug)
@@ -1342,6 +1351,9 @@ operand mul_class::code(CgenEnvironment *env)
     ValuePrinter vp(*env->cur_stream);
     operand lhs = this->e1->code(env);
     operand rhs = this->e2->code(env);
+
+    lhs = conform(lhs, rhs.get_type(), env);
+
     operand result = vp.mul(lhs, rhs);
 
     if (cgen_debug)
@@ -1355,6 +1367,8 @@ operand divide_class::code(CgenEnvironment *env)
     ValuePrinter vp(*env->cur_stream);
     operand lhs = this->e1->code(env);
     operand rhs = this->e2->code(env);
+
+    lhs = conform(lhs, rhs.get_type(), env);
 
     if (cgen_debug)
         std::cerr << "div" << std::endl;
