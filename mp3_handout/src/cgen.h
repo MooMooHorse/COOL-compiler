@@ -244,6 +244,9 @@ public:
 
   CgenNode* op_type2class(op_type type);
 
+  operand branch_operand;
+  std::string next_label;
+
   /**
    * Add an alloca instruction to the queue
    * @param op the alloca instruction to add (must be allocated in heap)
