@@ -58,6 +58,7 @@ namespace {
         };
         std::map<Register, VirtRegInfo> LiveVirtRegs;
         std::map<Register, int> SpillMap;
+        std::set<Register> AssignedRegs;
 
     public:
         StringRef getPassName() const override { return "Simple Register Allocator"; }
@@ -191,6 +192,8 @@ namespace {
                 UsedPhysRegs.insert(Entry.second.PhysReg);
             }
 
+            UsedPhysRegs.insert(this->AssignedRegs.begin(), this->AssignedRegs.end());
+
             // Get the preferred allocation order for the register class
             for (MCPhysReg PhysReg : AllocationOrder) {
                 if (MRI->isReserved(PhysReg))
@@ -232,7 +235,7 @@ namespace {
                     }
 
                     if (VRegToSpill != 0) {
-                        spillReg(VRegToSpill, *MO.getParent()->getParent(), MO.getParent()->getIterator(), true);
+                        spillReg(VRegToSpill, *MO.getParent()->getParent(), MO.getParent()->getIterator(), false);
                         LiveVirtRegs.erase(VRegToSpill);
                         AssignedPhysReg = PhysReg;
                         Spilled = true;
@@ -296,10 +299,21 @@ namespace {
         void allocateBasicBlock(MachineBasicBlock &MBB) {
             LiveVirtRegs.clear();
 
+
+            // for (MachineInstr &MI : MBB) {
+            //     for (MachineOperand &MO : MI.operands()) {
+            //         if(MO.isReg() && !MO.getReg().isVirtual()) {
+            //             this->AssignedRegs.insert(MO.getReg());
+            //         }
+            //     }
+            // }
+
             for (MachineInstr &MI : MBB) {
                 dbgs() << "Processing: " << MI;
 
                 allocateInstruction(MI);
+
+                dbgs() << "Processed: " << MI;
 
                 // Remove killed virtual registers from LiveVirtRegs
                 for (MachineOperand &MO : MI.operands()) {
@@ -320,10 +334,11 @@ namespace {
                 for (auto &Pair : LiveVirtRegs) {
                     Register VirtReg = Pair.first;
                     // dbgs() << "Spilling live virtual register " << VirtReg << "\n";
-                    spillReg(VirtReg, MBB, MBB.getFirstTerminator(), true);
+                    spillReg(VirtReg, MBB, MBB.getFirstTerminator(), false);
                 }
             }
 
+            this->AssignedRegs.clear();
             LiveVirtRegs.clear();
         }
 
