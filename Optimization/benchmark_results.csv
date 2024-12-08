@@ -1,0 +1,21 @@
+Program,Hoisted Loads,Hoisted Stores,Hoisted Computation
+almabench.c,6,0,0
+huffbench.c,15,0,0
+puzzle.c,5,0,0
+n-body.c,9,0,0
+whetstone.c,17,0,1
+hoist.c,1,0,1
+partialsums.c,2,0,0
+nesting.c,0,0,0
+spectral-norm.c,8,0,0
+doloop.c,2,0,0
+PR491.c,0,0,0
+matmul.c,6,0,0
+one-iter.c,1,0,0
+lpbench.c,46,0,0
+fannkuch.c,11,0,0
+random.c,0,0,0
+LA_test.c,0,0,0
+nsieve-bits.c,3,0,0
+ffbench.c,23,0,3
+recursive.c,0,0,0
