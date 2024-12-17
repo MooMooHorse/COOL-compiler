@@ -11,3 +11,5 @@ target_include_directories(UnitProject PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${LLVM
 if(NOT LLVM_ENABLE_RTTI)
   target_compile_options(UnitProject PUBLIC "-fno-rtti")
 endif()
+
+# Important: We use make file to orchestrate the end2end pipeline. CMake is only a component of the pipeline.

@@ -14,9 +14,12 @@ PLUGIN = $(BUILD_DIR)/libUnitProject.so
 # Compiler and optimization options
 CXXFLAGS = -c -O0 -Xclang -disable-O0-optnone -emit-llvm -S
 OPT_PASSES = function(mem2reg,instcombine,simplifycfg,adce),inline,globaldce,function(sroa,early-cse,unit-sccp,jump-threading,correlated-propagation,simplifycfg,instcombine,simplifycfg,reassociate,unit-licm,adce,simplifycfg,instcombine),globaldce
-LICM_PASS_OPT = unit-licm
-SCCP_PASS_OPT = unit-sccp
-CSE_PASS_OPT = unit-cse
+LICM_PASS_OPT = function(mem2reg),function(unit-licm)
+SCCP_PASS_OPT = function(mem2reg),function(unit-sccp)
+CSE_PASS_OPT = function(mem2reg),function(unit-cse)
+
+
+
 
 # Default output
 OUTPUT = $(PROGRAM)
@@ -25,10 +28,22 @@ REAL_PROG = $(TEST_DIR)/$(PROGRAM)
 
 # Build the shared library and optimize
 all: $(PLUGIN)
-
+	python3 end2end.py tests
 $(PLUGIN):
 	mkdir -p $(BUILD_DIR)
 	cd $(BUILD_DIR) && $(CMAKE) ../ && $(MAKE) -j
+
+no-optimize: # no optimization
+	@if [ "$(PROGRAM)" = "" ]; then \
+		echo "Error: Specify the <program> parameter"; \
+		exit 1; \
+	fi
+	@if [ "$(OUTPUT)" = "" ]; then \
+		OUTPUT=$(PROGRAM); \
+	fi; \
+	$(CLANG) $(REAL_PROG).c $(CXXFLAGS) -o - | \
+	$(OPT) -verify-each -S -o result.ll; \
+	cp result.ll $(TEST_DIR)/$(PROGRAM)-nooptimize.ll
 
 optimize: $(PLUGIN) # optimize using human-readable LLVM IR
 	@if [ "$(PROGRAM)" = "" ]; then \
@@ -38,7 +53,8 @@ optimize: $(PLUGIN) # optimize using human-readable LLVM IR
 	@if [ "$(OUTPUT)" = "" ]; then \
 		OUTPUT=$(PROGRAM); \
 	fi; \
-	$(OPT) -verify-machineinstrs -load-pass-plugin=$(PLUGIN) -passes="$(OPT_PASSES)" -S $(TEST_DIR)/$(PROGRAM).ll -o result.ll # current version
+	$(OPT) -verify-each -load-pass-plugin=$(PLUGIN) -passes="$(OPT_PASSES)" -S $(TEST_DIR)/$(PROGRAM).ll -o result.ll; \
+	cp result.ll $(TEST_DIR)/$(PROGRAM)-optimizeall.ll
 
 
 optimize-licm: $(PLUGIN) # optimize using human-readable LLVM IR
@@ -49,7 +65,8 @@ optimize-licm: $(PLUGIN) # optimize using human-readable LLVM IR
 	@if [ "$(OUTPUT)" = "" ]; then \
 		OUTPUT=$(PROGRAM); \
 	fi; \
-	$(OPT) -verify-machineinstrs -load-pass-plugin=$(PLUGIN) -passes="$(LICM_PASS_OPT)" -S $(TEST_DIR)/$(PROGRAM).ll -o result.ll # current version
+	$(OPT) -verify-each -load-pass-plugin=$(PLUGIN) -passes="$(LICM_PASS_OPT)" -S $(TEST_DIR)/$(PROGRAM).ll -o result.ll; \
+	cp result.ll $(TEST_DIR)/$(PROGRAM)-licm.ll
 
 optimize-sccp: $(PLUGIN) # optimize using human-readable LLVM IR
 	@if [ "$(PROGRAM)" = "" ]; then \
@@ -59,7 +76,8 @@ optimize-sccp: $(PLUGIN) # optimize using human-readable LLVM IR
 	@if [ "$(OUTPUT)" = "" ]; then \
 		OUTPUT=$(PROGRAM); \
 	fi; \
-	$(OPT) -verify-machineinstrs -load-pass-plugin=$(PLUGIN) -passes="$(SCCP_PASS_OPT)" -S $(TEST_DIR)/$(PROGRAM).ll -o result.ll # current version
+	$(OPT) -verify-each -load-pass-plugin=$(PLUGIN) -passes="$(SCCP_PASS_OPT)" -S $(TEST_DIR)/$(PROGRAM).ll -o result.ll; \
+	cp result.ll $(TEST_DIR)/$(PROGRAM)-sccp.ll
 
 optimize-cse: $(PLUGIN) # optimize using human-readable LLVM IR
 	@if [ "$(PROGRAM)" = "" ]; then \
@@ -69,7 +87,8 @@ optimize-cse: $(PLUGIN) # optimize using human-readable LLVM IR
 	@if [ "$(OUTPUT)" = "" ]; then \
 		OUTPUT=$(PROGRAM); \
 	fi; \
-	$(OPT) -verify-machineinstrs -load-pass-plugin=$(PLUGIN) -passes="$(CSE_PASS_OPT)" -S $(TEST_DIR)/$(PROGRAM).ll -o result.ll # current version
+	$(OPT) -verify-each -load-pass-plugin=$(PLUGIN) -passes="$(CSE_PASS_OPT)" -S $(TEST_DIR)/$(PROGRAM).ll -o result.ll; \
+	cp result.ll $(TEST_DIR)/$(PROGRAM)-cse.ll
 
 
 optimize-real: # optimize using real C++ file
@@ -81,7 +100,8 @@ optimize-real: # optimize using real C++ file
 		OUTPUT=$(PROGRAM); \
 	fi; \
 	$(CLANG) $(REAL_PROG).c $(CXXFLAGS) -o - | \
-	$(OPT) -verify-machineinstrs -load-pass-plugin=$(PLUGIN) -passes="$(OPT_PASSES)" -S  -o result.ll
+	$(OPT) -verify-each -load-pass-plugin=$(PLUGIN) -passes="$(OPT_PASSES)" -S  -o result.ll; \
+	cp result.ll $(TEST_DIR)/$(PROGRAM)-all.ll
 
 
 optimize-real-licm: # optimize using real C++ file
@@ -93,7 +113,8 @@ optimize-real-licm: # optimize using real C++ file
 		OUTPUT=$(PROGRAM); \
 	fi; \
 	$(CLANG) $(REAL_PROG).c $(CXXFLAGS) -o - | \
-	$(OPT) -verify-machineinstrs -load-pass-plugin=$(PLUGIN) -passes="$(LICM_PASS_OPT)" -S  -o result.ll
+	$(OPT) -verify-each -load-pass-plugin=$(PLUGIN) -passes="$(LICM_PASS_OPT)" -S  -o result.ll; \
+	cp result.ll $(TEST_DIR)/$(PROGRAM)-licm.ll
 
 optimize-real-sccp: # optimize using real C++ file
 	@if [ "$(PROGRAM)" = "" ]; then \
@@ -104,7 +125,8 @@ optimize-real-sccp: # optimize using real C++ file
 		OUTPUT=$(PROGRAM); \
 	fi; \
 	$(CLANG) $(REAL_PROG).c $(CXXFLAGS) -o - | \
-	$(OPT) -verify-machineinstrs -load-pass-plugin=$(PLUGIN) -passes="$(SCCP_PASS_OPT)" -S  -o result.ll
+	$(OPT) -verify-each -load-pass-plugin=$(PLUGIN) -passes="$(SCCP_PASS_OPT)" -S  -o result.ll; \
+	cp result.ll $(TEST_DIR)/$(PROGRAM)-sccp.ll
 
 optimize-real-cse: # optimize using real C++ file
 	@if [ "$(PROGRAM)" = "" ]; then \
@@ -115,22 +137,13 @@ optimize-real-cse: # optimize using real C++ file
 		OUTPUT=$(PROGRAM); \
 	fi; \
 	$(CLANG) $(REAL_PROG).c $(CXXFLAGS) -o - | \
-	$(OPT) -verify-machineinstrs -load-pass-plugin=$(PLUGIN) -passes="$(CSE_PASS_OPT)" -S  -o result.ll
+	$(OPT) -verify-each -load-pass-plugin=$(PLUGIN) -passes="$(CSE_PASS_OPT)" -S  -o result.ll; \
+	cp result.ll $(TEST_DIR)/$(PROGRAM)-cse.ll
 
 
-no-optimize: # no optimization
-	@if [ "$(PROGRAM)" = "" ]; then \
-		echo "Error: Specify the <program> parameter"; \
-		exit 1; \
-	fi
-	@if [ "$(OUTPUT)" = "" ]; then \
-		OUTPUT=$(PROGRAM); \
-	fi; \
-	$(CLANG) $(TEST_DIR)/$(PROGRAM).ll -o result.ll
 
 run:
-	$(CLANG) result.ll -o result \
-	&& ./result > output.txt
+	$(CLANG) result.ll -o result
 
 clean:
 	rm -rf $(BUILD_DIR) $(OUTPUT)

@@ -62,8 +62,9 @@ PreservedAnalyses UnitLICM::run(Function &F, FunctionAnalysisManager &FAM) {
         const UnitLoopInfo::Loop &Loop = LoopEntry.second;
         Changed |= hoistLoopInvariantCode(Loop, DT, AA);
     }
-    // for(auto &BB : F) dbg_printBasicBlockInstructions(&BB, &std::cerr);
-    // ULI.printLoops(&std::cerr);
+    
+    for(auto &BB : F) dbg_printBasicBlockInstructions(&BB, &std::cerr);
+    ULI.printLoops(&std::cerr);
 
     // print statistics
     dbgs() << "Hoisted loads: " << NumHoistedLoads << "\n";
@@ -236,6 +237,8 @@ bool UnitLICM::isLoopInvariant(Value *V, const UnitLoopInfo::Loop &Loop) {
 /// @param AA   Alias analysis object
 /// @return  True if the memory operation has an alias in the loop
 bool UnitLICM::hasAliasInLoop(Instruction *MemInst, const UnitLoopInfo::Loop &Loop, AliasAnalysis &AA) {
+    auto MemLoc1 = MemoryLocation::getOrNone(MemInst);
+    
     for (BasicBlock *BB : Loop.blocks) {
         for (Instruction &I : *BB) {
             if (&I == MemInst)
@@ -244,9 +247,22 @@ bool UnitLICM::hasAliasInLoop(Instruction *MemInst, const UnitLoopInfo::Loop &Lo
             if (I.mayReadOrWriteMemory()) {
                 // Check aliasing
                 // dbgs() << "against" << I << "\n";
-                
+                // If this is a call or invoke instruction, handle via ModRef analysis
+                if (auto *CB = dyn_cast<CallBase>(&I)) {
+                    // If we don't know MemInst's memory location, be conservative and query the call
+                    if (!MemLoc1.hasValue()) {
+                        return true;
+                    } else {
+                        ModRefInfo MRI = AA.getModRefInfo(CB, *MemLoc1);
+                        // If the call modifies or even reads this particular memory, consider it aliasing
+                        if (MRI != ModRefInfo::NoModRef)
+                            return true;
+                    }
+
+                }
+
                 // Safely get memory location for the instruction
-                auto MemLoc1 = MemoryLocation::getOrNone(MemInst);
+                
                 auto MemLoc2 = MemoryLocation::getOrNone(&I);
 
                 // Ensure both memory locations are valid before checking alias

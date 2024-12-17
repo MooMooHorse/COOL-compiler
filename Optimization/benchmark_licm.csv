@@ -4,10 +4,7 @@ huffbench.c,2,0,1
 puzzle.c,0,0,0
 n-body.c,0,0,0
 whetstone.c,1,0,9
-cse.c,0,0,0
-hoist.c,0,0,1
 partialsums.c,0,0,1
-hard2.c,0,0,0
 nesting.c,0,0,0
 spectral-norm.c,0,0,0
 doloop.c,0,1,1
@@ -17,8 +14,6 @@ one-iter.c,0,0,0
 lpbench.c,0,0,2
 fannkuch.c,0,0,0
 random.c,0,0,0
-LA_test.c,0,0,0
 nsieve-bits.c,0,0,0
 ffbench.c,0,0,12
 recursive.c,0,0,0
-hard1.c,0,0,0

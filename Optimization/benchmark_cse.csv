@@ -1,0 +1,17 @@
+Program,Instructions Removed
+almabench.c,85
+huffbench.c,49
+puzzle.c,4
+n-body.c,24
+whetstone.c,31
+cse.c,2
+partialsums.c,1
+spectral-norm.c,13
+doloop.c,1
+matmul.c,11
+lpbench.c,34
+fannkuch.c,12
+LA_test.c,4
+nsieve-bits.c,9
+ffbench.c,28
+recursive.c,5

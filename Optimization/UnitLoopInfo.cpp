@@ -95,7 +95,7 @@ const UnitLoopInfo::Loop *UnitLoopInfo::getLoopForHeader(BasicBlock *header) {
 
 
 
-void printBasicBlockInstructions(const BasicBlock *block, std::ostream *ct) {
+static void printBasicBlockInstructions(const BasicBlock *block, std::ostream *ct) {
     if (!block || !ct) return; // Check for null pointers
 
     *ct << "    Block: ";
@@ -165,7 +165,7 @@ UnitLoopInfo UnitLoopAnalysis::run(Function &F, FunctionAnalysisManager &FAM)
 	dbgs() << "All blocks in the function:\n";
 
 	for (auto &BB : F) {
-		printBasicBlockInstructions(&BB, &std::cerr);
+		// printBasicBlockInstructions(&BB, &std::cerr);
 	}
 
 	// Iterate through all blocks to find back edges

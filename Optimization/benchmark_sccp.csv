@@ -1,0 +1,19 @@
+Program,Instructions Removed,Unreachable Blocks,Constants Replaced
+almabench.c,0,0,0
+huffbench.c,0,0,0
+puzzle.c,0,0,0
+n-body.c,0,0,0
+whetstone.c,0,0,0
+partialsums.c,2,0,2
+nesting.c,0,0,0
+spectral-norm.c,0,0,0
+doloop.c,0,0,0
+PR491.c,0,0,0
+matmul.c,0,0,0
+one-iter.c,0,0,0
+lpbench.c,0,0,0
+fannkuch.c,0,0,0
+random.c,0,0,0
+nsieve-bits.c,3,0,3
+ffbench.c,5,0,5
+recursive.c,10,0,10
