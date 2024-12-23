@@ -1,3 +1,4 @@
+BIN_DIR=../bin
 SUPPORT_DIR=../cool-support
 FLEX_SRC=cool.flex
 BISON_SRC=cool.y
@@ -14,9 +15,9 @@ BISON=bison -d -v -y -b cool --debug -p cool_yy
 
 all: lexer parser
 lexer: ${FLEX_SRC}.o ${FLEX_OBJS} ${COMMON_OBJS}
-	${CC} $^ -o $@
+	${CC} $^ -o $(BIN_DIR)/$@
 parser: ${BISON_SRC}.o ${BISON_OBJS} ${COMMON_OBJS}
-	${CC} $^ -o $@
+	${CC} $^ -o $(BIN_DIR)/$@
 
 ${SUPPORT_DIR_OBJS}: %.o: ${SUPPORT_DIR}/src/%.cc
 	${CC} -c $< -o $@

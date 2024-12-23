@@ -2,10 +2,27 @@
 
 ### Compile the Optimization Passes
 
-Essentially if you are a TA
 
+1. download `llvm-project-18.1.0.src.tar.xz` from github (search llvm-project release)
+
+2. 
 ```bash
-make all # will do everything
+tar xvf llvm-project-18.1.0.src.tar.xz && mv llvm-project-18.1.0.src llvm18
+cd llvm18/
+cmake -B build/ -S llvm/ \
+  -DCMAKE_C_COMPILER="clang" -DCMAKE_CXX_COMPILER="clang++" \
+  -DLLVM_USE_LINKER=lld -DCMAKE_BUILD_TYPE="Debug" \
+  -DLLVM_TARGETS_TO_BUILD="NVPTX;X86" \
+  -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" \
+  -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi"
+cd llvm && make -j16
+```
+
+3. in Optimization directory do 
+
+```
+cmake -B build -DLLVM_DIR=/home/hao/COOL-compiler/llvm-project-15.0.0.src/lib/cmake/llvm
+cd build && make -j8
 ```
 
 ### End 2 End

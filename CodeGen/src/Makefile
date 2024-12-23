@@ -3,10 +3,9 @@ CC = gcc
 LEXER = ../reference-binaries/lexer
 PARSER = ../reference-binaries/parser
 SEMANT = ../reference-binaries/semant
-LLVM_CONF = llvm-config-15
+BIN_DIR = ../bin
 
-CXXFLAGS = -I. -I../cool-support/include -I $(shell ${LLVM_CONF} --includedir) -std=c++17 -Wall -Wno-register -Wno-write-strings
-CXX_LN_FLAGS = $(shell ${LLVM_CONF} --ldflags --libs --system-libs)
+CXXFLAGS = -I. -I../cool-support/include -std=c++17 -Wall -Wno-register -Wno-write-strings
 
 debug = true
 ifeq ($(debug),true)
@@ -25,19 +24,17 @@ default: all
 all: cgen-1 cgen-2
 
 cgen-1: cgen-1.o $(MP_OBJS) $(SUPPORT_OBJS)
-	$(CXX) $+ $(CXX_LN_FLAGS) -o $@
+	$(CXX) $+  -o $(BIN_DIR)/$@
 cgen-1.o: cgen.cc $(INCL)
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 cgen-2: cgen-2.o $(MP_OBJS) $(SUPPORT_OBJS)
-	$(CXX) $+ $(CXX_LN_FLAGS) -o $@
+	$(CXX) $+ -o $(BIN_DIR)/$@
 cgen-2.o : cgen.cc $(INCL)
 	$(CXX) -c $(CXXFLAGS) -DMP3 $< -o $@
 
 coolrt.o : coolrt.cc coolrt.h
 	$(CXX) -g $(CXXFLAGS) -c $< -o $@
-coolrt.bc : coolrt.cc coolrt.h
-	$(LLVMGCC) $(CXXFLAGS) -emit-llvm -c coolrt.c -o $@
 
 $(SUPPORT_OBJS): %.o: ../cool-support/src/%.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -45,4 +42,4 @@ $(MP_OBJS): %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f cgen-1.o cgen-2.o $(SUPPORT_OBJS) $(MP_OBJS) cgen-1 cgen-2
+	rm -f cgen-1.o cgen-2.o $(SUPPORT_OBJS) $(MP_OBJS) $(BIN_DIR)/cgen-1 $(BIN_DIR)/cgen-2
