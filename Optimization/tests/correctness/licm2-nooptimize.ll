@@ -4,41 +4,43 @@ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16
 target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @do_loop(i32 noundef %0, i32 noundef %1, ptr noundef %2) #0 {
-  %4 = alloca i32, align 4
-  %5 = alloca i32, align 4
-  %6 = alloca ptr, align 8
-  store i32 %0, ptr %4, align 4
-  store i32 %1, ptr %5, align 4
-  store ptr %2, ptr %6, align 8
-  br label %7
+define dso_local i32 @do_loop(i32 noundef %x, i32 noundef %y, ptr noundef %z) #0 {
+entry:
+  %x.addr = alloca i32, align 4
+  %y.addr = alloca i32, align 4
+  %z.addr = alloca ptr, align 8
+  store i32 %x, ptr %x.addr, align 4
+  store i32 %y, ptr %y.addr, align 4
+  store ptr %z, ptr %z.addr, align 8
+  br label %do.body
 
-7:                                                ; preds = %12, %3
-  %8 = load ptr, ptr %6, align 8
-  %9 = load i32, ptr %8, align 4
-  %10 = load i32, ptr %5, align 4
-  %11 = add nsw i32 %9, %10
-  store i32 %11, ptr %4, align 4
-  br label %12
+do.body:                                          ; preds = %do.cond, %entry
+  %0 = load ptr, ptr %z.addr, align 8
+  %1 = load i32, ptr %0, align 4
+  %2 = load i32, ptr %y.addr, align 4
+  %add = add nsw i32 %1, %2
+  store i32 %add, ptr %x.addr, align 4
+  br label %do.cond
 
-12:                                               ; preds = %7
-  %13 = load i32, ptr %4, align 4
-  %14 = icmp slt i32 %13, 0
-  br i1 %14, label %7, label %15, !llvm.loop !6
+do.cond:                                          ; preds = %do.body
+  %3 = load i32, ptr %x.addr, align 4
+  %cmp = icmp slt i32 %3, 0
+  br i1 %cmp, label %do.body, label %do.end, !llvm.loop !6
 
-15:                                               ; preds = %12
-  %16 = load i32, ptr %4, align 4
-  ret i32 %16
+do.end:                                           ; preds = %do.cond
+  %4 = load i32, ptr %x.addr, align 4
+  ret i32 %4
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  %2 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  store i32 2, ptr %2, align 4
-  %3 = call i32 @do_loop(i32 noundef 2, i32 noundef 3, ptr noundef %2)
-  ret i32 %3
+entry:
+  %retval = alloca i32, align 4
+  %x = alloca i32, align 4
+  store i32 0, ptr %retval, align 4
+  store i32 2, ptr %x, align 4
+  %call = call i32 @do_loop(i32 noundef 2, i32 noundef 3, ptr noundef %x)
+  ret i32 %call
 }
 
 attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }

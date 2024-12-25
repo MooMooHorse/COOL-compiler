@@ -7,15 +7,16 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = icmp sgt i32 15, 0
-  br label %2
+entry:
+  %cmp = icmp sgt i32 15, 0
+  br label %if.then
 
-2:                                                ; preds = %0
-  br label %3
+if.then:                                          ; preds = %entry
+  br label %if.end
 
-3:                                                ; preds = %2
-  %.0 = phi i32 [ 15, %2 ]
-  %4 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %.0)
+if.end:                                           ; preds = %if.then
+  %c.0 = phi i32 [ 15, %if.then ]
+  %call = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %c.0)
   ret i32 0
 }
 

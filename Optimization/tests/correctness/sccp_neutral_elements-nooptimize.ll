@@ -6,27 +6,29 @@ target triple = "x86_64-unknown-linux-gnu"
 @.str = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @neutral_elements(i32 noundef %0) #0 {
-  %2 = alloca i32, align 4
-  %3 = alloca i32, align 4
-  %4 = alloca i32, align 4
-  store i32 %0, ptr %2, align 4
-  %5 = load i32, ptr %2, align 4
-  %6 = add nsw i32 %5, 0
-  store i32 %6, ptr %3, align 4
-  %7 = load i32, ptr %3, align 4
-  %8 = mul nsw i32 %7, 1
-  store i32 %8, ptr %4, align 4
-  %9 = load i32, ptr %4, align 4
-  ret i32 %9
+define dso_local i32 @neutral_elements(i32 noundef %input) #0 {
+entry:
+  %input.addr = alloca i32, align 4
+  %a = alloca i32, align 4
+  %b = alloca i32, align 4
+  store i32 %input, ptr %input.addr, align 4
+  %0 = load i32, ptr %input.addr, align 4
+  %add = add nsw i32 %0, 0
+  store i32 %add, ptr %a, align 4
+  %1 = load i32, ptr %a, align 4
+  %mul = mul nsw i32 %1, 1
+  store i32 %mul, ptr %b, align 4
+  %2 = load i32, ptr %b, align 4
+  ret i32 %2
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  %2 = call i32 @neutral_elements(i32 noundef 5)
-  %3 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %2)
+entry:
+  %retval = alloca i32, align 4
+  store i32 0, ptr %retval, align 4
+  %call = call i32 @neutral_elements(i32 noundef 5)
+  %call1 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %call)
   ret i32 0
 }
 

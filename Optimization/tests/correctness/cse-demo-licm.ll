@@ -4,65 +4,70 @@ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16
 target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @test1(i8 noundef signext %0, ptr noundef %1, ptr noundef %2) #0 {
-  %4 = sext i8 %0 to i32
-  %5 = sext i8 %0 to i32
-  store i32 %4, ptr %1, align 4
-  store i32 %5, ptr %1, align 4
-  store volatile i32 %4, ptr %2, align 4
-  store volatile i32 %5, ptr %2, align 4
+define dso_local void @test1(i8 noundef signext %c, ptr noundef %x, ptr noundef %y) #0 {
+entry:
+  %conv = sext i8 %c to i32
+  %conv1 = sext i8 %c to i32
+  store i32 %conv, ptr %x, align 4
+  store i32 %conv1, ptr %x, align 4
+  store volatile i32 %conv, ptr %y, align 4
+  store volatile i32 %conv1, ptr %y, align 4
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @test2(float noundef %0, float noundef %1, ptr noundef %2, ptr noundef %3) #0 {
-  %5 = fadd float %0, %1
-  %6 = fptosi float %5 to i32
-  store i32 %6, ptr %2, align 4
-  %7 = fadd float %0, %1
-  %8 = fptosi float %7 to i32
-  store i32 %8, ptr %3, align 4
+define dso_local void @test2(float noundef %x, float noundef %y, ptr noundef %m, ptr noundef %n) #0 {
+entry:
+  %add = fadd float %x, %y
+  %conv = fptosi float %add to i32
+  store i32 %conv, ptr %m, align 4
+  %add1 = fadd float %x, %y
+  %conv2 = fptosi float %add1 to i32
+  store i32 %conv2, ptr %n, align 4
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @g(i32 noundef %0) #0 {
+define dso_local void @g(i32 noundef %x) #0 {
+entry:
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @test3(ptr noundef %0) #0 {
-  %2 = icmp ne ptr %0, null
-  br i1 %2, label %7, label %3
+define dso_local void @test3(ptr noundef %p) #0 {
+entry:
+  %tobool = icmp ne ptr %p, null
+  br i1 %tobool, label %if.end, label %if.then
 
-3:                                                ; preds = %1
-  %4 = icmp ne ptr %0, null
-  %5 = xor i1 %4, true
-  %6 = zext i1 %5 to i32
-  call void @g(i32 noundef %6)
-  br label %7
+if.then:                                          ; preds = %entry
+  %tobool1 = icmp ne ptr %p, null
+  %lnot = xor i1 %tobool1, true
+  %lnot.ext = zext i1 %lnot to i32
+  call void @g(i32 noundef %lnot.ext)
+  br label %if.end
 
-7:                                                ; preds = %3, %1
+if.end:                                           ; preds = %if.then, %entry
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  %2 = alloca i32, align 4
-  %3 = alloca i32, align 4
-  store i32 3, ptr %1, align 4
-  store i32 4, ptr %2, align 4
-  store i32 5, ptr %3, align 4
-  call void @test1(i8 noundef signext 97, ptr noundef %1, ptr noundef %2)
-  call void @test2(float noundef 1.000000e+00, float noundef 2.000000e+00, ptr noundef %3, ptr noundef %1)
-  call void @test3(ptr noundef %3)
-  %4 = load i32, ptr %1, align 4
-  %5 = load i32, ptr %2, align 4
-  %6 = add nsw i32 %4, %5
-  %7 = load i32, ptr %3, align 4
-  %8 = add nsw i32 %6, %7
-  ret i32 %8
+entry:
+  %x = alloca i32, align 4
+  %y = alloca i32, align 4
+  %m = alloca i32, align 4
+  store i32 3, ptr %x, align 4
+  store i32 4, ptr %y, align 4
+  store i32 5, ptr %m, align 4
+  call void @test1(i8 noundef signext 97, ptr noundef %x, ptr noundef %y)
+  call void @test2(float noundef 1.000000e+00, float noundef 2.000000e+00, ptr noundef %m, ptr noundef %x)
+  call void @test3(ptr noundef %m)
+  %0 = load i32, ptr %x, align 4
+  %1 = load i32, ptr %y, align 4
+  %add = add nsw i32 %0, %1
+  %2 = load i32, ptr %m, align 4
+  %add1 = add nsw i32 %add, %2
+  ret i32 %add1
 }
 
 attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }

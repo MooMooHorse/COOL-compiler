@@ -5,11 +5,13 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local void @unreachable_code() #0 {
+entry:
   unreachable
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
+entry:
   call void @unreachable_code()
   ret i32 0
 }

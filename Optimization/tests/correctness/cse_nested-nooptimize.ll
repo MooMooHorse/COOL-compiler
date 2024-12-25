@@ -7,23 +7,24 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  %2 = alloca i32, align 4
-  %3 = alloca i32, align 4
-  %4 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  store i32 4, ptr %2, align 4
-  store i32 6, ptr %3, align 4
-  %5 = load i32, ptr %2, align 4
-  %6 = load i32, ptr %3, align 4
-  %7 = add nsw i32 %5, %6
-  %8 = load i32, ptr %2, align 4
-  %9 = load i32, ptr %3, align 4
-  %10 = add nsw i32 %8, %9
-  %11 = mul nsw i32 %7, %10
-  store i32 %11, ptr %4, align 4
-  %12 = load i32, ptr %4, align 4
-  %13 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %12)
+entry:
+  %retval = alloca i32, align 4
+  %a = alloca i32, align 4
+  %b = alloca i32, align 4
+  %x = alloca i32, align 4
+  store i32 0, ptr %retval, align 4
+  store i32 4, ptr %a, align 4
+  store i32 6, ptr %b, align 4
+  %0 = load i32, ptr %a, align 4
+  %1 = load i32, ptr %b, align 4
+  %add = add nsw i32 %0, %1
+  %2 = load i32, ptr %a, align 4
+  %3 = load i32, ptr %b, align 4
+  %add1 = add nsw i32 %2, %3
+  %mul = mul nsw i32 %add, %add1
+  store i32 %mul, ptr %x, align 4
+  %4 = load i32, ptr %x, align 4
+  %call = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %4)
   ret i32 0
 }
 

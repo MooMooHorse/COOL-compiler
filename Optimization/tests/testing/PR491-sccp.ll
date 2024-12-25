@@ -11,58 +11,61 @@ target triple = "x86_64-unknown-linux-gnu"
 @.str.2 = private unnamed_addr constant [35 x i8] c"assertion failed in line %u: '%s'\0A\00", align 1
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @test(i32 noundef %0) #0 {
-  %2 = alloca %union.anon, align 8
-  store i64 0, ptr %2, align 8
-  %3 = getelementptr inbounds [8 x i8], ptr %2, i64 0, i64 0
-  store i8 -128, ptr %3, align 8
-  %4 = load i64, ptr %2, align 8
-  %5 = icmp eq i64 %4, 128
-  br i1 %5, label %6, label %7
+define dso_local i32 @test(i32 noundef %r) #0 {
+entry:
+  %u = alloca %union.anon, align 8
+  store i64 0, ptr %u, align 8
+  %arrayidx = getelementptr inbounds [8 x i8], ptr %u, i64 0, i64 0
+  store i8 -128, ptr %arrayidx, align 8
+  %0 = load i64, ptr %u, align 8
+  %cmp = icmp eq i64 %0, 128
+  br i1 %cmp, label %cond.true, label %cond.false
 
-6:                                                ; preds = %1
-  br label %9
+cond.true:                                        ; preds = %entry
+  br label %cond.end
 
-7:                                                ; preds = %1
-  %8 = call i32 @assert_fail(ptr noundef @.str, i32 noundef 22)
-  br label %9
+cond.false:                                       ; preds = %entry
+  %call = call i32 @assert_fail(ptr noundef @.str, i32 noundef 22)
+  br label %cond.end
 
-9:                                                ; preds = %7, %6
-  %10 = phi i32 [ 1, %6 ], [ %8, %7 ]
-  %11 = and i32 %0, %10
-  store i64 0, ptr %2, align 8
-  %12 = getelementptr inbounds [8 x i8], ptr %2, i64 0, i64 7
-  store i8 -128, ptr %12, align 1
-  %13 = load i64, ptr %2, align 8
-  %14 = icmp slt i64 %13, 0
-  br i1 %14, label %15, label %16
+cond.end:                                         ; preds = %cond.false, %cond.true
+  %cond = phi i32 [ 1, %cond.true ], [ %call, %cond.false ]
+  %and = and i32 %r, %cond
+  store i64 0, ptr %u, align 8
+  %arrayidx1 = getelementptr inbounds [8 x i8], ptr %u, i64 0, i64 7
+  store i8 -128, ptr %arrayidx1, align 1
+  %1 = load i64, ptr %u, align 8
+  %cmp2 = icmp slt i64 %1, 0
+  br i1 %cmp2, label %cond.true3, label %cond.false4
 
-15:                                               ; preds = %9
-  br label %18
+cond.true3:                                       ; preds = %cond.end
+  br label %cond.end6
 
-16:                                               ; preds = %9
-  %17 = call i32 @assert_fail(ptr noundef @.str.1, i32 noundef 24)
-  br label %18
+cond.false4:                                      ; preds = %cond.end
+  %call5 = call i32 @assert_fail(ptr noundef @.str.1, i32 noundef 24)
+  br label %cond.end6
 
-18:                                               ; preds = %16, %15
-  %19 = phi i32 [ 1, %15 ], [ %17, %16 ]
-  %20 = and i32 %11, %19
-  ret i32 %20
+cond.end6:                                        ; preds = %cond.false4, %cond.true3
+  %cond7 = phi i32 [ 1, %cond.true3 ], [ %call5, %cond.false4 ]
+  %and8 = and i32 %and, %cond7
+  ret i32 %and8
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define internal i32 @assert_fail(ptr noundef %0, i32 noundef %1) #0 {
-  %3 = load ptr, ptr @stderr, align 8
-  %4 = call i32 (ptr, ptr, ...) @fprintf(ptr noundef %3, ptr noundef @.str.2, i32 noundef %1, ptr noundef %0)
+define internal i32 @assert_fail(ptr noundef %s, i32 noundef %l) #0 {
+entry:
+  %0 = load ptr, ptr @stderr, align 8
+  %call = call i32 (ptr, ptr, ...) @fprintf(ptr noundef %0, ptr noundef @.str.2, i32 noundef %l, ptr noundef %s)
   ret i32 0
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = call i32 @test(i32 noundef 1)
-  %2 = icmp ne i32 %1, 1
-  %3 = zext i1 %2 to i32
-  ret i32 %3
+entry:
+  %call = call i32 @test(i32 noundef 1)
+  %cmp = icmp ne i32 %call, 1
+  %conv = zext i1 %cmp to i32
+  ret i32 %conv
 }
 
 declare i32 @fprintf(ptr noundef, ptr noundef, ...) #1

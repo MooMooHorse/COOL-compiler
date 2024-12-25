@@ -1,92 +1,45 @@
 ; ModuleID = '<stdin>'
-source_filename = "tests/testing/matmul.c"
+source_filename = "tests/testing/one-iter.c"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @matmul(i32 noundef %0, i32 noundef %1, i32 noundef %2, ptr noundef %3, ptr noundef %4, ptr noundef %5) #0 {
-  %7 = zext i32 %0 to i64
-  %8 = zext i32 %1 to i64
-  %9 = zext i32 %1 to i64
-  %10 = zext i32 %2 to i64
-  %11 = zext i32 %0 to i64
-  %12 = zext i32 %2 to i64
-  br label %13
+define dso_local i32 @foo(i32 noundef %n) #0 {
+entry:
+  br label %do.body
 
-13:                                               ; preds = %53, %6
-  %.02 = phi i32 [ 0, %6 ], [ %54, %53 ]
-  %14 = icmp slt i32 %.02, %0
-  br i1 %14, label %15, label %55
+do.body:                                          ; preds = %do.cond, %entry
+  %i.0 = phi i32 [ 1, %entry ], [ %i.1, %do.cond ]
+  %add = add nsw i32 %i.0, 1
+  %call = call i32 @rand() #2
+  %rem = srem i32 %call, 4
+  %add1 = add nsw i32 1, %add
+  %sub = sub nsw i32 %rem, %add1
+  %add2 = add nsw i32 %sub, %n
+  %cmp = icmp sgt i32 %add, 0
+  br i1 %cmp, label %if.then, label %if.end
 
-15:                                               ; preds = %13
-  %16 = sext i32 %.02 to i64
-  %17 = sext i32 %.02 to i64
-  %18 = sext i32 %.02 to i64
-  %19 = mul nsw i64 %16, %12
-  %20 = mul nsw i64 %17, %8
-  %21 = mul nsw i64 %18, %12
-  %22 = getelementptr inbounds i32, ptr %5, i64 %19
-  %23 = getelementptr inbounds i32, ptr %3, i64 %20
-  %24 = getelementptr inbounds i32, ptr %5, i64 %21
-  br label %25
+if.then:                                          ; preds = %do.body
+  br label %if.end
 
-25:                                               ; preds = %50, %15
-  %.01 = phi i32 [ 0, %15 ], [ %51, %50 ]
-  %26 = icmp slt i32 %.01, %2
-  br i1 %26, label %27, label %52
+if.end:                                           ; preds = %if.then, %do.body
+  %i.1 = phi i32 [ %add, %if.then ], [ %add2, %do.body ]
+  br label %do.cond
 
-27:                                               ; preds = %25
-  %28 = sext i32 %.01 to i64
-  %29 = getelementptr inbounds i32, ptr %22, i64 %28
-  store i32 0, ptr %29, align 4
-  %30 = sext i32 %.01 to i64
-  %31 = sext i32 %.01 to i64
-  %32 = getelementptr inbounds i32, ptr %24, i64 %31
-  br label %33
+do.cond:                                          ; preds = %if.end
+  %cmp3 = icmp slt i32 %add, 2
+  br i1 %cmp3, label %do.body, label %do.end, !llvm.loop !6
 
-33:                                               ; preds = %47, %27
-  %.0 = phi i32 [ 0, %27 ], [ %48, %47 ]
-  %34 = icmp slt i32 %.0, %1
-  br i1 %34, label %35, label %49
-
-35:                                               ; preds = %33
-  %36 = sext i32 %.0 to i64
-  %37 = getelementptr inbounds i32, ptr %23, i64 %36
-  %38 = load i32, ptr %37, align 4
-  %39 = sext i32 %.0 to i64
-  %40 = mul nsw i64 %39, %10
-  %41 = getelementptr inbounds i32, ptr %4, i64 %40
-  %42 = getelementptr inbounds i32, ptr %41, i64 %30
-  %43 = load i32, ptr %42, align 4
-  %44 = mul nsw i32 %38, %43
-  %45 = load i32, ptr %32, align 4
-  %46 = add nsw i32 %45, %44
-  store i32 %46, ptr %32, align 4
-  br label %47
-
-47:                                               ; preds = %35
-  %48 = add nsw i32 %.0, 1
-  br label %33, !llvm.loop !6
-
-49:                                               ; preds = %33
-  br label %50
-
-50:                                               ; preds = %49
-  %51 = add nsw i32 %.01, 1
-  br label %25, !llvm.loop !8
-
-52:                                               ; preds = %25
-  br label %53
-
-53:                                               ; preds = %52
-  %54 = add nsw i32 %.02, 1
-  br label %13, !llvm.loop !9
-
-55:                                               ; preds = %13
-  ret void
+do.end:                                           ; preds = %do.cond
+  ret i32 %i.1
 }
 
+; Function Attrs: nounwind
+declare i32 @rand() #1
+
 attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #1 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #2 = { nounwind }
 
 !llvm.module.flags = !{!0, !1, !2, !3, !4}
 !llvm.ident = !{!5}
@@ -99,5 +52,3 @@ attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vec
 !5 = !{!"clang version 15.0.0 (git@github.com:MooMooHorse/COOL-compiler.git bd76a3d41b4001cc1224acf7e88bb2644f8829e2)"}
 !6 = distinct !{!6, !7}
 !7 = !{!"llvm.loop.mustprogress"}
-!8 = distinct !{!8, !7}
-!9 = distinct !{!9, !7}

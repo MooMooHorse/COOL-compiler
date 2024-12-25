@@ -4,170 +4,172 @@ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16
 target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @crazy_loops(i32 noundef %0) #0 {
-  br label %2
+define dso_local i32 @crazy_loops(i32 noundef %p) #0 {
+entry:
+  br label %do.body
 
-2:                                                ; preds = %21, %1
-  %.04 = phi i32 [ 25, %1 ], [ %.15, %21 ]
-  %.01 = phi i32 [ 5, %1 ], [ %.12, %21 ]
-  %.0 = phi i32 [ 5, %1 ], [ %20, %21 ]
-  br label %3
+do.body:                                          ; preds = %do.cond12, %entry
+  %y.0 = phi i32 [ 25, %entry ], [ %y.1, %do.cond12 ]
+  %x.0 = phi i32 [ 5, %entry ], [ %x.1, %do.cond12 ]
+  %z.0 = phi i32 [ 5, %entry ], [ %add11, %do.cond12 ]
+  br label %while.cond
 
-3:                                                ; preds = %18, %2
-  %.15 = phi i32 [ %.04, %2 ], [ %.37, %18 ]
-  %.12 = phi i32 [ %.01, %2 ], [ %10, %18 ]
-  %4 = add nsw i32 %.12, %.15
-  %5 = icmp slt i32 %4, %.0
-  br i1 %5, label %6, label %19
+while.cond:                                       ; preds = %do.end, %do.body
+  %y.1 = phi i32 [ %y.0, %do.body ], [ %y.3, %do.end ]
+  %x.1 = phi i32 [ %x.0, %do.body ], [ %mul6, %do.end ]
+  %add2 = add nsw i32 %x.1, %y.1
+  %cmp = icmp slt i32 %add2, %z.0
+  br i1 %cmp, label %while.body, label %while.end
 
-6:                                                ; preds = %3
-  %7 = add nsw i32 %.12, 1
-  %8 = add nsw i32 %.15, 1
-  br label %9
+while.body:                                       ; preds = %while.cond
+  %add3 = add nsw i32 %x.1, 1
+  %add4 = add nsw i32 %y.1, 1
+  br label %do.body5
 
-9:                                                ; preds = %15, %6
-  %.26 = phi i32 [ %8, %6 ], [ %.37, %15 ]
-  %.23 = phi i32 [ %7, %6 ], [ %10, %15 ]
-  %10 = mul nsw i32 %.23, %.23
-  %11 = icmp sgt i32 %10, 10
-  br i1 %11, label %12, label %14
+do.body5:                                         ; preds = %do.cond, %while.body
+  %y.2 = phi i32 [ %add4, %while.body ], [ %y.3, %do.cond ]
+  %x.2 = phi i32 [ %add3, %while.body ], [ %mul6, %do.cond ]
+  %mul6 = mul nsw i32 %x.2, %x.2
+  %cmp7 = icmp sgt i32 %mul6, 10
+  br i1 %cmp7, label %if.then, label %if.end
 
-12:                                               ; preds = %9
-  %13 = mul nsw i32 %.26, %.26
-  br label %14
+if.then:                                          ; preds = %do.body5
+  %mul8 = mul nsw i32 %y.2, %y.2
+  br label %if.end
 
-14:                                               ; preds = %12, %9
-  %.37 = phi i32 [ %13, %12 ], [ %.26, %9 ]
-  br label %15
+if.end:                                           ; preds = %if.then, %do.body5
+  %y.3 = phi i32 [ %mul8, %if.then ], [ %y.2, %do.body5 ]
+  br label %do.cond
 
-15:                                               ; preds = %14
-  %16 = mul nsw i32 %0, %0
-  %17 = icmp slt i32 %10, %16
-  br i1 %17, label %9, label %18, !llvm.loop !6
+do.cond:                                          ; preds = %if.end
+  %mul9 = mul nsw i32 %p, %p
+  %cmp10 = icmp slt i32 %mul6, %mul9
+  br i1 %cmp10, label %do.body5, label %do.end, !llvm.loop !6
 
-18:                                               ; preds = %15
-  br label %3, !llvm.loop !8
+do.end:                                           ; preds = %do.cond
+  br label %while.cond, !llvm.loop !8
 
-19:                                               ; preds = %3
-  %20 = add nsw i32 %.0, 1
-  br label %21
+while.end:                                        ; preds = %while.cond
+  %add11 = add nsw i32 %z.0, 1
+  br label %do.cond12
 
-21:                                               ; preds = %19
-  %22 = icmp slt i32 %.12, %0
-  br i1 %22, label %2, label %23, !llvm.loop !9
+do.cond12:                                        ; preds = %while.end
+  %cmp13 = icmp slt i32 %x.1, %p
+  br i1 %cmp13, label %do.body, label %do.end14, !llvm.loop !9
 
-23:                                               ; preds = %21
-  br label %24
+do.end14:                                         ; preds = %do.cond12
+  br label %do.body15
 
-24:                                               ; preds = %43, %23
-  %.48 = phi i32 [ %.15, %23 ], [ %.59, %43 ]
-  %.3 = phi i32 [ 50, %23 ], [ %.4, %43 ]
-  %.1 = phi i32 [ %20, %23 ], [ %42, %43 ]
-  br label %25
+do.body15:                                        ; preds = %do.cond34, %do.end14
+  %y.4 = phi i32 [ %y.1, %do.end14 ], [ %y.5, %do.cond34 ]
+  %x.3 = phi i32 [ 50, %do.end14 ], [ %x.4, %do.cond34 ]
+  %z.1 = phi i32 [ %add11, %do.end14 ], [ %add33, %do.cond34 ]
+  br label %while.cond16
 
-25:                                               ; preds = %40, %24
-  %.59 = phi i32 [ %.48, %24 ], [ %.711, %40 ]
-  %.4 = phi i32 [ %.3, %24 ], [ %32, %40 ]
-  %26 = add nsw i32 %.4, %.59
-  %27 = icmp slt i32 %26, %.1
-  br i1 %27, label %28, label %41
+while.cond16:                                     ; preds = %do.end31, %do.body15
+  %y.5 = phi i32 [ %y.4, %do.body15 ], [ %y.7, %do.end31 ]
+  %x.4 = phi i32 [ %x.3, %do.body15 ], [ %mul23, %do.end31 ]
+  %add17 = add nsw i32 %x.4, %y.5
+  %cmp18 = icmp slt i32 %add17, %z.1
+  br i1 %cmp18, label %while.body19, label %while.end32
 
-28:                                               ; preds = %25
-  %29 = add nsw i32 %.4, 1
-  %30 = add nsw i32 %.59, 1
-  br label %31
+while.body19:                                     ; preds = %while.cond16
+  %add20 = add nsw i32 %x.4, 1
+  %add21 = add nsw i32 %y.5, 1
+  br label %do.body22
 
-31:                                               ; preds = %37, %28
-  %.610 = phi i32 [ %30, %28 ], [ %.711, %37 ]
-  %.5 = phi i32 [ %29, %28 ], [ %32, %37 ]
-  %32 = mul nsw i32 %.5, %.5
-  %33 = icmp sgt i32 %32, 10
-  br i1 %33, label %34, label %36
+do.body22:                                        ; preds = %do.cond28, %while.body19
+  %y.6 = phi i32 [ %add21, %while.body19 ], [ %y.7, %do.cond28 ]
+  %x.5 = phi i32 [ %add20, %while.body19 ], [ %mul23, %do.cond28 ]
+  %mul23 = mul nsw i32 %x.5, %x.5
+  %cmp24 = icmp sgt i32 %mul23, 10
+  br i1 %cmp24, label %if.then25, label %if.end27
 
-34:                                               ; preds = %31
-  %35 = mul nsw i32 %.610, %.610
-  br label %36
+if.then25:                                        ; preds = %do.body22
+  %mul26 = mul nsw i32 %y.6, %y.6
+  br label %if.end27
 
-36:                                               ; preds = %34, %31
-  %.711 = phi i32 [ %35, %34 ], [ %.610, %31 ]
-  br label %37
+if.end27:                                         ; preds = %if.then25, %do.body22
+  %y.7 = phi i32 [ %mul26, %if.then25 ], [ %y.6, %do.body22 ]
+  br label %do.cond28
 
-37:                                               ; preds = %36
-  %38 = mul nsw i32 %0, %0
-  %39 = icmp slt i32 %32, %38
-  br i1 %39, label %31, label %40, !llvm.loop !10
+do.cond28:                                        ; preds = %if.end27
+  %mul29 = mul nsw i32 %p, %p
+  %cmp30 = icmp slt i32 %mul23, %mul29
+  br i1 %cmp30, label %do.body22, label %do.end31, !llvm.loop !10
 
-40:                                               ; preds = %37
-  br label %25, !llvm.loop !11
+do.end31:                                         ; preds = %do.cond28
+  br label %while.cond16, !llvm.loop !11
 
-41:                                               ; preds = %25
-  %42 = add nsw i32 %.1, 1
-  br label %43
+while.end32:                                      ; preds = %while.cond16
+  %add33 = add nsw i32 %z.1, 1
+  br label %do.cond34
 
-43:                                               ; preds = %41
-  %44 = icmp slt i32 %.4, %0
-  br i1 %44, label %24, label %45, !llvm.loop !12
+do.cond34:                                        ; preds = %while.end32
+  %cmp35 = icmp slt i32 %x.4, %p
+  br i1 %cmp35, label %do.body15, label %do.end36, !llvm.loop !12
 
-45:                                               ; preds = %43
-  br label %46
+do.end36:                                         ; preds = %do.cond34
+  br label %do.body37
 
-46:                                               ; preds = %65, %45
-  %.812 = phi i32 [ %.59, %45 ], [ %.9, %65 ]
-  %.6 = phi i32 [ %0, %45 ], [ %.7, %65 ]
-  %.2 = phi i32 [ %42, %45 ], [ %64, %65 ]
-  br label %47
+do.body37:                                        ; preds = %do.cond56, %do.end36
+  %y.8 = phi i32 [ %y.5, %do.end36 ], [ %y.9, %do.cond56 ]
+  %x.6 = phi i32 [ %p, %do.end36 ], [ %x.7, %do.cond56 ]
+  %z.2 = phi i32 [ %add33, %do.end36 ], [ %add55, %do.cond56 ]
+  br label %while.cond38
 
-47:                                               ; preds = %62, %46
-  %.9 = phi i32 [ %.812, %46 ], [ %.11, %62 ]
-  %.7 = phi i32 [ %.6, %46 ], [ %54, %62 ]
-  %48 = add nsw i32 %.7, %.9
-  %49 = icmp slt i32 %48, %.2
-  br i1 %49, label %50, label %63
+while.cond38:                                     ; preds = %do.end53, %do.body37
+  %y.9 = phi i32 [ %y.8, %do.body37 ], [ %y.11, %do.end53 ]
+  %x.7 = phi i32 [ %x.6, %do.body37 ], [ %mul45, %do.end53 ]
+  %add39 = add nsw i32 %x.7, %y.9
+  %cmp40 = icmp slt i32 %add39, %z.2
+  br i1 %cmp40, label %while.body41, label %while.end54
 
-50:                                               ; preds = %47
-  %51 = add nsw i32 %.7, 1
-  %52 = add nsw i32 %.9, 1
-  br label %53
+while.body41:                                     ; preds = %while.cond38
+  %add42 = add nsw i32 %x.7, 1
+  %add43 = add nsw i32 %y.9, 1
+  br label %do.body44
 
-53:                                               ; preds = %59, %50
-  %.10 = phi i32 [ %52, %50 ], [ %.11, %59 ]
-  %.8 = phi i32 [ %51, %50 ], [ %54, %59 ]
-  %54 = mul nsw i32 %.8, %.8
-  %55 = icmp sgt i32 %54, 10
-  br i1 %55, label %56, label %58
+do.body44:                                        ; preds = %do.cond50, %while.body41
+  %y.10 = phi i32 [ %add43, %while.body41 ], [ %y.11, %do.cond50 ]
+  %x.8 = phi i32 [ %add42, %while.body41 ], [ %mul45, %do.cond50 ]
+  %mul45 = mul nsw i32 %x.8, %x.8
+  %cmp46 = icmp sgt i32 %mul45, 10
+  br i1 %cmp46, label %if.then47, label %if.end49
 
-56:                                               ; preds = %53
-  %57 = mul nsw i32 %.10, %.10
-  br label %58
+if.then47:                                        ; preds = %do.body44
+  %mul48 = mul nsw i32 %y.10, %y.10
+  br label %if.end49
 
-58:                                               ; preds = %56, %53
-  %.11 = phi i32 [ %57, %56 ], [ %.10, %53 ]
-  br label %59
+if.end49:                                         ; preds = %if.then47, %do.body44
+  %y.11 = phi i32 [ %mul48, %if.then47 ], [ %y.10, %do.body44 ]
+  br label %do.cond50
 
-59:                                               ; preds = %58
-  %60 = mul nsw i32 %0, %0
-  %61 = icmp slt i32 %54, %60
-  br i1 %61, label %53, label %62, !llvm.loop !13
+do.cond50:                                        ; preds = %if.end49
+  %mul51 = mul nsw i32 %p, %p
+  %cmp52 = icmp slt i32 %mul45, %mul51
+  br i1 %cmp52, label %do.body44, label %do.end53, !llvm.loop !13
 
-62:                                               ; preds = %59
-  br label %47, !llvm.loop !14
+do.end53:                                         ; preds = %do.cond50
+  br label %while.cond38, !llvm.loop !14
 
-63:                                               ; preds = %47
-  %64 = add nsw i32 %.2, 1
-  br label %65
+while.end54:                                      ; preds = %while.cond38
+  %add55 = add nsw i32 %z.2, 1
+  br label %do.cond56
 
-65:                                               ; preds = %63
-  %66 = icmp slt i32 %.7, %0
-  br i1 %66, label %46, label %67, !llvm.loop !15
+do.cond56:                                        ; preds = %while.end54
+  %cmp57 = icmp slt i32 %x.7, %p
+  br i1 %cmp57, label %do.body37, label %do.end58, !llvm.loop !15
 
-67:                                               ; preds = %65
-  ret i32 %64
+do.end58:                                         ; preds = %do.cond56
+  ret i32 %add55
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = call i32 @crazy_loops(i32 noundef 50)
-  ret i32 %1
+entry:
+  %call = call i32 @crazy_loops(i32 noundef 50)
+  ret i32 %call
 }
 
 attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }

@@ -10,386 +10,390 @@ target triple = "x86_64-unknown-linux-gnu"
 @seed = internal global i64 1325, align 8
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @matgen(ptr noundef %0, ptr noundef %1) #0 {
-  br label %3
+define dso_local void @matgen(ptr noundef %a, ptr noundef %b) #0 {
+entry:
+  br label %for.cond
 
-3:                                                ; preds = %18, %2
-  %.01 = phi i32 [ 0, %2 ], [ %19, %18 ]
-  %4 = icmp slt i32 %.01, 2000
-  br i1 %4, label %5, label %20
+for.cond:                                         ; preds = %for.inc6, %entry
+  %i.0 = phi i32 [ 0, %entry ], [ %inc7, %for.inc6 ]
+  %cmp = icmp slt i32 %i.0, 2000
+  br i1 %cmp, label %for.body, label %for.end8
 
-5:                                                ; preds = %3
-  br label %6
+for.body:                                         ; preds = %for.cond
+  br label %for.cond1
 
-6:                                                ; preds = %15, %5
-  %.0 = phi i32 [ 0, %5 ], [ %16, %15 ]
-  %7 = icmp slt i32 %.0, 2000
-  br i1 %7, label %8, label %17
+for.cond1:                                        ; preds = %for.inc, %for.body
+  %j.0 = phi i32 [ 0, %for.body ], [ %inc, %for.inc ]
+  %cmp2 = icmp slt i32 %j.0, 2000
+  br i1 %cmp2, label %for.body3, label %for.end
 
-8:                                                ; preds = %6
-  %9 = call double @random_double()
-  %10 = sext i32 %.0 to i64
-  %11 = getelementptr inbounds ptr, ptr %0, i64 %10
-  %12 = load ptr, ptr %11, align 8
-  %13 = sext i32 %.01 to i64
-  %14 = getelementptr inbounds double, ptr %12, i64 %13
-  store double %9, ptr %14, align 8
-  br label %15
+for.body3:                                        ; preds = %for.cond1
+  %call = call double @random_double()
+  %idxprom = sext i32 %j.0 to i64
+  %arrayidx = getelementptr inbounds ptr, ptr %a, i64 %idxprom
+  %0 = load ptr, ptr %arrayidx, align 8
+  %idxprom4 = sext i32 %i.0 to i64
+  %arrayidx5 = getelementptr inbounds double, ptr %0, i64 %idxprom4
+  store double %call, ptr %arrayidx5, align 8
+  br label %for.inc
 
-15:                                               ; preds = %8
-  %16 = add nsw i32 %.0, 1
-  br label %6, !llvm.loop !6
+for.inc:                                          ; preds = %for.body3
+  %inc = add nsw i32 %j.0, 1
+  br label %for.cond1, !llvm.loop !6
 
-17:                                               ; preds = %6
-  br label %18
+for.end:                                          ; preds = %for.cond1
+  br label %for.inc6
 
-18:                                               ; preds = %17
-  %19 = add nsw i32 %.01, 1
-  br label %3, !llvm.loop !8
+for.inc6:                                         ; preds = %for.end
+  %inc7 = add nsw i32 %i.0, 1
+  br label %for.cond, !llvm.loop !8
 
-20:                                               ; preds = %3
-  br label %21
+for.end8:                                         ; preds = %for.cond
+  br label %for.cond9
 
-21:                                               ; preds = %26, %20
-  %.12 = phi i32 [ 0, %20 ], [ %27, %26 ]
-  %22 = icmp slt i32 %.12, 2000
-  br i1 %22, label %23, label %28
+for.cond9:                                        ; preds = %for.inc14, %for.end8
+  %i.1 = phi i32 [ 0, %for.end8 ], [ %inc15, %for.inc14 ]
+  %cmp10 = icmp slt i32 %i.1, 2000
+  br i1 %cmp10, label %for.body11, label %for.end16
 
-23:                                               ; preds = %21
-  %24 = sext i32 %.12 to i64
-  %25 = getelementptr inbounds double, ptr %1, i64 %24
-  store double 0.000000e+00, ptr %25, align 8
-  br label %26
+for.body11:                                       ; preds = %for.cond9
+  %idxprom12 = sext i32 %i.1 to i64
+  %arrayidx13 = getelementptr inbounds double, ptr %b, i64 %idxprom12
+  store double 0.000000e+00, ptr %arrayidx13, align 8
+  br label %for.inc14
 
-26:                                               ; preds = %23
-  %27 = add nsw i32 %.12, 1
-  br label %21, !llvm.loop !9
+for.inc14:                                        ; preds = %for.body11
+  %inc15 = add nsw i32 %i.1, 1
+  br label %for.cond9, !llvm.loop !9
 
-28:                                               ; preds = %21
-  br label %29
+for.end16:                                        ; preds = %for.cond9
+  br label %for.cond17
 
-29:                                               ; preds = %48, %28
-  %.1 = phi i32 [ 0, %28 ], [ %49, %48 ]
-  %30 = icmp slt i32 %.1, 2000
-  br i1 %30, label %31, label %50
+for.cond17:                                       ; preds = %for.inc32, %for.end16
+  %j.1 = phi i32 [ 0, %for.end16 ], [ %inc33, %for.inc32 ]
+  %cmp18 = icmp slt i32 %j.1, 2000
+  br i1 %cmp18, label %for.body19, label %for.end34
 
-31:                                               ; preds = %29
-  br label %32
+for.body19:                                       ; preds = %for.cond17
+  br label %for.cond20
 
-32:                                               ; preds = %45, %31
-  %.2 = phi i32 [ 0, %31 ], [ %46, %45 ]
-  %33 = icmp slt i32 %.2, 2000
-  br i1 %33, label %34, label %47
+for.cond20:                                       ; preds = %for.inc29, %for.body19
+  %i.2 = phi i32 [ 0, %for.body19 ], [ %inc30, %for.inc29 ]
+  %cmp21 = icmp slt i32 %i.2, 2000
+  br i1 %cmp21, label %for.body22, label %for.end31
 
-34:                                               ; preds = %32
-  %35 = sext i32 %.1 to i64
-  %36 = getelementptr inbounds ptr, ptr %0, i64 %35
-  %37 = load ptr, ptr %36, align 8
-  %38 = sext i32 %.2 to i64
-  %39 = getelementptr inbounds double, ptr %37, i64 %38
-  %40 = load double, ptr %39, align 8
-  %41 = sext i32 %.2 to i64
-  %42 = getelementptr inbounds double, ptr %1, i64 %41
-  %43 = load double, ptr %42, align 8
-  %44 = fadd double %43, %40
-  store double %44, ptr %42, align 8
-  br label %45
+for.body22:                                       ; preds = %for.cond20
+  %idxprom23 = sext i32 %j.1 to i64
+  %arrayidx24 = getelementptr inbounds ptr, ptr %a, i64 %idxprom23
+  %1 = load ptr, ptr %arrayidx24, align 8
+  %idxprom25 = sext i32 %i.2 to i64
+  %arrayidx26 = getelementptr inbounds double, ptr %1, i64 %idxprom25
+  %2 = load double, ptr %arrayidx26, align 8
+  %idxprom27 = sext i32 %i.2 to i64
+  %arrayidx28 = getelementptr inbounds double, ptr %b, i64 %idxprom27
+  %3 = load double, ptr %arrayidx28, align 8
+  %add = fadd double %3, %2
+  store double %add, ptr %arrayidx28, align 8
+  br label %for.inc29
 
-45:                                               ; preds = %34
-  %46 = add nsw i32 %.2, 1
-  br label %32, !llvm.loop !10
+for.inc29:                                        ; preds = %for.body22
+  %inc30 = add nsw i32 %i.2, 1
+  br label %for.cond20, !llvm.loop !10
 
-47:                                               ; preds = %32
-  br label %48
+for.end31:                                        ; preds = %for.cond20
+  br label %for.inc32
 
-48:                                               ; preds = %47
-  %49 = add nsw i32 %.1, 1
-  br label %29, !llvm.loop !11
+for.inc32:                                        ; preds = %for.end31
+  %inc33 = add nsw i32 %j.1, 1
+  br label %for.cond17, !llvm.loop !11
 
-50:                                               ; preds = %29
+for.end34:                                        ; preds = %for.cond17
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @idamax(i32 noundef %0, ptr noundef %1, i32 noundef %2, i32 noundef %3) #0 {
-  %5 = icmp slt i32 %0, 1
-  br i1 %5, label %6, label %7
+define dso_local i32 @idamax(i32 noundef %n, ptr noundef %dx, i32 noundef %dx_off, i32 noundef %incx) #0 {
+entry:
+  %cmp = icmp slt i32 %n, 1
+  br i1 %cmp, label %if.then, label %if.else
 
-6:                                                ; preds = %4
-  br label %54
+if.then:                                          ; preds = %entry
+  br label %if.end30
 
-7:                                                ; preds = %4
-  %8 = icmp eq i32 %0, 1
-  br i1 %8, label %9, label %10
+if.else:                                          ; preds = %entry
+  %cmp1 = icmp eq i32 %n, 1
+  br i1 %cmp1, label %if.then2, label %if.else3
 
-9:                                                ; preds = %7
-  br label %53
+if.then2:                                         ; preds = %if.else
+  br label %if.end29
 
-10:                                               ; preds = %7
-  %11 = icmp ne i32 %3, 1
-  br i1 %11, label %12, label %33
+if.else3:                                         ; preds = %if.else
+  %cmp4 = icmp ne i32 %incx, 1
+  br i1 %cmp4, label %if.then5, label %if.else13
 
-12:                                               ; preds = %10
-  %13 = sext i32 %2 to i64
-  %14 = getelementptr inbounds double, ptr %1, i64 %13
-  %15 = load double, ptr %14, align 8
-  %16 = call double @llvm.fabs.f64(double %15)
-  %17 = add nsw i32 1, %3
-  br label %18
+if.then5:                                         ; preds = %if.else3
+  %idxprom = sext i32 %dx_off to i64
+  %arrayidx = getelementptr inbounds double, ptr %dx, i64 %idxprom
+  %0 = load double, ptr %arrayidx, align 8
+  %1 = call double @llvm.fabs.f64(double %0)
+  %add = add nsw i32 1, %incx
+  br label %for.cond
 
-18:                                               ; preds = %30, %12
-  %.04 = phi double [ %16, %12 ], [ %.15, %30 ]
-  %.02 = phi i32 [ 1, %12 ], [ %31, %30 ]
-  %.01 = phi i32 [ %17, %12 ], [ %29, %30 ]
-  %.0 = phi i32 [ 0, %12 ], [ %.1, %30 ]
-  %19 = icmp slt i32 %.02, %0
-  br i1 %19, label %20, label %32
+for.cond:                                         ; preds = %for.inc, %if.then5
+  %dmax.0 = phi double [ %1, %if.then5 ], [ %dmax.1, %for.inc ]
+  %i.0 = phi i32 [ 1, %if.then5 ], [ %inc, %for.inc ]
+  %ix.0 = phi i32 [ %add, %if.then5 ], [ %add12, %for.inc ]
+  %itemp.0 = phi i32 [ 0, %if.then5 ], [ %itemp.1, %for.inc ]
+  %cmp6 = icmp slt i32 %i.0, %n
+  br i1 %cmp6, label %for.body, label %for.end
 
-20:                                               ; preds = %18
-  %21 = add nsw i32 %.01, %2
-  %22 = sext i32 %21 to i64
-  %23 = getelementptr inbounds double, ptr %1, i64 %22
-  %24 = load double, ptr %23, align 8
-  %25 = call double @llvm.fabs.f64(double %24)
-  %26 = fcmp ogt double %25, %.04
-  br i1 %26, label %27, label %28
+for.body:                                         ; preds = %for.cond
+  %add7 = add nsw i32 %ix.0, %dx_off
+  %idxprom8 = sext i32 %add7 to i64
+  %arrayidx9 = getelementptr inbounds double, ptr %dx, i64 %idxprom8
+  %2 = load double, ptr %arrayidx9, align 8
+  %3 = call double @llvm.fabs.f64(double %2)
+  %cmp10 = fcmp ogt double %3, %dmax.0
+  br i1 %cmp10, label %if.then11, label %if.end
 
-27:                                               ; preds = %20
-  br label %28
+if.then11:                                        ; preds = %for.body
+  br label %if.end
 
-28:                                               ; preds = %27, %20
-  %.15 = phi double [ %25, %27 ], [ %.04, %20 ]
-  %.1 = phi i32 [ %.02, %27 ], [ %.0, %20 ]
-  %29 = add nsw i32 %.01, %3
-  br label %30
+if.end:                                           ; preds = %if.then11, %for.body
+  %dmax.1 = phi double [ %3, %if.then11 ], [ %dmax.0, %for.body ]
+  %itemp.1 = phi i32 [ %i.0, %if.then11 ], [ %itemp.0, %for.body ]
+  %add12 = add nsw i32 %ix.0, %incx
+  br label %for.inc
 
-30:                                               ; preds = %28
-  %31 = add nsw i32 %.02, 1
-  br label %18, !llvm.loop !12
+for.inc:                                          ; preds = %if.end
+  %inc = add nsw i32 %i.0, 1
+  br label %for.cond, !llvm.loop !12
 
-32:                                               ; preds = %18
-  br label %52
+for.end:                                          ; preds = %for.cond
+  br label %if.end28
 
-33:                                               ; preds = %10
-  %34 = sext i32 %2 to i64
-  %35 = getelementptr inbounds double, ptr %1, i64 %34
-  %36 = load double, ptr %35, align 8
-  %37 = call double @llvm.fabs.f64(double %36)
-  br label %38
+if.else13:                                        ; preds = %if.else3
+  %idxprom14 = sext i32 %dx_off to i64
+  %arrayidx15 = getelementptr inbounds double, ptr %dx, i64 %idxprom14
+  %4 = load double, ptr %arrayidx15, align 8
+  %5 = call double @llvm.fabs.f64(double %4)
+  br label %for.cond16
 
-38:                                               ; preds = %49, %33
-  %.26 = phi double [ %37, %33 ], [ %.37, %49 ]
-  %.13 = phi i32 [ 1, %33 ], [ %50, %49 ]
-  %.2 = phi i32 [ 0, %33 ], [ %.3, %49 ]
-  %39 = icmp slt i32 %.13, %0
-  br i1 %39, label %40, label %51
+for.cond16:                                       ; preds = %for.inc25, %if.else13
+  %dmax.2 = phi double [ %5, %if.else13 ], [ %dmax.3, %for.inc25 ]
+  %i.1 = phi i32 [ 1, %if.else13 ], [ %inc26, %for.inc25 ]
+  %itemp.2 = phi i32 [ 0, %if.else13 ], [ %itemp.3, %for.inc25 ]
+  %cmp17 = icmp slt i32 %i.1, %n
+  br i1 %cmp17, label %for.body18, label %for.end27
 
-40:                                               ; preds = %38
-  %41 = add nsw i32 %.13, %2
-  %42 = sext i32 %41 to i64
-  %43 = getelementptr inbounds double, ptr %1, i64 %42
-  %44 = load double, ptr %43, align 8
-  %45 = call double @llvm.fabs.f64(double %44)
-  %46 = fcmp ogt double %45, %.26
-  br i1 %46, label %47, label %48
+for.body18:                                       ; preds = %for.cond16
+  %add19 = add nsw i32 %i.1, %dx_off
+  %idxprom20 = sext i32 %add19 to i64
+  %arrayidx21 = getelementptr inbounds double, ptr %dx, i64 %idxprom20
+  %6 = load double, ptr %arrayidx21, align 8
+  %7 = call double @llvm.fabs.f64(double %6)
+  %cmp22 = fcmp ogt double %7, %dmax.2
+  br i1 %cmp22, label %if.then23, label %if.end24
 
-47:                                               ; preds = %40
-  br label %48
+if.then23:                                        ; preds = %for.body18
+  br label %if.end24
 
-48:                                               ; preds = %47, %40
-  %.37 = phi double [ %45, %47 ], [ %.26, %40 ]
-  %.3 = phi i32 [ %.13, %47 ], [ %.2, %40 ]
-  br label %49
+if.end24:                                         ; preds = %if.then23, %for.body18
+  %dmax.3 = phi double [ %7, %if.then23 ], [ %dmax.2, %for.body18 ]
+  %itemp.3 = phi i32 [ %i.1, %if.then23 ], [ %itemp.2, %for.body18 ]
+  br label %for.inc25
 
-49:                                               ; preds = %48
-  %50 = add nsw i32 %.13, 1
-  br label %38, !llvm.loop !13
+for.inc25:                                        ; preds = %if.end24
+  %inc26 = add nsw i32 %i.1, 1
+  br label %for.cond16, !llvm.loop !13
 
-51:                                               ; preds = %38
-  br label %52
+for.end27:                                        ; preds = %for.cond16
+  br label %if.end28
 
-52:                                               ; preds = %51, %32
-  %.4 = phi i32 [ %.0, %32 ], [ %.2, %51 ]
-  br label %53
+if.end28:                                         ; preds = %for.end27, %for.end
+  %itemp.4 = phi i32 [ %itemp.0, %for.end ], [ %itemp.2, %for.end27 ]
+  br label %if.end29
 
-53:                                               ; preds = %52, %9
-  %.5 = phi i32 [ 0, %9 ], [ %.4, %52 ]
-  br label %54
+if.end29:                                         ; preds = %if.end28, %if.then2
+  %itemp.5 = phi i32 [ 0, %if.then2 ], [ %itemp.4, %if.end28 ]
+  br label %if.end30
 
-54:                                               ; preds = %53, %6
-  %.6 = phi i32 [ -1, %6 ], [ %.5, %53 ]
-  ret i32 %.6
+if.end30:                                         ; preds = %if.end29, %if.then
+  %itemp.6 = phi i32 [ -1, %if.then ], [ %itemp.5, %if.end29 ]
+  ret i32 %itemp.6
 }
 
 ; Function Attrs: nocallback nofree nosync nounwind readnone speculatable willreturn
 declare double @llvm.fabs.f64(double) #1
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @dscal(i32 noundef %0, double noundef %1, ptr noundef %2, i32 noundef %3, i32 noundef %4) #0 {
-  %6 = icmp sgt i32 %0, 0
-  br i1 %6, label %7, label %35
+define dso_local void @dscal(i32 noundef %n, double noundef %da, ptr noundef %dx, i32 noundef %dx_off, i32 noundef %incx) #0 {
+entry:
+  %cmp = icmp sgt i32 %n, 0
+  br i1 %cmp, label %if.then, label %if.end15
 
-7:                                                ; preds = %5
-  %8 = icmp ne i32 %4, 1
-  br i1 %8, label %9, label %22
+if.then:                                          ; preds = %entry
+  %cmp1 = icmp ne i32 %incx, 1
+  br i1 %cmp1, label %if.then2, label %if.else
 
-9:                                                ; preds = %7
-  %10 = mul nsw i32 %0, %4
-  br label %11
+if.then2:                                         ; preds = %if.then
+  %mul = mul nsw i32 %n, %incx
+  br label %for.cond
 
-11:                                               ; preds = %19, %9
-  %.0 = phi i32 [ 0, %9 ], [ %20, %19 ]
-  %12 = icmp slt i32 %.0, %10
-  br i1 %12, label %13, label %21
+for.cond:                                         ; preds = %for.inc, %if.then2
+  %i.0 = phi i32 [ 0, %if.then2 ], [ %add5, %for.inc ]
+  %cmp3 = icmp slt i32 %i.0, %mul
+  br i1 %cmp3, label %for.body, label %for.end
 
-13:                                               ; preds = %11
-  %14 = add nsw i32 %.0, %3
-  %15 = sext i32 %14 to i64
-  %16 = getelementptr inbounds double, ptr %2, i64 %15
-  %17 = load double, ptr %16, align 8
-  %18 = fmul double %17, %1
-  store double %18, ptr %16, align 8
-  br label %19
+for.body:                                         ; preds = %for.cond
+  %add = add nsw i32 %i.0, %dx_off
+  %idxprom = sext i32 %add to i64
+  %arrayidx = getelementptr inbounds double, ptr %dx, i64 %idxprom
+  %0 = load double, ptr %arrayidx, align 8
+  %mul4 = fmul double %0, %da
+  store double %mul4, ptr %arrayidx, align 8
+  br label %for.inc
 
-19:                                               ; preds = %13
-  %20 = add nsw i32 %.0, %4
-  br label %11, !llvm.loop !14
+for.inc:                                          ; preds = %for.body
+  %add5 = add nsw i32 %i.0, %incx
+  br label %for.cond, !llvm.loop !14
 
-21:                                               ; preds = %11
-  br label %34
+for.end:                                          ; preds = %for.cond
+  br label %if.end
 
-22:                                               ; preds = %7
-  br label %23
+if.else:                                          ; preds = %if.then
+  br label %for.cond6
 
-23:                                               ; preds = %31, %22
-  %.1 = phi i32 [ 0, %22 ], [ %32, %31 ]
-  %24 = icmp slt i32 %.1, %0
-  br i1 %24, label %25, label %33
+for.cond6:                                        ; preds = %for.inc13, %if.else
+  %i.1 = phi i32 [ 0, %if.else ], [ %inc, %for.inc13 ]
+  %cmp7 = icmp slt i32 %i.1, %n
+  br i1 %cmp7, label %for.body8, label %for.end14
 
-25:                                               ; preds = %23
-  %26 = add nsw i32 %.1, %3
-  %27 = sext i32 %26 to i64
-  %28 = getelementptr inbounds double, ptr %2, i64 %27
-  %29 = load double, ptr %28, align 8
-  %30 = fmul double %29, %1
-  store double %30, ptr %28, align 8
-  br label %31
+for.body8:                                        ; preds = %for.cond6
+  %add9 = add nsw i32 %i.1, %dx_off
+  %idxprom10 = sext i32 %add9 to i64
+  %arrayidx11 = getelementptr inbounds double, ptr %dx, i64 %idxprom10
+  %1 = load double, ptr %arrayidx11, align 8
+  %mul12 = fmul double %1, %da
+  store double %mul12, ptr %arrayidx11, align 8
+  br label %for.inc13
 
-31:                                               ; preds = %25
-  %32 = add nsw i32 %.1, 1
-  br label %23, !llvm.loop !15
+for.inc13:                                        ; preds = %for.body8
+  %inc = add nsw i32 %i.1, 1
+  br label %for.cond6, !llvm.loop !15
 
-33:                                               ; preds = %23
-  br label %34
+for.end14:                                        ; preds = %for.cond6
+  br label %if.end
 
-34:                                               ; preds = %33, %21
-  br label %35
+if.end:                                           ; preds = %for.end14, %for.end
+  br label %if.end15
 
-35:                                               ; preds = %34, %5
+if.end15:                                         ; preds = %if.end, %entry
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @daxpy(i32 noundef %0, double noundef %1, ptr noundef %2, i32 noundef %3, i32 noundef %4, ptr noundef %5, i32 noundef %6, i32 noundef %7) #0 {
-  %9 = icmp sgt i32 %0, 0
-  br i1 %9, label %10, label %61
+define dso_local void @daxpy(i32 noundef %n, double noundef %da, ptr noundef %dx, i32 noundef %dx_off, i32 noundef %incx, ptr noundef %dy, i32 noundef %dy_off, i32 noundef %incy) #0 {
+entry:
+  %cmp = icmp sgt i32 %n, 0
+  br i1 %cmp, label %land.lhs.true, label %if.end33
 
-10:                                               ; preds = %8
-  %11 = fcmp une double %1, 0.000000e+00
-  br i1 %11, label %12, label %61
+land.lhs.true:                                    ; preds = %entry
+  %cmp1 = fcmp une double %da, 0.000000e+00
+  br i1 %cmp1, label %if.then, label %if.end33
 
-12:                                               ; preds = %10
-  %13 = icmp ne i32 %4, 1
-  br i1 %13, label %16, label %14
+if.then:                                          ; preds = %land.lhs.true
+  %cmp2 = icmp ne i32 %incx, 1
+  br i1 %cmp2, label %if.then4, label %lor.lhs.false
 
-14:                                               ; preds = %12
-  %15 = icmp ne i32 %7, 1
-  br i1 %15, label %16, label %44
+lor.lhs.false:                                    ; preds = %if.then
+  %cmp3 = icmp ne i32 %incy, 1
+  br i1 %cmp3, label %if.then4, label %if.else
 
-16:                                               ; preds = %14, %12
-  %17 = icmp slt i32 %4, 0
-  br i1 %17, label %18, label %21
+if.then4:                                         ; preds = %lor.lhs.false, %if.then
+  %cmp5 = icmp slt i32 %incx, 0
+  br i1 %cmp5, label %if.then6, label %if.end
 
-18:                                               ; preds = %16
-  %19 = sub nsw i32 1, %0
-  %20 = mul nsw i32 %19, %4
-  br label %21
+if.then6:                                         ; preds = %if.then4
+  %sub = sub nsw i32 1, %n
+  %mul = mul nsw i32 %sub, %incx
+  br label %if.end
 
-21:                                               ; preds = %18, %16
-  %.01 = phi i32 [ %20, %18 ], [ 0, %16 ]
-  %22 = icmp slt i32 %7, 0
-  br i1 %22, label %23, label %26
+if.end:                                           ; preds = %if.then6, %if.then4
+  %ix.0 = phi i32 [ %mul, %if.then6 ], [ 0, %if.then4 ]
+  %cmp7 = icmp slt i32 %incy, 0
+  br i1 %cmp7, label %if.then8, label %if.end11
 
-23:                                               ; preds = %21
-  %24 = sub nsw i32 1, %0
-  %25 = mul nsw i32 %24, %7
-  br label %26
+if.then8:                                         ; preds = %if.end
+  %sub9 = sub nsw i32 1, %n
+  %mul10 = mul nsw i32 %sub9, %incy
+  br label %if.end11
 
-26:                                               ; preds = %23, %21
-  %.0 = phi i32 [ %25, %23 ], [ 0, %21 ]
-  br label %27
+if.end11:                                         ; preds = %if.then8, %if.end
+  %iy.0 = phi i32 [ %mul10, %if.then8 ], [ 0, %if.end ]
+  br label %for.cond
 
-27:                                               ; preds = %41, %26
-  %.03 = phi i32 [ 0, %26 ], [ %42, %41 ]
-  %.12 = phi i32 [ %.01, %26 ], [ %39, %41 ]
-  %.1 = phi i32 [ %.0, %26 ], [ %40, %41 ]
-  %28 = icmp slt i32 %.03, %0
-  br i1 %28, label %29, label %43
+for.cond:                                         ; preds = %for.inc, %if.end11
+  %i.0 = phi i32 [ 0, %if.end11 ], [ %inc, %for.inc ]
+  %ix.1 = phi i32 [ %ix.0, %if.end11 ], [ %add17, %for.inc ]
+  %iy.1 = phi i32 [ %iy.0, %if.end11 ], [ %add18, %for.inc ]
+  %cmp12 = icmp slt i32 %i.0, %n
+  br i1 %cmp12, label %for.body, label %for.end
 
-29:                                               ; preds = %27
-  %30 = add nsw i32 %.12, %3
-  %31 = sext i32 %30 to i64
-  %32 = getelementptr inbounds double, ptr %2, i64 %31
-  %33 = load double, ptr %32, align 8
-  %34 = add nsw i32 %.1, %6
-  %35 = sext i32 %34 to i64
-  %36 = getelementptr inbounds double, ptr %5, i64 %35
-  %37 = load double, ptr %36, align 8
-  %38 = call double @llvm.fmuladd.f64(double %1, double %33, double %37)
-  store double %38, ptr %36, align 8
-  %39 = add nsw i32 %.12, %4
-  %40 = add nsw i32 %.1, %7
-  br label %41
+for.body:                                         ; preds = %for.cond
+  %add = add nsw i32 %ix.1, %dx_off
+  %idxprom = sext i32 %add to i64
+  %arrayidx = getelementptr inbounds double, ptr %dx, i64 %idxprom
+  %0 = load double, ptr %arrayidx, align 8
+  %add14 = add nsw i32 %iy.1, %dy_off
+  %idxprom15 = sext i32 %add14 to i64
+  %arrayidx16 = getelementptr inbounds double, ptr %dy, i64 %idxprom15
+  %1 = load double, ptr %arrayidx16, align 8
+  %2 = call double @llvm.fmuladd.f64(double %da, double %0, double %1)
+  store double %2, ptr %arrayidx16, align 8
+  %add17 = add nsw i32 %ix.1, %incx
+  %add18 = add nsw i32 %iy.1, %incy
+  br label %for.inc
 
-41:                                               ; preds = %29
-  %42 = add nsw i32 %.03, 1
-  br label %27, !llvm.loop !16
+for.inc:                                          ; preds = %for.body
+  %inc = add nsw i32 %i.0, 1
+  br label %for.cond, !llvm.loop !16
 
-43:                                               ; preds = %27
-  br label %61
+for.end:                                          ; preds = %for.cond
+  br label %if.end33
 
-44:                                               ; preds = %14
-  br label %45
+if.else:                                          ; preds = %lor.lhs.false
+  br label %for.cond19
 
-45:                                               ; preds = %57, %44
-  %.14 = phi i32 [ 0, %44 ], [ %58, %57 ]
-  %46 = icmp slt i32 %.14, %0
-  br i1 %46, label %47, label %59
+for.cond19:                                       ; preds = %for.inc29, %if.else
+  %i.1 = phi i32 [ 0, %if.else ], [ %inc30, %for.inc29 ]
+  %cmp20 = icmp slt i32 %i.1, %n
+  br i1 %cmp20, label %for.body21, label %for.end31
 
-47:                                               ; preds = %45
-  %48 = add nsw i32 %.14, %3
-  %49 = sext i32 %48 to i64
-  %50 = getelementptr inbounds double, ptr %2, i64 %49
-  %51 = load double, ptr %50, align 8
-  %52 = add nsw i32 %.14, %6
-  %53 = sext i32 %52 to i64
-  %54 = getelementptr inbounds double, ptr %5, i64 %53
-  %55 = load double, ptr %54, align 8
-  %56 = call double @llvm.fmuladd.f64(double %1, double %51, double %55)
-  store double %56, ptr %54, align 8
-  br label %57
+for.body21:                                       ; preds = %for.cond19
+  %add22 = add nsw i32 %i.1, %dx_off
+  %idxprom23 = sext i32 %add22 to i64
+  %arrayidx24 = getelementptr inbounds double, ptr %dx, i64 %idxprom23
+  %3 = load double, ptr %arrayidx24, align 8
+  %add26 = add nsw i32 %i.1, %dy_off
+  %idxprom27 = sext i32 %add26 to i64
+  %arrayidx28 = getelementptr inbounds double, ptr %dy, i64 %idxprom27
+  %4 = load double, ptr %arrayidx28, align 8
+  %5 = call double @llvm.fmuladd.f64(double %da, double %3, double %4)
+  store double %5, ptr %arrayidx28, align 8
+  br label %for.inc29
 
-57:                                               ; preds = %47
-  %58 = add nsw i32 %.14, 1
-  br label %45, !llvm.loop !17
+for.inc29:                                        ; preds = %for.body21
+  %inc30 = add nsw i32 %i.1, 1
+  br label %for.cond19, !llvm.loop !17
 
-59:                                               ; preds = %45
-  br label %60
+for.end31:                                        ; preds = %for.cond19
+  br label %if.end32
 
-60:                                               ; preds = %59
-  br label %61
+if.end32:                                         ; preds = %for.end31
+  br label %if.end33
 
-61:                                               ; preds = %60, %43, %10, %8
+if.end33:                                         ; preds = %if.end32, %for.end, %land.lhs.true, %entry
   ret void
 }
 
@@ -397,296 +401,299 @@ define dso_local void @daxpy(i32 noundef %0, double noundef %1, ptr noundef %2, 
 declare double @llvm.fmuladd.f64(double, double, double) #1
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @dgefa(ptr noundef %0, ptr noundef %1) #0 {
-  br label %3
+define dso_local void @dgefa(ptr noundef %a, ptr noundef %ipvt) #0 {
+entry:
+  br label %for.cond
 
-3:                                                ; preds = %62, %2
-  %.01 = phi i32 [ 0, %2 ], [ %63, %62 ]
-  %4 = icmp slt i32 %.01, 1999
-  br i1 %4, label %5, label %64
+for.cond:                                         ; preds = %for.inc38, %entry
+  %k.0 = phi i32 [ 0, %entry ], [ %inc39, %for.inc38 ]
+  %cmp = icmp slt i32 %k.0, 1999
+  br i1 %cmp, label %for.body, label %for.end40
 
-5:                                                ; preds = %3
-  %6 = sext i32 %.01 to i64
-  %7 = getelementptr inbounds ptr, ptr %0, i64 %6
-  %8 = load ptr, ptr %7, align 8
-  %9 = add nsw i32 %.01, 1
-  %10 = sub nsw i32 2000, %.01
-  %11 = call i32 @idamax(i32 noundef %10, ptr noundef %8, i32 noundef %.01, i32 noundef 1)
-  %12 = add nsw i32 %11, %.01
-  %13 = sext i32 %.01 to i64
-  %14 = getelementptr inbounds i32, ptr %1, i64 %13
-  store i32 %12, ptr %14, align 4
-  %15 = sext i32 %12 to i64
-  %16 = getelementptr inbounds double, ptr %8, i64 %15
-  %17 = load double, ptr %16, align 8
-  %18 = fcmp une double %17, 0.000000e+00
-  br i1 %18, label %19, label %61
+for.body:                                         ; preds = %for.cond
+  %idxprom = sext i32 %k.0 to i64
+  %arrayidx = getelementptr inbounds ptr, ptr %a, i64 %idxprom
+  %0 = load ptr, ptr %arrayidx, align 8
+  %add = add nsw i32 %k.0, 1
+  %sub = sub nsw i32 2000, %k.0
+  %call = call i32 @idamax(i32 noundef %sub, ptr noundef %0, i32 noundef %k.0, i32 noundef 1)
+  %add1 = add nsw i32 %call, %k.0
+  %idxprom2 = sext i32 %k.0 to i64
+  %arrayidx3 = getelementptr inbounds i32, ptr %ipvt, i64 %idxprom2
+  store i32 %add1, ptr %arrayidx3, align 4
+  %idxprom4 = sext i32 %add1 to i64
+  %arrayidx5 = getelementptr inbounds double, ptr %0, i64 %idxprom4
+  %1 = load double, ptr %arrayidx5, align 8
+  %cmp6 = fcmp une double %1, 0.000000e+00
+  br i1 %cmp6, label %if.then, label %if.end37
 
-19:                                               ; preds = %5
-  %20 = icmp ne i32 %12, %.01
-  br i1 %20, label %21, label %32
+if.then:                                          ; preds = %for.body
+  %cmp7 = icmp ne i32 %add1, %k.0
+  br i1 %cmp7, label %if.then8, label %if.end
 
-21:                                               ; preds = %19
-  %22 = sext i32 %12 to i64
-  %23 = getelementptr inbounds double, ptr %8, i64 %22
-  %24 = load double, ptr %23, align 8
-  %25 = sext i32 %.01 to i64
-  %26 = getelementptr inbounds double, ptr %8, i64 %25
-  %27 = load double, ptr %26, align 8
-  %28 = sext i32 %12 to i64
-  %29 = getelementptr inbounds double, ptr %8, i64 %28
-  store double %27, ptr %29, align 8
-  %30 = sext i32 %.01 to i64
-  %31 = getelementptr inbounds double, ptr %8, i64 %30
-  store double %24, ptr %31, align 8
-  br label %32
+if.then8:                                         ; preds = %if.then
+  %idxprom9 = sext i32 %add1 to i64
+  %arrayidx10 = getelementptr inbounds double, ptr %0, i64 %idxprom9
+  %2 = load double, ptr %arrayidx10, align 8
+  %idxprom11 = sext i32 %k.0 to i64
+  %arrayidx12 = getelementptr inbounds double, ptr %0, i64 %idxprom11
+  %3 = load double, ptr %arrayidx12, align 8
+  %idxprom13 = sext i32 %add1 to i64
+  %arrayidx14 = getelementptr inbounds double, ptr %0, i64 %idxprom13
+  store double %3, ptr %arrayidx14, align 8
+  %idxprom15 = sext i32 %k.0 to i64
+  %arrayidx16 = getelementptr inbounds double, ptr %0, i64 %idxprom15
+  store double %2, ptr %arrayidx16, align 8
+  br label %if.end
 
-32:                                               ; preds = %21, %19
-  %33 = sext i32 %.01 to i64
-  %34 = getelementptr inbounds double, ptr %8, i64 %33
-  %35 = load double, ptr %34, align 8
-  %36 = fdiv double -1.000000e+00, %35
-  %37 = sub nsw i32 2000, %9
-  call void @dscal(i32 noundef %37, double noundef %36, ptr noundef %8, i32 noundef %9, i32 noundef 1)
-  br label %38
+if.end:                                           ; preds = %if.then8, %if.then
+  %idxprom17 = sext i32 %k.0 to i64
+  %arrayidx18 = getelementptr inbounds double, ptr %0, i64 %idxprom17
+  %4 = load double, ptr %arrayidx18, align 8
+  %div = fdiv double -1.000000e+00, %4
+  %sub19 = sub nsw i32 2000, %add
+  call void @dscal(i32 noundef %sub19, double noundef %div, ptr noundef %0, i32 noundef %add, i32 noundef 1)
+  br label %for.cond20
 
-38:                                               ; preds = %58, %32
-  %.0 = phi i32 [ %9, %32 ], [ %59, %58 ]
-  %39 = icmp slt i32 %.0, 2000
-  br i1 %39, label %40, label %60
+for.cond20:                                       ; preds = %for.inc, %if.end
+  %j.0 = phi i32 [ %add, %if.end ], [ %inc, %for.inc ]
+  %cmp21 = icmp slt i32 %j.0, 2000
+  br i1 %cmp21, label %for.body22, label %for.end
 
-40:                                               ; preds = %38
-  %41 = sext i32 %.0 to i64
-  %42 = getelementptr inbounds ptr, ptr %0, i64 %41
-  %43 = load ptr, ptr %42, align 8
-  %44 = sext i32 %12 to i64
-  %45 = getelementptr inbounds double, ptr %43, i64 %44
-  %46 = load double, ptr %45, align 8
-  %47 = icmp ne i32 %12, %.01
-  br i1 %47, label %48, label %56
+for.body22:                                       ; preds = %for.cond20
+  %idxprom23 = sext i32 %j.0 to i64
+  %arrayidx24 = getelementptr inbounds ptr, ptr %a, i64 %idxprom23
+  %5 = load ptr, ptr %arrayidx24, align 8
+  %idxprom25 = sext i32 %add1 to i64
+  %arrayidx26 = getelementptr inbounds double, ptr %5, i64 %idxprom25
+  %6 = load double, ptr %arrayidx26, align 8
+  %cmp27 = icmp ne i32 %add1, %k.0
+  br i1 %cmp27, label %if.then28, label %if.end35
 
-48:                                               ; preds = %40
-  %49 = sext i32 %.01 to i64
-  %50 = getelementptr inbounds double, ptr %43, i64 %49
-  %51 = load double, ptr %50, align 8
-  %52 = sext i32 %12 to i64
-  %53 = getelementptr inbounds double, ptr %43, i64 %52
-  store double %51, ptr %53, align 8
-  %54 = sext i32 %.01 to i64
-  %55 = getelementptr inbounds double, ptr %43, i64 %54
-  store double %46, ptr %55, align 8
-  br label %56
+if.then28:                                        ; preds = %for.body22
+  %idxprom29 = sext i32 %k.0 to i64
+  %arrayidx30 = getelementptr inbounds double, ptr %5, i64 %idxprom29
+  %7 = load double, ptr %arrayidx30, align 8
+  %idxprom31 = sext i32 %add1 to i64
+  %arrayidx32 = getelementptr inbounds double, ptr %5, i64 %idxprom31
+  store double %7, ptr %arrayidx32, align 8
+  %idxprom33 = sext i32 %k.0 to i64
+  %arrayidx34 = getelementptr inbounds double, ptr %5, i64 %idxprom33
+  store double %6, ptr %arrayidx34, align 8
+  br label %if.end35
 
-56:                                               ; preds = %48, %40
-  %57 = sub nsw i32 2000, %9
-  call void @daxpy(i32 noundef %57, double noundef %46, ptr noundef %8, i32 noundef %9, i32 noundef 1, ptr noundef %43, i32 noundef %9, i32 noundef 1)
-  br label %58
+if.end35:                                         ; preds = %if.then28, %for.body22
+  %sub36 = sub nsw i32 2000, %add
+  call void @daxpy(i32 noundef %sub36, double noundef %6, ptr noundef %0, i32 noundef %add, i32 noundef 1, ptr noundef %5, i32 noundef %add, i32 noundef 1)
+  br label %for.inc
 
-58:                                               ; preds = %56
-  %59 = add nsw i32 %.0, 1
-  br label %38, !llvm.loop !18
+for.inc:                                          ; preds = %if.end35
+  %inc = add nsw i32 %j.0, 1
+  br label %for.cond20, !llvm.loop !18
 
-60:                                               ; preds = %38
-  br label %61
+for.end:                                          ; preds = %for.cond20
+  br label %if.end37
 
-61:                                               ; preds = %60, %5
-  br label %62
+if.end37:                                         ; preds = %for.end, %for.body
+  br label %for.inc38
 
-62:                                               ; preds = %61
-  %63 = add nsw i32 %.01, 1
-  br label %3, !llvm.loop !19
+for.inc38:                                        ; preds = %if.end37
+  %inc39 = add nsw i32 %k.0, 1
+  br label %for.cond, !llvm.loop !19
 
-64:                                               ; preds = %3
-  %65 = getelementptr inbounds i32, ptr %1, i64 1999
-  store i32 1999, ptr %65, align 4
+for.end40:                                        ; preds = %for.cond
+  %arrayidx41 = getelementptr inbounds i32, ptr %ipvt, i64 1999
+  store i32 1999, ptr %arrayidx41, align 4
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @dgesl(ptr noundef %0, ptr noundef %1, ptr noundef %2) #0 {
-  br label %4
+define dso_local void @dgesl(ptr noundef %a, ptr noundef %ipvt, ptr noundef %b) #0 {
+entry:
+  br label %for.cond
 
-4:                                                ; preds = %28, %3
-  %.01 = phi i32 [ 0, %3 ], [ %29, %28 ]
-  %5 = icmp slt i32 %.01, 1999
-  br i1 %5, label %6, label %30
+for.cond:                                         ; preds = %for.inc, %entry
+  %k.0 = phi i32 [ 0, %entry ], [ %inc, %for.inc ]
+  %cmp = icmp slt i32 %k.0, 1999
+  br i1 %cmp, label %for.body, label %for.end
 
-6:                                                ; preds = %4
-  %7 = sext i32 %.01 to i64
-  %8 = getelementptr inbounds i32, ptr %1, i64 %7
-  %9 = load i32, ptr %8, align 4
-  %10 = sext i32 %9 to i64
-  %11 = getelementptr inbounds double, ptr %2, i64 %10
-  %12 = load double, ptr %11, align 8
-  %13 = icmp ne i32 %9, %.01
-  br i1 %13, label %14, label %22
+for.body:                                         ; preds = %for.cond
+  %idxprom = sext i32 %k.0 to i64
+  %arrayidx = getelementptr inbounds i32, ptr %ipvt, i64 %idxprom
+  %0 = load i32, ptr %arrayidx, align 4
+  %idxprom1 = sext i32 %0 to i64
+  %arrayidx2 = getelementptr inbounds double, ptr %b, i64 %idxprom1
+  %1 = load double, ptr %arrayidx2, align 8
+  %cmp3 = icmp ne i32 %0, %k.0
+  br i1 %cmp3, label %if.then, label %if.end
 
-14:                                               ; preds = %6
-  %15 = sext i32 %.01 to i64
-  %16 = getelementptr inbounds double, ptr %2, i64 %15
-  %17 = load double, ptr %16, align 8
-  %18 = sext i32 %9 to i64
-  %19 = getelementptr inbounds double, ptr %2, i64 %18
-  store double %17, ptr %19, align 8
-  %20 = sext i32 %.01 to i64
-  %21 = getelementptr inbounds double, ptr %2, i64 %20
-  store double %12, ptr %21, align 8
-  br label %22
+if.then:                                          ; preds = %for.body
+  %idxprom4 = sext i32 %k.0 to i64
+  %arrayidx5 = getelementptr inbounds double, ptr %b, i64 %idxprom4
+  %2 = load double, ptr %arrayidx5, align 8
+  %idxprom6 = sext i32 %0 to i64
+  %arrayidx7 = getelementptr inbounds double, ptr %b, i64 %idxprom6
+  store double %2, ptr %arrayidx7, align 8
+  %idxprom8 = sext i32 %k.0 to i64
+  %arrayidx9 = getelementptr inbounds double, ptr %b, i64 %idxprom8
+  store double %1, ptr %arrayidx9, align 8
+  br label %if.end
 
-22:                                               ; preds = %14, %6
-  %23 = add nsw i32 %.01, 1
-  %24 = sub nsw i32 2000, %23
-  %25 = sext i32 %.01 to i64
-  %26 = getelementptr inbounds ptr, ptr %0, i64 %25
-  %27 = load ptr, ptr %26, align 8
-  call void @daxpy(i32 noundef %24, double noundef %12, ptr noundef %27, i32 noundef %23, i32 noundef 1, ptr noundef %2, i32 noundef %23, i32 noundef 1)
-  br label %28
+if.end:                                           ; preds = %if.then, %for.body
+  %add = add nsw i32 %k.0, 1
+  %sub = sub nsw i32 2000, %add
+  %idxprom10 = sext i32 %k.0 to i64
+  %arrayidx11 = getelementptr inbounds ptr, ptr %a, i64 %idxprom10
+  %3 = load ptr, ptr %arrayidx11, align 8
+  call void @daxpy(i32 noundef %sub, double noundef %1, ptr noundef %3, i32 noundef %add, i32 noundef 1, ptr noundef %b, i32 noundef %add, i32 noundef 1)
+  br label %for.inc
 
-28:                                               ; preds = %22
-  %29 = add nsw i32 %.01, 1
-  br label %4, !llvm.loop !20
+for.inc:                                          ; preds = %if.end
+  %inc = add nsw i32 %k.0, 1
+  br label %for.cond, !llvm.loop !20
 
-30:                                               ; preds = %4
-  br label %31
+for.end:                                          ; preds = %for.cond
+  br label %for.cond12
 
-31:                                               ; preds = %53, %30
-  %.0 = phi i32 [ 0, %30 ], [ %54, %53 ]
-  %32 = icmp slt i32 %.0, 2000
-  br i1 %32, label %33, label %55
+for.cond12:                                       ; preds = %for.inc27, %for.end
+  %kb.0 = phi i32 [ 0, %for.end ], [ %inc28, %for.inc27 ]
+  %cmp13 = icmp slt i32 %kb.0, 2000
+  br i1 %cmp13, label %for.body14, label %for.end29
 
-33:                                               ; preds = %31
-  %34 = add nsw i32 %.0, 1
-  %35 = sub nsw i32 2000, %34
-  %36 = sext i32 %35 to i64
-  %37 = getelementptr inbounds ptr, ptr %0, i64 %36
-  %38 = load ptr, ptr %37, align 8
-  %39 = sext i32 %35 to i64
-  %40 = getelementptr inbounds double, ptr %38, i64 %39
-  %41 = load double, ptr %40, align 8
-  %42 = sext i32 %35 to i64
-  %43 = getelementptr inbounds double, ptr %2, i64 %42
-  %44 = load double, ptr %43, align 8
-  %45 = fdiv double %44, %41
-  store double %45, ptr %43, align 8
-  %46 = sext i32 %35 to i64
-  %47 = getelementptr inbounds double, ptr %2, i64 %46
-  %48 = load double, ptr %47, align 8
-  %49 = fneg double %48
-  %50 = sext i32 %35 to i64
-  %51 = getelementptr inbounds ptr, ptr %0, i64 %50
-  %52 = load ptr, ptr %51, align 8
-  call void @daxpy(i32 noundef %35, double noundef %49, ptr noundef %52, i32 noundef 0, i32 noundef 1, ptr noundef %2, i32 noundef 0, i32 noundef 1)
-  br label %53
+for.body14:                                       ; preds = %for.cond12
+  %add15 = add nsw i32 %kb.0, 1
+  %sub16 = sub nsw i32 2000, %add15
+  %idxprom17 = sext i32 %sub16 to i64
+  %arrayidx18 = getelementptr inbounds ptr, ptr %a, i64 %idxprom17
+  %4 = load ptr, ptr %arrayidx18, align 8
+  %idxprom19 = sext i32 %sub16 to i64
+  %arrayidx20 = getelementptr inbounds double, ptr %4, i64 %idxprom19
+  %5 = load double, ptr %arrayidx20, align 8
+  %idxprom21 = sext i32 %sub16 to i64
+  %arrayidx22 = getelementptr inbounds double, ptr %b, i64 %idxprom21
+  %6 = load double, ptr %arrayidx22, align 8
+  %div = fdiv double %6, %5
+  store double %div, ptr %arrayidx22, align 8
+  %idxprom23 = sext i32 %sub16 to i64
+  %arrayidx24 = getelementptr inbounds double, ptr %b, i64 %idxprom23
+  %7 = load double, ptr %arrayidx24, align 8
+  %fneg = fneg double %7
+  %idxprom25 = sext i32 %sub16 to i64
+  %arrayidx26 = getelementptr inbounds ptr, ptr %a, i64 %idxprom25
+  %8 = load ptr, ptr %arrayidx26, align 8
+  call void @daxpy(i32 noundef %sub16, double noundef %fneg, ptr noundef %8, i32 noundef 0, i32 noundef 1, ptr noundef %b, i32 noundef 0, i32 noundef 1)
+  br label %for.inc27
 
-53:                                               ; preds = %33
-  %54 = add nsw i32 %.0, 1
-  br label %31, !llvm.loop !21
+for.inc27:                                        ; preds = %for.body14
+  %inc28 = add nsw i32 %kb.0, 1
+  br label %for.cond12, !llvm.loop !21
 
-55:                                               ; preds = %31
+for.end29:                                        ; preds = %for.cond12
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @main(i32 noundef %0, ptr noundef %1) #0 {
-  %3 = icmp sgt i32 %0, 1
-  br i1 %3, label %4, label %17
+define dso_local i32 @main(i32 noundef %argc, ptr noundef %argv) #0 {
+entry:
+  %cmp = icmp sgt i32 %argc, 1
+  br i1 %cmp, label %if.then, label %if.end3
 
-4:                                                ; preds = %2
-  br label %5
+if.then:                                          ; preds = %entry
+  br label %for.cond
 
-5:                                                ; preds = %14, %4
-  %.01 = phi i32 [ 1, %4 ], [ %15, %14 ]
-  %6 = icmp slt i32 %.01, %0
-  br i1 %6, label %7, label %16
+for.cond:                                         ; preds = %for.inc, %if.then
+  %i.0 = phi i32 [ 1, %if.then ], [ %inc, %for.inc ]
+  %cmp1 = icmp slt i32 %i.0, %argc
+  br i1 %cmp1, label %for.body, label %for.end
 
-7:                                                ; preds = %5
-  %8 = getelementptr inbounds ptr, ptr %1, i64 1
-  %9 = load ptr, ptr %8, align 8
-  %10 = call i32 @strcmp(ptr noundef %9, ptr noundef @.str) #6
-  %11 = icmp ne i32 %10, 0
-  br i1 %11, label %13, label %12
+for.body:                                         ; preds = %for.cond
+  %arrayidx = getelementptr inbounds ptr, ptr %argv, i64 1
+  %0 = load ptr, ptr %arrayidx, align 8
+  %call = call i32 @strcmp(ptr noundef %0, ptr noundef @.str) #6
+  %tobool = icmp ne i32 %call, 0
+  br i1 %tobool, label %if.end, label %if.then2
 
-12:                                               ; preds = %7
-  br label %16
+if.then2:                                         ; preds = %for.body
+  br label %for.end
 
-13:                                               ; preds = %7
-  br label %14
+if.end:                                           ; preds = %for.body
+  br label %for.inc
 
-14:                                               ; preds = %13
-  %15 = add nsw i32 %.01, 1
-  br label %5, !llvm.loop !22
+for.inc:                                          ; preds = %if.end
+  %inc = add nsw i32 %i.0, 1
+  br label %for.cond, !llvm.loop !22
 
-16:                                               ; preds = %12, %5
-  %.0 = phi i8 [ 1, %12 ], [ 0, %5 ]
-  br label %17
+for.end:                                          ; preds = %if.then2, %for.cond
+  %ga_testing.0 = phi i8 [ 1, %if.then2 ], [ 0, %for.cond ]
+  br label %if.end3
 
-17:                                               ; preds = %16, %2
-  %.1 = phi i8 [ %.0, %16 ], [ 0, %2 ]
-  %18 = call noalias ptr @malloc(i64 noundef 16000) #7
-  br label %19
+if.end3:                                          ; preds = %for.end, %entry
+  %ga_testing.1 = phi i8 [ %ga_testing.0, %for.end ], [ 0, %entry ]
+  %call4 = call noalias ptr @malloc(i64 noundef 16000) #7
+  br label %for.cond5
 
-19:                                               ; preds = %25, %17
-  %.12 = phi i32 [ 0, %17 ], [ %26, %25 ]
-  %20 = icmp slt i32 %.12, 2000
-  br i1 %20, label %21, label %27
+for.cond5:                                        ; preds = %for.inc10, %if.end3
+  %i.1 = phi i32 [ 0, %if.end3 ], [ %inc11, %for.inc10 ]
+  %cmp6 = icmp slt i32 %i.1, 2000
+  br i1 %cmp6, label %for.body7, label %for.end12
 
-21:                                               ; preds = %19
-  %22 = call noalias ptr @malloc(i64 noundef 16008) #7
-  %23 = sext i32 %.12 to i64
-  %24 = getelementptr inbounds ptr, ptr %18, i64 %23
-  store ptr %22, ptr %24, align 8
-  br label %25
+for.body7:                                        ; preds = %for.cond5
+  %call8 = call noalias ptr @malloc(i64 noundef 16008) #7
+  %idxprom = sext i32 %i.1 to i64
+  %arrayidx9 = getelementptr inbounds ptr, ptr %call4, i64 %idxprom
+  store ptr %call8, ptr %arrayidx9, align 8
+  br label %for.inc10
 
-25:                                               ; preds = %21
-  %26 = add nsw i32 %.12, 1
-  br label %19, !llvm.loop !23
+for.inc10:                                        ; preds = %for.body7
+  %inc11 = add nsw i32 %i.1, 1
+  br label %for.cond5, !llvm.loop !23
 
-27:                                               ; preds = %19
-  %28 = call noalias ptr @malloc(i64 noundef 16000) #7
-  %29 = call noalias ptr @malloc(i64 noundef 16000) #7
-  %30 = call noalias ptr @malloc(i64 noundef 8000) #7
-  call void @matgen(ptr noundef %18, ptr noundef %28)
-  call void @dgefa(ptr noundef %18, ptr noundef %30)
-  call void @dgesl(ptr noundef %18, ptr noundef %30, ptr noundef %28)
-  call void @free(ptr noundef %30) #8
-  call void @free(ptr noundef %29) #8
-  call void @free(ptr noundef %28) #8
-  br label %31
+for.end12:                                        ; preds = %for.cond5
+  %call13 = call noalias ptr @malloc(i64 noundef 16000) #7
+  %call14 = call noalias ptr @malloc(i64 noundef 16000) #7
+  %call15 = call noalias ptr @malloc(i64 noundef 8000) #7
+  call void @matgen(ptr noundef %call4, ptr noundef %call13)
+  call void @dgefa(ptr noundef %call4, ptr noundef %call15)
+  call void @dgesl(ptr noundef %call4, ptr noundef %call15, ptr noundef %call13)
+  call void @free(ptr noundef %call15) #8
+  call void @free(ptr noundef %call14) #8
+  call void @free(ptr noundef %call13) #8
+  br label %for.cond16
 
-31:                                               ; preds = %37, %27
-  %.2 = phi i32 [ 0, %27 ], [ %38, %37 ]
-  %32 = icmp slt i32 %.2, 2000
-  br i1 %32, label %33, label %39
+for.cond16:                                       ; preds = %for.inc21, %for.end12
+  %i.2 = phi i32 [ 0, %for.end12 ], [ %inc22, %for.inc21 ]
+  %cmp17 = icmp slt i32 %i.2, 2000
+  br i1 %cmp17, label %for.body18, label %for.end23
 
-33:                                               ; preds = %31
-  %34 = sext i32 %.2 to i64
-  %35 = getelementptr inbounds ptr, ptr %18, i64 %34
-  %36 = load ptr, ptr %35, align 8
-  call void @free(ptr noundef %36) #8
-  br label %37
+for.body18:                                       ; preds = %for.cond16
+  %idxprom19 = sext i32 %i.2 to i64
+  %arrayidx20 = getelementptr inbounds ptr, ptr %call4, i64 %idxprom19
+  %1 = load ptr, ptr %arrayidx20, align 8
+  call void @free(ptr noundef %1) #8
+  br label %for.inc21
 
-37:                                               ; preds = %33
-  %38 = add nsw i32 %.2, 1
-  br label %31, !llvm.loop !24
+for.inc21:                                        ; preds = %for.body18
+  %inc22 = add nsw i32 %i.2, 1
+  br label %for.cond16, !llvm.loop !24
 
-39:                                               ; preds = %31
-  call void @free(ptr noundef %18) #8
-  %40 = trunc i8 %.1 to i1
-  br i1 %40, label %41, label %44
+for.end23:                                        ; preds = %for.cond16
+  call void @free(ptr noundef %call4) #8
+  %tobool24 = trunc i8 %ga_testing.1 to i1
+  br i1 %tobool24, label %if.then25, label %if.else
 
-41:                                               ; preds = %39
-  %42 = load ptr, ptr @stdout, align 8
-  %43 = call i32 (ptr, ptr, ...) @fprintf(ptr noundef %42, ptr noundef @.str.1, double noundef 0.000000e+00)
-  br label %47
+if.then25:                                        ; preds = %for.end23
+  %2 = load ptr, ptr @stdout, align 8
+  %call26 = call i32 (ptr, ptr, ...) @fprintf(ptr noundef %2, ptr noundef @.str.1, double noundef 0.000000e+00)
+  br label %if.end28
 
-44:                                               ; preds = %39
-  %45 = load ptr, ptr @stdout, align 8
-  %46 = call i32 (ptr, ptr, ...) @fprintf(ptr noundef %45, ptr noundef @.str.2, double noundef 0.000000e+00)
-  br label %47
+if.else:                                          ; preds = %for.end23
+  %3 = load ptr, ptr @stdout, align 8
+  %call27 = call i32 (ptr, ptr, ...) @fprintf(ptr noundef %3, ptr noundef @.str.2, double noundef 0.000000e+00)
+  br label %if.end28
 
-47:                                               ; preds = %44, %41
-  %48 = load ptr, ptr @stdout, align 8
-  %49 = call i32 @fflush(ptr noundef %48)
+if.end28:                                         ; preds = %if.else, %if.then25
+  %4 = load ptr, ptr @stdout, align 8
+  %call29 = call i32 @fflush(ptr noundef %4)
   ret i32 0
 }
 
@@ -705,36 +712,37 @@ declare i32 @fflush(ptr noundef) #5
 
 ; Function Attrs: noinline nounwind uwtable
 define internal double @random_double() #0 {
+entry:
+  %0 = load i64, ptr @seed, align 8
+  %xor = xor i64 %0, 123459876
+  store i64 %xor, ptr @seed, align 8
   %1 = load i64, ptr @seed, align 8
-  %2 = xor i64 %1, 123459876
-  store i64 %2, ptr @seed, align 8
+  %div = sdiv i64 %1, 127773
+  %2 = load i64, ptr @seed, align 8
+  %mul = mul nsw i64 %div, 127773
+  %sub = sub nsw i64 %2, %mul
+  %mul1 = mul nsw i64 16807, %sub
+  %mul2 = mul nsw i64 2836, %div
+  %sub3 = sub nsw i64 %mul1, %mul2
+  store i64 %sub3, ptr @seed, align 8
   %3 = load i64, ptr @seed, align 8
-  %4 = sdiv i64 %3, 127773
+  %cmp = icmp slt i64 %3, 0
+  br i1 %cmp, label %if.then, label %if.end
+
+if.then:                                          ; preds = %entry
+  %4 = load i64, ptr @seed, align 8
+  %add = add nsw i64 %4, 2147483647
+  store i64 %add, ptr @seed, align 8
+  br label %if.end
+
+if.end:                                           ; preds = %if.then, %entry
   %5 = load i64, ptr @seed, align 8
-  %6 = mul nsw i64 %4, 127773
-  %7 = sub nsw i64 %5, %6
-  %8 = mul nsw i64 16807, %7
-  %9 = mul nsw i64 2836, %4
-  %10 = sub nsw i64 %8, %9
-  store i64 %10, ptr @seed, align 8
-  %11 = load i64, ptr @seed, align 8
-  %12 = icmp slt i64 %11, 0
-  br i1 %12, label %13, label %16
-
-13:                                               ; preds = %0
-  %14 = load i64, ptr @seed, align 8
-  %15 = add nsw i64 %14, 2147483647
-  store i64 %15, ptr @seed, align 8
-  br label %16
-
-16:                                               ; preds = %13, %0
-  %17 = load i64, ptr @seed, align 8
-  %18 = sitofp i64 %17 to double
-  %19 = fmul double 0x3E00000000200FE1, %18
-  %20 = load i64, ptr @seed, align 8
-  %21 = xor i64 %20, 123459876
-  store i64 %21, ptr @seed, align 8
-  ret double %19
+  %conv = sitofp i64 %5 to double
+  %mul4 = fmul double 0x3E00000000200FE1, %conv
+  %6 = load i64, ptr @seed, align 8
+  %xor5 = xor i64 %6, 123459876
+  store i64 %xor5, ptr @seed, align 8
+  ret double %mul4
 }
 
 attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }

@@ -8,17 +8,18 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca [3 x i32], align 4
-  call void @llvm.memcpy.p0.p0.i64(ptr align 4 %1, ptr align 4 @__const.main.arr, i64 12, i1 false)
-  %2 = getelementptr inbounds [3 x i32], ptr %1, i64 0, i64 1
-  %3 = load i32, ptr %2, align 4
-  %4 = getelementptr inbounds [3 x i32], ptr %1, i64 0, i64 2
-  %5 = load i32, ptr %4, align 4
-  %6 = add nsw i32 %3, %5
-  %7 = load i32, ptr %2, align 4
-  %8 = load i32, ptr %4, align 4
-  %9 = add nsw i32 %7, %8
-  %10 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %6, i32 noundef %9)
+entry:
+  %arr = alloca [3 x i32], align 4
+  call void @llvm.memcpy.p0.p0.i64(ptr align 4 %arr, ptr align 4 @__const.main.arr, i64 12, i1 false)
+  %arrayidx = getelementptr inbounds [3 x i32], ptr %arr, i64 0, i64 1
+  %0 = load i32, ptr %arrayidx, align 4
+  %arrayidx1 = getelementptr inbounds [3 x i32], ptr %arr, i64 0, i64 2
+  %1 = load i32, ptr %arrayidx1, align 4
+  %add = add nsw i32 %0, %1
+  %2 = load i32, ptr %arrayidx, align 4
+  %3 = load i32, ptr %arrayidx1, align 4
+  %add4 = add nsw i32 %2, %3
+  %call = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %add, i32 noundef %add4)
   ret i32 0
 }
 

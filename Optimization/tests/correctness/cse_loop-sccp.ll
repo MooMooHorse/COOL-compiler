@@ -7,27 +7,28 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  br label %1
+entry:
+  br label %for.cond
 
-1:                                                ; preds = %8, %0
-  %.01 = phi i32 [ 0, %0 ], [ %7, %8 ]
-  %.0 = phi i32 [ 0, %0 ], [ %9, %8 ]
-  %2 = icmp slt i32 %.0, 10
-  br i1 %2, label %3, label %10
+for.cond:                                         ; preds = %for.inc, %entry
+  %sum.0 = phi i32 [ 0, %entry ], [ %add2, %for.inc ]
+  %i.0 = phi i32 [ 0, %entry ], [ %inc, %for.inc ]
+  %cmp = icmp slt i32 %i.0, 10
+  br i1 %cmp, label %for.body, label %for.end
 
-3:                                                ; preds = %1
-  %4 = mul nsw i32 %.0, 2
-  %5 = mul nsw i32 %.0, 2
-  %6 = add nsw i32 %4, %5
-  %7 = add nsw i32 %.01, %6
-  br label %8
+for.body:                                         ; preds = %for.cond
+  %mul = mul nsw i32 %i.0, 2
+  %mul1 = mul nsw i32 %i.0, 2
+  %add = add nsw i32 %mul, %mul1
+  %add2 = add nsw i32 %sum.0, %add
+  br label %for.inc
 
-8:                                                ; preds = %3
-  %9 = add nsw i32 %.0, 1
-  br label %1, !llvm.loop !6
+for.inc:                                          ; preds = %for.body
+  %inc = add nsw i32 %i.0, 1
+  br label %for.cond, !llvm.loop !6
 
-10:                                               ; preds = %1
-  %11 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %.01)
+for.end:                                          ; preds = %for.cond
+  %call = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %sum.0)
   ret i32 0
 }
 

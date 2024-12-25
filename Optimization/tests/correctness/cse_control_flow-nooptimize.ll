@@ -7,33 +7,34 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  %2 = alloca i32, align 4
-  %3 = alloca i32, align 4
-  %4 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  store i32 5, ptr %2, align 4
-  store i32 10, ptr %3, align 4
-  %5 = load i32, ptr %2, align 4
-  %6 = load i32, ptr %3, align 4
-  %7 = add nsw i32 %5, %6
-  %8 = icmp sgt i32 %7, 0
-  br i1 %8, label %9, label %13
+entry:
+  %retval = alloca i32, align 4
+  %a = alloca i32, align 4
+  %b = alloca i32, align 4
+  %c = alloca i32, align 4
+  store i32 0, ptr %retval, align 4
+  store i32 5, ptr %a, align 4
+  store i32 10, ptr %b, align 4
+  %0 = load i32, ptr %a, align 4
+  %1 = load i32, ptr %b, align 4
+  %add = add nsw i32 %0, %1
+  %cmp = icmp sgt i32 %add, 0
+  br i1 %cmp, label %if.then, label %if.else
 
-9:                                                ; preds = %0
-  %10 = load i32, ptr %2, align 4
-  %11 = load i32, ptr %3, align 4
-  %12 = add nsw i32 %10, %11
-  store i32 %12, ptr %4, align 4
-  br label %14
+if.then:                                          ; preds = %entry
+  %2 = load i32, ptr %a, align 4
+  %3 = load i32, ptr %b, align 4
+  %add1 = add nsw i32 %2, %3
+  store i32 %add1, ptr %c, align 4
+  br label %if.end
 
-13:                                               ; preds = %0
-  store i32 0, ptr %4, align 4
-  br label %14
+if.else:                                          ; preds = %entry
+  store i32 0, ptr %c, align 4
+  br label %if.end
 
-14:                                               ; preds = %13, %9
-  %15 = load i32, ptr %4, align 4
-  %16 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %15)
+if.end:                                           ; preds = %if.else, %if.then
+  %4 = load i32, ptr %c, align 4
+  %call = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %4)
   ret i32 0
 }
 

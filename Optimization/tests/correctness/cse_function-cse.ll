@@ -8,19 +8,21 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @getValue() #0 {
-  %1 = load i32, ptr @getValue.x, align 4
-  %2 = add nsw i32 %1, 1
-  store i32 %2, ptr @getValue.x, align 4
-  ret i32 %2
+entry:
+  %0 = load i32, ptr @getValue.x, align 4
+  %inc = add nsw i32 %0, 1
+  store i32 %inc, ptr @getValue.x, align 4
+  ret i32 %inc
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = call i32 @getValue()
-  %2 = mul nsw i32 %1, 2
-  %3 = call i32 @getValue()
-  %4 = mul nsw i32 %3, 2
-  %5 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %2, i32 noundef %4)
+entry:
+  %call = call i32 @getValue()
+  %mul = mul nsw i32 %call, 2
+  %call1 = call i32 @getValue()
+  %mul2 = mul nsw i32 %call1, 2
+  %call3 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %mul, i32 noundef %mul2)
   ret i32 0
 }
 

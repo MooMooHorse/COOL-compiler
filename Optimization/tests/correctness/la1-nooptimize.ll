@@ -4,100 +4,102 @@ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16
 target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @crazy_loops(i32 noundef %0) #0 {
-  %2 = alloca i32, align 4
-  %3 = alloca i32, align 4
-  %4 = alloca i32, align 4
-  %5 = alloca i32, align 4
-  store i32 %0, ptr %2, align 4
-  store i32 5, ptr %3, align 4
-  %6 = load i32, ptr %3, align 4
-  %7 = load i32, ptr %3, align 4
-  %8 = mul nsw i32 %6, %7
-  store i32 %8, ptr %4, align 4
-  %9 = load i32, ptr %3, align 4
-  %10 = load i32, ptr %3, align 4
-  %11 = mul nsw i32 %9, %10
-  %12 = load i32, ptr %3, align 4
-  %13 = add nsw i32 %11, %12
-  %14 = load i32, ptr %4, align 4
-  %15 = sub nsw i32 %13, %14
-  store i32 %15, ptr %5, align 4
-  br label %16
+define dso_local i32 @crazy_loops(i32 noundef %p) #0 {
+entry:
+  %p.addr = alloca i32, align 4
+  %x = alloca i32, align 4
+  %y = alloca i32, align 4
+  %z = alloca i32, align 4
+  store i32 %p, ptr %p.addr, align 4
+  store i32 5, ptr %x, align 4
+  %0 = load i32, ptr %x, align 4
+  %1 = load i32, ptr %x, align 4
+  %mul = mul nsw i32 %0, %1
+  store i32 %mul, ptr %y, align 4
+  %2 = load i32, ptr %x, align 4
+  %3 = load i32, ptr %x, align 4
+  %mul1 = mul nsw i32 %2, %3
+  %4 = load i32, ptr %x, align 4
+  %add = add nsw i32 %mul1, %4
+  %5 = load i32, ptr %y, align 4
+  %sub = sub nsw i32 %add, %5
+  store i32 %sub, ptr %z, align 4
+  br label %do.body
 
-16:                                               ; preds = %49, %1
-  br label %17
+do.body:                                          ; preds = %do.cond12, %entry
+  br label %while.cond
 
-17:                                               ; preds = %45, %16
-  %18 = load i32, ptr %3, align 4
-  %19 = load i32, ptr %4, align 4
-  %20 = add nsw i32 %18, %19
-  %21 = load i32, ptr %5, align 4
-  %22 = icmp slt i32 %20, %21
-  br i1 %22, label %23, label %46
+while.cond:                                       ; preds = %do.end, %do.body
+  %6 = load i32, ptr %x, align 4
+  %7 = load i32, ptr %y, align 4
+  %add2 = add nsw i32 %6, %7
+  %8 = load i32, ptr %z, align 4
+  %cmp = icmp slt i32 %add2, %8
+  br i1 %cmp, label %while.body, label %while.end
 
-23:                                               ; preds = %17
-  %24 = load i32, ptr %3, align 4
-  %25 = add nsw i32 %24, 1
-  store i32 %25, ptr %3, align 4
-  %26 = load i32, ptr %4, align 4
-  %27 = add nsw i32 %26, 1
-  store i32 %27, ptr %4, align 4
-  br label %28
+while.body:                                       ; preds = %while.cond
+  %9 = load i32, ptr %x, align 4
+  %add3 = add nsw i32 %9, 1
+  store i32 %add3, ptr %x, align 4
+  %10 = load i32, ptr %y, align 4
+  %add4 = add nsw i32 %10, 1
+  store i32 %add4, ptr %y, align 4
+  br label %do.body5
 
-28:                                               ; preds = %39, %23
-  %29 = load i32, ptr %3, align 4
-  %30 = load i32, ptr %3, align 4
-  %31 = mul nsw i32 %29, %30
-  store i32 %31, ptr %3, align 4
-  %32 = load i32, ptr %3, align 4
-  %33 = icmp sgt i32 %32, 10
-  br i1 %33, label %34, label %38
+do.body5:                                         ; preds = %do.cond, %while.body
+  %11 = load i32, ptr %x, align 4
+  %12 = load i32, ptr %x, align 4
+  %mul6 = mul nsw i32 %11, %12
+  store i32 %mul6, ptr %x, align 4
+  %13 = load i32, ptr %x, align 4
+  %cmp7 = icmp sgt i32 %13, 10
+  br i1 %cmp7, label %if.then, label %if.end
 
-34:                                               ; preds = %28
-  %35 = load i32, ptr %4, align 4
-  %36 = load i32, ptr %4, align 4
-  %37 = mul nsw i32 %35, %36
-  store i32 %37, ptr %4, align 4
-  br label %38
+if.then:                                          ; preds = %do.body5
+  %14 = load i32, ptr %y, align 4
+  %15 = load i32, ptr %y, align 4
+  %mul8 = mul nsw i32 %14, %15
+  store i32 %mul8, ptr %y, align 4
+  br label %if.end
 
-38:                                               ; preds = %34, %28
-  br label %39
+if.end:                                           ; preds = %if.then, %do.body5
+  br label %do.cond
 
-39:                                               ; preds = %38
-  %40 = load i32, ptr %3, align 4
-  %41 = load i32, ptr %2, align 4
-  %42 = load i32, ptr %2, align 4
-  %43 = mul nsw i32 %41, %42
-  %44 = icmp slt i32 %40, %43
-  br i1 %44, label %28, label %45, !llvm.loop !6
+do.cond:                                          ; preds = %if.end
+  %16 = load i32, ptr %x, align 4
+  %17 = load i32, ptr %p.addr, align 4
+  %18 = load i32, ptr %p.addr, align 4
+  %mul9 = mul nsw i32 %17, %18
+  %cmp10 = icmp slt i32 %16, %mul9
+  br i1 %cmp10, label %do.body5, label %do.end, !llvm.loop !6
 
-45:                                               ; preds = %39
-  br label %17, !llvm.loop !8
+do.end:                                           ; preds = %do.cond
+  br label %while.cond, !llvm.loop !8
 
-46:                                               ; preds = %17
-  %47 = load i32, ptr %5, align 4
-  %48 = add nsw i32 %47, 1
-  store i32 %48, ptr %5, align 4
-  br label %49
+while.end:                                        ; preds = %while.cond
+  %19 = load i32, ptr %z, align 4
+  %add11 = add nsw i32 %19, 1
+  store i32 %add11, ptr %z, align 4
+  br label %do.cond12
 
-49:                                               ; preds = %46
-  %50 = load i32, ptr %3, align 4
-  %51 = load i32, ptr %2, align 4
-  %52 = icmp slt i32 %50, %51
-  br i1 %52, label %16, label %53, !llvm.loop !9
+do.cond12:                                        ; preds = %while.end
+  %20 = load i32, ptr %x, align 4
+  %21 = load i32, ptr %p.addr, align 4
+  %cmp13 = icmp slt i32 %20, %21
+  br i1 %cmp13, label %do.body, label %do.end14, !llvm.loop !9
 
-53:                                               ; preds = %49
-  %54 = load i32, ptr %5, align 4
-  ret i32 %54
+do.end14:                                         ; preds = %do.cond12
+  %22 = load i32, ptr %z, align 4
+  ret i32 %22
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  %2 = call i32 @crazy_loops(i32 noundef 1000)
-  ret i32 %2
+entry:
+  %retval = alloca i32, align 4
+  store i32 0, ptr %retval, align 4
+  %call = call i32 @crazy_loops(i32 noundef 1000)
+  ret i32 %call
 }
 
 attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }

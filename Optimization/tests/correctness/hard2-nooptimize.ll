@@ -6,102 +6,104 @@ target triple = "x86_64-unknown-linux-gnu"
 @m = dso_local global [10 x i32] zeroinitializer, align 16
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @changeall(ptr noundef %0) #0 {
-  %2 = alloca ptr, align 8
-  store ptr %0, ptr %2, align 8
-  %3 = load ptr, ptr %2, align 8
-  %4 = getelementptr inbounds i32, ptr %3, i64 0
-  %5 = load i32, ptr %4, align 4
-  %6 = add nsw i32 %5, 1
-  store i32 %6, ptr %4, align 4
-  %7 = load ptr, ptr %2, align 8
-  %8 = getelementptr inbounds i32, ptr %7, i64 1
-  %9 = load i32, ptr %8, align 4
-  %10 = add nsw i32 %9, 1
-  store i32 %10, ptr %8, align 4
-  %11 = load ptr, ptr %2, align 8
-  %12 = getelementptr inbounds i32, ptr %11, i64 2
-  %13 = load i32, ptr %12, align 4
-  %14 = add nsw i32 %13, 1
-  store i32 %14, ptr %12, align 4
-  %15 = load ptr, ptr %2, align 8
-  %16 = getelementptr inbounds i32, ptr %15, i64 3
-  %17 = load i32, ptr %16, align 4
-  %18 = add nsw i32 %17, 1
-  store i32 %18, ptr %16, align 4
-  %19 = load ptr, ptr %2, align 8
-  %20 = getelementptr inbounds i32, ptr %19, i64 1
-  %21 = load i32, ptr %20, align 4
-  ret i32 %21
+define dso_local i32 @changeall(ptr noundef %p) #0 {
+entry:
+  %p.addr = alloca ptr, align 8
+  store ptr %p, ptr %p.addr, align 8
+  %0 = load ptr, ptr %p.addr, align 8
+  %arrayidx = getelementptr inbounds i32, ptr %0, i64 0
+  %1 = load i32, ptr %arrayidx, align 4
+  %inc = add nsw i32 %1, 1
+  store i32 %inc, ptr %arrayidx, align 4
+  %2 = load ptr, ptr %p.addr, align 8
+  %arrayidx1 = getelementptr inbounds i32, ptr %2, i64 1
+  %3 = load i32, ptr %arrayidx1, align 4
+  %inc2 = add nsw i32 %3, 1
+  store i32 %inc2, ptr %arrayidx1, align 4
+  %4 = load ptr, ptr %p.addr, align 8
+  %arrayidx3 = getelementptr inbounds i32, ptr %4, i64 2
+  %5 = load i32, ptr %arrayidx3, align 4
+  %inc4 = add nsw i32 %5, 1
+  store i32 %inc4, ptr %arrayidx3, align 4
+  %6 = load ptr, ptr %p.addr, align 8
+  %arrayidx5 = getelementptr inbounds i32, ptr %6, i64 3
+  %7 = load i32, ptr %arrayidx5, align 4
+  %inc6 = add nsw i32 %7, 1
+  store i32 %inc6, ptr %arrayidx5, align 4
+  %8 = load ptr, ptr %p.addr, align 8
+  %arrayidx7 = getelementptr inbounds i32, ptr %8, i64 1
+  %9 = load i32, ptr %arrayidx7, align 4
+  ret i32 %9
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  %2 = alloca ptr, align 8
-  store i32 0, ptr %1, align 4
+entry:
+  %retval = alloca i32, align 4
+  %p = alloca ptr, align 8
+  store i32 0, ptr %retval, align 4
   store i32 20, ptr @m, align 16
   store i32 30, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
-  %3 = load i32, ptr @m, align 16
-  %4 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
-  %5 = add nsw i32 %3, %4
-  store i32 %5, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
+  %0 = load i32, ptr @m, align 16
+  %1 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
+  %add = add nsw i32 %0, %1
+  store i32 %add, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
+  %2 = load i32, ptr @m, align 16
+  %3 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
+  %sub = sub nsw i32 %2, %3
+  store i32 %sub, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 3), align 4
+  %4 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
+  %5 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
+  %mul = mul nsw i32 %4, %5
+  store i32 %mul, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 4), align 16
+  store ptr @m, ptr %p, align 8
+  br label %while.cond
+
+while.cond:                                       ; preds = %if.end, %entry
   %6 = load i32, ptr @m, align 16
-  %7 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
-  %8 = sub nsw i32 %6, %7
-  store i32 %8, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 3), align 4
-  %9 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
-  %10 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
-  %11 = mul nsw i32 %9, %10
-  store i32 %11, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 4), align 16
-  store ptr @m, ptr %2, align 8
-  br label %12
+  %7 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
+  %cmp = icmp slt i32 %6, %7
+  br i1 %cmp, label %while.body, label %while.end
 
-12:                                               ; preds = %33, %0
+while.body:                                       ; preds = %while.cond
+  %8 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
+  store i32 %8, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 5), align 4
+  %9 = load ptr, ptr %p, align 8
+  %call = call i32 @changeall(ptr noundef %9)
+  %10 = load i32, ptr @m, align 16
+  %11 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
+  %add1 = add nsw i32 %10, %11
+  %12 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
+  %cmp2 = icmp slt i32 %add1, %12
+  br i1 %cmp2, label %if.then, label %if.else
+
+if.then:                                          ; preds = %while.body
   %13 = load i32, ptr @m, align 16
-  %14 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
-  %15 = icmp slt i32 %13, %14
-  br i1 %15, label %16, label %39
+  %14 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
+  %sub3 = sub nsw i32 %13, %14
+  store i32 %sub3, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 3), align 4
+  br label %if.end
 
-16:                                               ; preds = %12
-  %17 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
-  store i32 %17, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 5), align 4
-  %18 = load ptr, ptr %2, align 8
-  %19 = call i32 @changeall(ptr noundef %18)
-  %20 = load i32, ptr @m, align 16
-  %21 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
-  %22 = add nsw i32 %20, %21
-  %23 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
-  %24 = icmp slt i32 %22, %23
-  br i1 %24, label %25, label %29
+if.else:                                          ; preds = %while.body
+  %15 = load i32, ptr @m, align 16
+  %16 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
+  %mul4 = mul nsw i32 %15, %16
+  store i32 %mul4, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 3), align 4
+  br label %if.end
 
-25:                                               ; preds = %16
-  %26 = load i32, ptr @m, align 16
-  %27 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
-  %28 = sub nsw i32 %26, %27
-  store i32 %28, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 3), align 4
-  br label %33
+if.end:                                           ; preds = %if.else, %if.then
+  %17 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
+  %18 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
+  %mul5 = mul nsw i32 %17, %18
+  store i32 %mul5, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 4), align 16
+  %19 = load i32, ptr @m, align 16
+  %inc = add nsw i32 %19, 1
+  store i32 %inc, ptr @m, align 16
+  br label %while.cond, !llvm.loop !6
 
-29:                                               ; preds = %16
-  %30 = load i32, ptr @m, align 16
-  %31 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 1), align 4
-  %32 = mul nsw i32 %30, %31
-  store i32 %32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 3), align 4
-  br label %33
-
-33:                                               ; preds = %29, %25
-  %34 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
-  %35 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 2), align 8
-  %36 = mul nsw i32 %34, %35
-  store i32 %36, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 4), align 16
-  %37 = load i32, ptr @m, align 16
-  %38 = add nsw i32 %37, 1
-  store i32 %38, ptr @m, align 16
-  br label %12, !llvm.loop !6
-
-39:                                               ; preds = %12
-  %40 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 5), align 4
-  ret i32 %40
+while.end:                                        ; preds = %while.cond
+  %20 = load i32, ptr getelementptr inbounds ([10 x i32], ptr @m, i64 0, i64 5), align 4
+  ret i32 %20
 }
 
 attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }

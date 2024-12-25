@@ -7,32 +7,34 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @constant_loop() #0 {
-  %1 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  br label %2
+entry:
+  %i = alloca i32, align 4
+  store i32 0, ptr %i, align 4
+  br label %while.cond
 
-2:                                                ; preds = %5, %0
-  %3 = load i32, ptr %1, align 4
-  %4 = icmp ne i32 %3, 3
-  br i1 %4, label %5, label %8
+while.cond:                                       ; preds = %while.body, %entry
+  %0 = load i32, ptr %i, align 4
+  %cmp = icmp ne i32 %0, 3
+  br i1 %cmp, label %while.body, label %while.end
 
-5:                                                ; preds = %2
-  %6 = load i32, ptr %1, align 4
-  %7 = add nsw i32 %6, 1
-  store i32 %7, ptr %1, align 4
-  br label %2, !llvm.loop !6
+while.body:                                       ; preds = %while.cond
+  %1 = load i32, ptr %i, align 4
+  %add = add nsw i32 %1, 1
+  store i32 %add, ptr %i, align 4
+  br label %while.cond, !llvm.loop !6
 
-8:                                                ; preds = %2
-  %9 = load i32, ptr %1, align 4
-  ret i32 %9
+while.end:                                        ; preds = %while.cond
+  %2 = load i32, ptr %i, align 4
+  ret i32 %2
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  %2 = call i32 @constant_loop()
-  %3 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %2)
+entry:
+  %retval = alloca i32, align 4
+  store i32 0, ptr %retval, align 4
+  %call = call i32 @constant_loop()
+  %call1 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %call)
   ret i32 0
 }
 

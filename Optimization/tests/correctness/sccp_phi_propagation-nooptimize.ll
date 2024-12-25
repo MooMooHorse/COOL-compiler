@@ -7,18 +7,20 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @phi_example() #0 {
-  %1 = alloca i32, align 4
-  store i32 42, ptr %1, align 4
-  %2 = load i32, ptr %1, align 4
-  ret i32 %2
+entry:
+  %a = alloca i32, align 4
+  store i32 42, ptr %a, align 4
+  %0 = load i32, ptr %a, align 4
+  ret i32 %0
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  %2 = call i32 @phi_example()
-  %3 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %2)
+entry:
+  %retval = alloca i32, align 4
+  store i32 0, ptr %retval, align 4
+  %call = call i32 @phi_example()
+  %call1 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %call)
   ret i32 0
 }
 

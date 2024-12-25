@@ -6,16 +6,18 @@ target triple = "x86_64-unknown-linux-gnu"
 @.str = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @neutral_elements(i32 noundef %0) #0 {
-  %2 = add nsw i32 %0, 0
-  %3 = mul nsw i32 %2, 1
-  ret i32 %3
+define dso_local i32 @neutral_elements(i32 noundef %input) #0 {
+entry:
+  %add = add nsw i32 %input, 0
+  %mul = mul nsw i32 %add, 1
+  ret i32 %mul
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = call i32 @neutral_elements(i32 noundef 5)
-  %2 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %1)
+entry:
+  %call = call i32 @neutral_elements(i32 noundef 5)
+  %call1 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %call)
   ret i32 0
 }
 

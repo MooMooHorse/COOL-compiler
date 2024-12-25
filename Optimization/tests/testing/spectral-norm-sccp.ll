@@ -6,63 +6,65 @@ target triple = "x86_64-unknown-linux-gnu"
 @.str = private unnamed_addr constant [7 x i8] c"%0.9f\0A\00", align 1
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local double @eval_A(i32 noundef %0, i32 noundef %1) #0 {
-  %3 = add nsw i32 %0, %1
-  %4 = add nsw i32 %0, %1
-  %5 = add nsw i32 %4, 1
-  %6 = mul nsw i32 %3, %5
-  %7 = sdiv i32 %6, 2
-  %8 = add nsw i32 %7, %0
-  %9 = add nsw i32 %8, 1
-  %10 = sitofp i32 %9 to double
-  %11 = fdiv double 1.000000e+00, %10
-  ret double %11
+define dso_local double @eval_A(i32 noundef %i, i32 noundef %j) #0 {
+entry:
+  %add = add nsw i32 %i, %j
+  %add1 = add nsw i32 %i, %j
+  %add2 = add nsw i32 %add1, 1
+  %mul = mul nsw i32 %add, %add2
+  %div = sdiv i32 %mul, 2
+  %add3 = add nsw i32 %div, %i
+  %add4 = add nsw i32 %add3, 1
+  %conv = sitofp i32 %add4 to double
+  %div5 = fdiv double 1.000000e+00, %conv
+  ret double %div5
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @eval_A_times_u(i32 noundef %0, ptr noundef %1, ptr noundef %2) #0 {
-  br label %4
+define dso_local void @eval_A_times_u(i32 noundef %N, ptr noundef %u, ptr noundef %Au) #0 {
+entry:
+  br label %for.cond
 
-4:                                                ; preds = %23, %3
-  %.01 = phi i32 [ 0, %3 ], [ %24, %23 ]
-  %5 = icmp slt i32 %.01, %0
-  br i1 %5, label %6, label %25
+for.cond:                                         ; preds = %for.inc8, %entry
+  %i.0 = phi i32 [ 0, %entry ], [ %inc9, %for.inc8 ]
+  %cmp = icmp slt i32 %i.0, %N
+  br i1 %cmp, label %for.body, label %for.end10
 
-6:                                                ; preds = %4
-  %7 = sext i32 %.01 to i64
-  %8 = getelementptr inbounds double, ptr %2, i64 %7
-  store double 0.000000e+00, ptr %8, align 8
-  br label %9
+for.body:                                         ; preds = %for.cond
+  %idxprom = sext i32 %i.0 to i64
+  %arrayidx = getelementptr inbounds double, ptr %Au, i64 %idxprom
+  store double 0.000000e+00, ptr %arrayidx, align 8
+  br label %for.cond1
 
-9:                                                ; preds = %20, %6
-  %.0 = phi i32 [ 0, %6 ], [ %21, %20 ]
-  %10 = icmp slt i32 %.0, %0
-  br i1 %10, label %11, label %22
+for.cond1:                                        ; preds = %for.inc, %for.body
+  %j.0 = phi i32 [ 0, %for.body ], [ %inc, %for.inc ]
+  %cmp2 = icmp slt i32 %j.0, %N
+  br i1 %cmp2, label %for.body3, label %for.end
 
-11:                                               ; preds = %9
-  %12 = call double @eval_A(i32 noundef %.01, i32 noundef %.0)
-  %13 = sext i32 %.0 to i64
-  %14 = getelementptr inbounds double, ptr %1, i64 %13
-  %15 = load double, ptr %14, align 8
-  %16 = sext i32 %.01 to i64
-  %17 = getelementptr inbounds double, ptr %2, i64 %16
-  %18 = load double, ptr %17, align 8
-  %19 = call double @llvm.fmuladd.f64(double %12, double %15, double %18)
-  store double %19, ptr %17, align 8
-  br label %20
+for.body3:                                        ; preds = %for.cond1
+  %call = call double @eval_A(i32 noundef %i.0, i32 noundef %j.0)
+  %idxprom4 = sext i32 %j.0 to i64
+  %arrayidx5 = getelementptr inbounds double, ptr %u, i64 %idxprom4
+  %0 = load double, ptr %arrayidx5, align 8
+  %idxprom6 = sext i32 %i.0 to i64
+  %arrayidx7 = getelementptr inbounds double, ptr %Au, i64 %idxprom6
+  %1 = load double, ptr %arrayidx7, align 8
+  %2 = call double @llvm.fmuladd.f64(double %call, double %0, double %1)
+  store double %2, ptr %arrayidx7, align 8
+  br label %for.inc
 
-20:                                               ; preds = %11
-  %21 = add nsw i32 %.0, 1
-  br label %9, !llvm.loop !6
+for.inc:                                          ; preds = %for.body3
+  %inc = add nsw i32 %j.0, 1
+  br label %for.cond1, !llvm.loop !6
 
-22:                                               ; preds = %9
-  br label %23
+for.end:                                          ; preds = %for.cond1
+  br label %for.inc8
 
-23:                                               ; preds = %22
-  %24 = add nsw i32 %.01, 1
-  br label %4, !llvm.loop !8
+for.inc8:                                         ; preds = %for.end
+  %inc9 = add nsw i32 %i.0, 1
+  br label %for.cond, !llvm.loop !8
 
-25:                                               ; preds = %4
+for.end10:                                        ; preds = %for.cond
   ret void
 }
 
@@ -70,60 +72,62 @@ define dso_local void @eval_A_times_u(i32 noundef %0, ptr noundef %1, ptr nounde
 declare double @llvm.fmuladd.f64(double, double, double) #1
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @eval_At_times_u(i32 noundef %0, ptr noundef %1, ptr noundef %2) #0 {
-  br label %4
+define dso_local void @eval_At_times_u(i32 noundef %N, ptr noundef %u, ptr noundef %Au) #0 {
+entry:
+  br label %for.cond
 
-4:                                                ; preds = %23, %3
-  %.01 = phi i32 [ 0, %3 ], [ %24, %23 ]
-  %5 = icmp slt i32 %.01, %0
-  br i1 %5, label %6, label %25
+for.cond:                                         ; preds = %for.inc8, %entry
+  %i.0 = phi i32 [ 0, %entry ], [ %inc9, %for.inc8 ]
+  %cmp = icmp slt i32 %i.0, %N
+  br i1 %cmp, label %for.body, label %for.end10
 
-6:                                                ; preds = %4
-  %7 = sext i32 %.01 to i64
-  %8 = getelementptr inbounds double, ptr %2, i64 %7
-  store double 0.000000e+00, ptr %8, align 8
-  br label %9
+for.body:                                         ; preds = %for.cond
+  %idxprom = sext i32 %i.0 to i64
+  %arrayidx = getelementptr inbounds double, ptr %Au, i64 %idxprom
+  store double 0.000000e+00, ptr %arrayidx, align 8
+  br label %for.cond1
 
-9:                                                ; preds = %20, %6
-  %.0 = phi i32 [ 0, %6 ], [ %21, %20 ]
-  %10 = icmp slt i32 %.0, %0
-  br i1 %10, label %11, label %22
+for.cond1:                                        ; preds = %for.inc, %for.body
+  %j.0 = phi i32 [ 0, %for.body ], [ %inc, %for.inc ]
+  %cmp2 = icmp slt i32 %j.0, %N
+  br i1 %cmp2, label %for.body3, label %for.end
 
-11:                                               ; preds = %9
-  %12 = call double @eval_A(i32 noundef %.0, i32 noundef %.01)
-  %13 = sext i32 %.0 to i64
-  %14 = getelementptr inbounds double, ptr %1, i64 %13
-  %15 = load double, ptr %14, align 8
-  %16 = sext i32 %.01 to i64
-  %17 = getelementptr inbounds double, ptr %2, i64 %16
-  %18 = load double, ptr %17, align 8
-  %19 = call double @llvm.fmuladd.f64(double %12, double %15, double %18)
-  store double %19, ptr %17, align 8
-  br label %20
+for.body3:                                        ; preds = %for.cond1
+  %call = call double @eval_A(i32 noundef %j.0, i32 noundef %i.0)
+  %idxprom4 = sext i32 %j.0 to i64
+  %arrayidx5 = getelementptr inbounds double, ptr %u, i64 %idxprom4
+  %0 = load double, ptr %arrayidx5, align 8
+  %idxprom6 = sext i32 %i.0 to i64
+  %arrayidx7 = getelementptr inbounds double, ptr %Au, i64 %idxprom6
+  %1 = load double, ptr %arrayidx7, align 8
+  %2 = call double @llvm.fmuladd.f64(double %call, double %0, double %1)
+  store double %2, ptr %arrayidx7, align 8
+  br label %for.inc
 
-20:                                               ; preds = %11
-  %21 = add nsw i32 %.0, 1
-  br label %9, !llvm.loop !9
+for.inc:                                          ; preds = %for.body3
+  %inc = add nsw i32 %j.0, 1
+  br label %for.cond1, !llvm.loop !9
 
-22:                                               ; preds = %9
-  br label %23
+for.end:                                          ; preds = %for.cond1
+  br label %for.inc8
 
-23:                                               ; preds = %22
-  %24 = add nsw i32 %.01, 1
-  br label %4, !llvm.loop !10
+for.inc8:                                         ; preds = %for.end
+  %inc9 = add nsw i32 %i.0, 1
+  br label %for.cond, !llvm.loop !10
 
-25:                                               ; preds = %4
+for.end10:                                        ; preds = %for.cond
   ret void
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local void @eval_AtA_times_u(i32 noundef %0, ptr noundef %1, ptr noundef %2) #0 {
-  %4 = zext i32 %0 to i64
-  %5 = call ptr @llvm.stacksave()
-  %6 = alloca double, i64 %4, align 16
-  call void @eval_A_times_u(i32 noundef %0, ptr noundef %1, ptr noundef %6)
-  call void @eval_At_times_u(i32 noundef %0, ptr noundef %6, ptr noundef %2)
-  call void @llvm.stackrestore(ptr %5)
+define dso_local void @eval_AtA_times_u(i32 noundef %N, ptr noundef %u, ptr noundef %AtAu) #0 {
+entry:
+  %0 = zext i32 %N to i64
+  %1 = call ptr @llvm.stacksave()
+  %vla = alloca double, i64 %0, align 16
+  call void @eval_A_times_u(i32 noundef %N, ptr noundef %u, ptr noundef %vla)
+  call void @eval_At_times_u(i32 noundef %N, ptr noundef %vla, ptr noundef %AtAu)
+  call void @llvm.stackrestore(ptr %1)
   ret void
 }
 
@@ -134,96 +138,97 @@ declare ptr @llvm.stacksave() #2
 declare void @llvm.stackrestore(ptr) #2
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @main(i32 noundef %0, ptr noundef %1) #0 {
-  %3 = icmp eq i32 %0, 2
-  br i1 %3, label %4, label %8
+define dso_local i32 @main(i32 noundef %argc, ptr noundef %argv) #0 {
+entry:
+  %cmp = icmp eq i32 %argc, 2
+  br i1 %cmp, label %cond.true, label %cond.false
 
-4:                                                ; preds = %2
-  %5 = getelementptr inbounds ptr, ptr %1, i64 1
-  %6 = load ptr, ptr %5, align 8
-  %7 = call i32 @atoi(ptr noundef %6) #6
-  br label %9
+cond.true:                                        ; preds = %entry
+  %arrayidx = getelementptr inbounds ptr, ptr %argv, i64 1
+  %0 = load ptr, ptr %arrayidx, align 8
+  %call = call i32 @atoi(ptr noundef %0) #6
+  br label %cond.end
 
-8:                                                ; preds = %2
-  br label %9
+cond.false:                                       ; preds = %entry
+  br label %cond.end
 
-9:                                                ; preds = %8, %4
-  %10 = phi i32 [ %7, %4 ], [ 2000, %8 ]
-  %11 = zext i32 %10 to i64
-  %12 = call ptr @llvm.stacksave()
-  %13 = alloca double, i64 %11, align 16
-  %14 = zext i32 %10 to i64
-  %15 = alloca double, i64 %14, align 16
-  br label %16
+cond.end:                                         ; preds = %cond.false, %cond.true
+  %cond = phi i32 [ %call, %cond.true ], [ 2000, %cond.false ]
+  %1 = zext i32 %cond to i64
+  %2 = call ptr @llvm.stacksave()
+  %vla = alloca double, i64 %1, align 16
+  %3 = zext i32 %cond to i64
+  %vla1 = alloca double, i64 %3, align 16
+  br label %for.cond
 
-16:                                               ; preds = %21, %9
-  %.02 = phi i32 [ 0, %9 ], [ %22, %21 ]
-  %17 = icmp slt i32 %.02, %10
-  br i1 %17, label %18, label %23
+for.cond:                                         ; preds = %for.inc, %cond.end
+  %i.0 = phi i32 [ 0, %cond.end ], [ %inc, %for.inc ]
+  %cmp2 = icmp slt i32 %i.0, %cond
+  br i1 %cmp2, label %for.body, label %for.end
 
-18:                                               ; preds = %16
-  %19 = sext i32 %.02 to i64
-  %20 = getelementptr inbounds double, ptr %13, i64 %19
-  store double 1.000000e+00, ptr %20, align 8
-  br label %21
+for.body:                                         ; preds = %for.cond
+  %idxprom = sext i32 %i.0 to i64
+  %arrayidx3 = getelementptr inbounds double, ptr %vla, i64 %idxprom
+  store double 1.000000e+00, ptr %arrayidx3, align 8
+  br label %for.inc
 
-21:                                               ; preds = %18
-  %22 = add nsw i32 %.02, 1
-  br label %16, !llvm.loop !11
+for.inc:                                          ; preds = %for.body
+  %inc = add nsw i32 %i.0, 1
+  br label %for.cond, !llvm.loop !11
 
-23:                                               ; preds = %16
-  br label %24
+for.end:                                          ; preds = %for.cond
+  br label %for.cond4
 
-24:                                               ; preds = %27, %23
-  %.1 = phi i32 [ 0, %23 ], [ %28, %27 ]
-  %25 = icmp slt i32 %.1, 10
-  br i1 %25, label %26, label %29
+for.cond4:                                        ; preds = %for.inc7, %for.end
+  %i.1 = phi i32 [ 0, %for.end ], [ %inc8, %for.inc7 ]
+  %cmp5 = icmp slt i32 %i.1, 10
+  br i1 %cmp5, label %for.body6, label %for.end9
 
-26:                                               ; preds = %24
-  call void @eval_AtA_times_u(i32 noundef %10, ptr noundef %13, ptr noundef %15)
-  call void @eval_AtA_times_u(i32 noundef %10, ptr noundef %15, ptr noundef %13)
-  br label %27
+for.body6:                                        ; preds = %for.cond4
+  call void @eval_AtA_times_u(i32 noundef %cond, ptr noundef %vla, ptr noundef %vla1)
+  call void @eval_AtA_times_u(i32 noundef %cond, ptr noundef %vla1, ptr noundef %vla)
+  br label %for.inc7
 
-27:                                               ; preds = %26
-  %28 = add nsw i32 %.1, 1
-  br label %24, !llvm.loop !12
+for.inc7:                                         ; preds = %for.body6
+  %inc8 = add nsw i32 %i.1, 1
+  br label %for.cond4, !llvm.loop !12
 
-29:                                               ; preds = %24
-  br label %30
+for.end9:                                         ; preds = %for.cond4
+  br label %for.cond10
 
-30:                                               ; preds = %47, %29
-  %.2 = phi i32 [ 0, %29 ], [ %48, %47 ]
-  %.01 = phi double [ 0.000000e+00, %29 ], [ %39, %47 ]
-  %.0 = phi double [ 0.000000e+00, %29 ], [ %46, %47 ]
-  %31 = icmp slt i32 %.2, %10
-  br i1 %31, label %32, label %49
+for.cond10:                                       ; preds = %for.inc21, %for.end9
+  %i.2 = phi i32 [ 0, %for.end9 ], [ %inc22, %for.inc21 ]
+  %vBv.0 = phi double [ 0.000000e+00, %for.end9 ], [ %6, %for.inc21 ]
+  %vv.0 = phi double [ 0.000000e+00, %for.end9 ], [ %9, %for.inc21 ]
+  %cmp11 = icmp slt i32 %i.2, %cond
+  br i1 %cmp11, label %for.body12, label %for.end23
 
-32:                                               ; preds = %30
-  %33 = sext i32 %.2 to i64
-  %34 = getelementptr inbounds double, ptr %13, i64 %33
-  %35 = load double, ptr %34, align 8
-  %36 = sext i32 %.2 to i64
-  %37 = getelementptr inbounds double, ptr %15, i64 %36
-  %38 = load double, ptr %37, align 8
-  %39 = call double @llvm.fmuladd.f64(double %35, double %38, double %.01)
-  %40 = sext i32 %.2 to i64
-  %41 = getelementptr inbounds double, ptr %15, i64 %40
-  %42 = load double, ptr %41, align 8
-  %43 = sext i32 %.2 to i64
-  %44 = getelementptr inbounds double, ptr %15, i64 %43
-  %45 = load double, ptr %44, align 8
-  %46 = call double @llvm.fmuladd.f64(double %42, double %45, double %.0)
-  br label %47
+for.body12:                                       ; preds = %for.cond10
+  %idxprom13 = sext i32 %i.2 to i64
+  %arrayidx14 = getelementptr inbounds double, ptr %vla, i64 %idxprom13
+  %4 = load double, ptr %arrayidx14, align 8
+  %idxprom15 = sext i32 %i.2 to i64
+  %arrayidx16 = getelementptr inbounds double, ptr %vla1, i64 %idxprom15
+  %5 = load double, ptr %arrayidx16, align 8
+  %6 = call double @llvm.fmuladd.f64(double %4, double %5, double %vBv.0)
+  %idxprom17 = sext i32 %i.2 to i64
+  %arrayidx18 = getelementptr inbounds double, ptr %vla1, i64 %idxprom17
+  %7 = load double, ptr %arrayidx18, align 8
+  %idxprom19 = sext i32 %i.2 to i64
+  %arrayidx20 = getelementptr inbounds double, ptr %vla1, i64 %idxprom19
+  %8 = load double, ptr %arrayidx20, align 8
+  %9 = call double @llvm.fmuladd.f64(double %7, double %8, double %vv.0)
+  br label %for.inc21
 
-47:                                               ; preds = %32
-  %48 = add nsw i32 %.2, 1
-  br label %30, !llvm.loop !13
+for.inc21:                                        ; preds = %for.body12
+  %inc22 = add nsw i32 %i.2, 1
+  br label %for.cond10, !llvm.loop !13
 
-49:                                               ; preds = %30
-  %50 = fdiv double %.01, %.0
-  %51 = call double @sqrt(double noundef %50) #7
-  %52 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %51)
-  call void @llvm.stackrestore(ptr %12)
+for.end23:                                        ; preds = %for.cond10
+  %div = fdiv double %vBv.0, %vv.0
+  %call24 = call double @sqrt(double noundef %div) #7
+  %call25 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %call24)
+  call void @llvm.stackrestore(ptr %2)
   ret i32 0
 }
 

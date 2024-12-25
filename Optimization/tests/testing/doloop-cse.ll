@@ -4,40 +4,41 @@ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16
 target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @foo(i32 noundef %0, ptr noalias noundef %1, ptr noalias noundef %2) #0 {
-  br label %4
+define dso_local i32 @foo(i32 noundef %n, ptr noalias noundef %p, ptr noalias noundef %q) #0 {
+entry:
+  br label %do.body
 
-4:                                                ; preds = %14, %3
-  %.01 = phi i32 [ 1, %3 ], [ %.1, %14 ]
-  %.0 = phi i32 [ %0, %3 ], [ %11, %14 ]
-  %5 = icmp sgt i32 %.01, 0
-  br i1 %5, label %6, label %7
+do.body:                                          ; preds = %do.cond, %entry
+  %i.0 = phi i32 [ 1, %entry ], [ %i.1, %do.cond ]
+  %n.addr.0 = phi i32 [ %n, %entry ], [ %add1, %do.cond ]
+  %cmp = icmp sgt i32 %i.0, 0
+  br i1 %cmp, label %if.then, label %if.end
 
-6:                                                ; preds = %4
-  store i32 %0, ptr %1, align 4
-  br label %7
+if.then:                                          ; preds = %do.body
+  store i32 %n, ptr %p, align 4
+  br label %if.end
 
-7:                                                ; preds = %6, %4
-  %8 = sdiv i32 %0, -3
-  %9 = add nsw i32 1, %.01
-  %10 = sub nsw i32 %8, %9
-  %11 = add nsw i32 %.0, %10
-  br i1 %5, label %12, label %13
+if.end:                                           ; preds = %if.then, %do.body
+  %div = sdiv i32 %n, -3
+  %add = add nsw i32 1, %i.0
+  %sub = sub nsw i32 %div, %add
+  %add1 = add nsw i32 %n.addr.0, %sub
+  br i1 %cmp, label %if.then3, label %if.end4
 
-12:                                               ; preds = %7
-  br label %13
+if.then3:                                         ; preds = %if.end
+  br label %if.end4
 
-13:                                               ; preds = %12, %7
-  %.1 = phi i32 [ %.01, %12 ], [ %10, %7 ]
-  store i32 %0, ptr %2, align 4
-  br label %14
+if.end4:                                          ; preds = %if.then3, %if.end
+  %i.1 = phi i32 [ %i.0, %if.then3 ], [ %sub, %if.end ]
+  store i32 %n, ptr %q, align 4
+  br label %do.cond
 
-14:                                               ; preds = %13
-  %15 = icmp slt i32 0, %11
-  br i1 %15, label %4, label %16, !llvm.loop !6
+do.cond:                                          ; preds = %if.end4
+  %cmp5 = icmp slt i32 0, %add1
+  br i1 %cmp5, label %do.body, label %do.end, !llvm.loop !6
 
-16:                                               ; preds = %14
-  ret i32 %.1
+do.end:                                           ; preds = %do.cond
+  ret i32 %i.1
 }
 
 attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }

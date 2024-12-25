@@ -7,45 +7,46 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  %2 = alloca i32, align 4
-  %3 = alloca i32, align 4
-  %4 = alloca i32, align 4
-  %5 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  store i32 0, ptr %2, align 4
-  store i32 0, ptr %3, align 4
-  br label %6
+entry:
+  %retval = alloca i32, align 4
+  %sum = alloca i32, align 4
+  %i = alloca i32, align 4
+  %x = alloca i32, align 4
+  %y = alloca i32, align 4
+  store i32 0, ptr %retval, align 4
+  store i32 0, ptr %sum, align 4
+  store i32 0, ptr %i, align 4
+  br label %for.cond
 
-6:                                                ; preds = %19, %0
-  %7 = load i32, ptr %3, align 4
-  %8 = icmp slt i32 %7, 10
-  br i1 %8, label %9, label %22
+for.cond:                                         ; preds = %for.inc, %entry
+  %0 = load i32, ptr %i, align 4
+  %cmp = icmp slt i32 %0, 10
+  br i1 %cmp, label %for.body, label %for.end
 
-9:                                                ; preds = %6
-  %10 = load i32, ptr %3, align 4
-  %11 = mul nsw i32 %10, 2
-  store i32 %11, ptr %4, align 4
-  %12 = load i32, ptr %3, align 4
-  %13 = mul nsw i32 %12, 2
-  store i32 %13, ptr %5, align 4
-  %14 = load i32, ptr %4, align 4
-  %15 = load i32, ptr %5, align 4
-  %16 = add nsw i32 %14, %15
-  %17 = load i32, ptr %2, align 4
-  %18 = add nsw i32 %17, %16
-  store i32 %18, ptr %2, align 4
-  br label %19
+for.body:                                         ; preds = %for.cond
+  %1 = load i32, ptr %i, align 4
+  %mul = mul nsw i32 %1, 2
+  store i32 %mul, ptr %x, align 4
+  %2 = load i32, ptr %i, align 4
+  %mul1 = mul nsw i32 %2, 2
+  store i32 %mul1, ptr %y, align 4
+  %3 = load i32, ptr %x, align 4
+  %4 = load i32, ptr %y, align 4
+  %add = add nsw i32 %3, %4
+  %5 = load i32, ptr %sum, align 4
+  %add2 = add nsw i32 %5, %add
+  store i32 %add2, ptr %sum, align 4
+  br label %for.inc
 
-19:                                               ; preds = %9
-  %20 = load i32, ptr %3, align 4
-  %21 = add nsw i32 %20, 1
-  store i32 %21, ptr %3, align 4
-  br label %6, !llvm.loop !6
+for.inc:                                          ; preds = %for.body
+  %6 = load i32, ptr %i, align 4
+  %inc = add nsw i32 %6, 1
+  store i32 %inc, ptr %i, align 4
+  br label %for.cond, !llvm.loop !6
 
-22:                                               ; preds = %6
-  %23 = load i32, ptr %2, align 4
-  %24 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %23)
+for.end:                                          ; preds = %for.cond
+  %7 = load i32, ptr %sum, align 4
+  %call = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %7)
   ret i32 0
 }
 

@@ -5,37 +5,38 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = mul nsw i32 20, 30
-  br label %2
+entry:
+  %mul = mul nsw i32 20, 30
+  br label %while.cond
 
-2:                                                ; preds = %13, %0
-  %.01 = phi i32 [ -10, %0 ], [ %.1, %13 ]
-  %.0 = phi i32 [ 20, %0 ], [ %14, %13 ]
-  %3 = icmp slt i32 %.0, 30
-  br i1 %3, label %4, label %15
+while.cond:                                       ; preds = %if.end, %entry
+  %b.0 = phi i32 [ -10, %entry ], [ %b.1, %if.end ]
+  %x.0 = phi i32 [ 20, %entry ], [ %add7, %if.end ]
+  %cmp = icmp slt i32 %x.0, 30
+  br i1 %cmp, label %while.body, label %while.end
 
-4:                                                ; preds = %2
-  %5 = add nsw i32 %.0, 30
-  %6 = icmp slt i32 %5, 50
-  br i1 %6, label %7, label %10
+while.body:                                       ; preds = %while.cond
+  %add1 = add nsw i32 %x.0, 30
+  %cmp2 = icmp slt i32 %add1, 50
+  br i1 %cmp2, label %if.then, label %if.else
 
-7:                                                ; preds = %4
-  %8 = sub nsw i32 %.0, 30
-  %9 = sub nsw i32 %.0, 30
-  br label %13
+if.then:                                          ; preds = %while.body
+  %sub3 = sub nsw i32 %x.0, 30
+  %sub4 = sub nsw i32 %x.0, 30
+  br label %if.end
 
-10:                                               ; preds = %4
-  %11 = mul nsw i32 %.0, 30
-  %12 = mul nsw i32 %.0, 30
-  br label %13
+if.else:                                          ; preds = %while.body
+  %mul5 = mul nsw i32 %x.0, 30
+  %mul6 = mul nsw i32 %x.0, 30
+  br label %if.end
 
-13:                                               ; preds = %10, %7
-  %.1 = phi i32 [ %9, %7 ], [ %12, %10 ]
-  %14 = add nsw i32 %.0, 1
-  br label %2, !llvm.loop !6
+if.end:                                           ; preds = %if.else, %if.then
+  %b.1 = phi i32 [ %sub4, %if.then ], [ %mul6, %if.else ]
+  %add7 = add nsw i32 %x.0, 1
+  br label %while.cond, !llvm.loop !6
 
-15:                                               ; preds = %2
-  ret i32 %.01
+while.end:                                        ; preds = %while.cond
+  ret i32 %b.0
 }
 
 attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }

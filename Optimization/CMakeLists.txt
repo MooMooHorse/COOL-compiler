@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.13.4)
 project(unit-mp5)
 set(CMAKE_CXX_STANDARD 20 CACHE STRING "")
+set(LLVM_DIR "../llvm-project-15.0.0.src/build/lib/cmake/llvm" CACHE STRING "")
 
 # Add an option for LLVM path or use an environment variable
 if(NOT LLVM_DIR)
     if(DEFINED ENV{LLVM_DIR})
-        set(LLVM_DIR $ENV{LLVM_DIR})
+        list(APPEND CMAKE_PREFIX_PATH $ENV{LLVM_DIR})
     else()
-        message(FATAL_ERROR "LLVM_DIR is not set. Please provide it with -DLLVM_DIR or set the environment variable LLVM_DIR.")
+        list(APPEND CMAKE_PREFIX_PATH ${LLVM_DIR})
     endif()
 endif()
 

@@ -8,27 +8,28 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  %2 = alloca [3 x i32], align 4
-  %3 = alloca i32, align 4
-  %4 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  call void @llvm.memcpy.p0.p0.i64(ptr align 4 %2, ptr align 4 @__const.main.arr, i64 12, i1 false)
-  %5 = getelementptr inbounds [3 x i32], ptr %2, i64 0, i64 1
-  %6 = load i32, ptr %5, align 4
-  %7 = getelementptr inbounds [3 x i32], ptr %2, i64 0, i64 2
-  %8 = load i32, ptr %7, align 4
-  %9 = add nsw i32 %6, %8
-  store i32 %9, ptr %3, align 4
-  %10 = getelementptr inbounds [3 x i32], ptr %2, i64 0, i64 1
-  %11 = load i32, ptr %10, align 4
-  %12 = getelementptr inbounds [3 x i32], ptr %2, i64 0, i64 2
-  %13 = load i32, ptr %12, align 4
-  %14 = add nsw i32 %11, %13
-  store i32 %14, ptr %4, align 4
-  %15 = load i32, ptr %3, align 4
-  %16 = load i32, ptr %4, align 4
-  %17 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %15, i32 noundef %16)
+entry:
+  %retval = alloca i32, align 4
+  %arr = alloca [3 x i32], align 4
+  %x = alloca i32, align 4
+  %y = alloca i32, align 4
+  store i32 0, ptr %retval, align 4
+  call void @llvm.memcpy.p0.p0.i64(ptr align 4 %arr, ptr align 4 @__const.main.arr, i64 12, i1 false)
+  %arrayidx = getelementptr inbounds [3 x i32], ptr %arr, i64 0, i64 1
+  %0 = load i32, ptr %arrayidx, align 4
+  %arrayidx1 = getelementptr inbounds [3 x i32], ptr %arr, i64 0, i64 2
+  %1 = load i32, ptr %arrayidx1, align 4
+  %add = add nsw i32 %0, %1
+  store i32 %add, ptr %x, align 4
+  %arrayidx2 = getelementptr inbounds [3 x i32], ptr %arr, i64 0, i64 1
+  %2 = load i32, ptr %arrayidx2, align 4
+  %arrayidx3 = getelementptr inbounds [3 x i32], ptr %arr, i64 0, i64 2
+  %3 = load i32, ptr %arrayidx3, align 4
+  %add4 = add nsw i32 %2, %3
+  store i32 %add4, ptr %y, align 4
+  %4 = load i32, ptr %x, align 4
+  %5 = load i32, ptr %y, align 4
+  %call = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %4, i32 noundef %5)
   ret i32 0
 }
 

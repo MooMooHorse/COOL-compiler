@@ -7,32 +7,34 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @constant_replace() #0 {
-  %1 = alloca i32, align 4
-  %2 = alloca i32, align 4
-  store i32 4, ptr %2, align 4
-  %3 = load i32, ptr %2, align 4
-  %4 = icmp eq i32 %3, 4
-  br i1 %4, label %5, label %6
+entry:
+  %retval = alloca i32, align 4
+  %x = alloca i32, align 4
+  store i32 4, ptr %x, align 4
+  %0 = load i32, ptr %x, align 4
+  %cmp = icmp eq i32 %0, 4
+  br i1 %cmp, label %if.then, label %if.else
 
-5:                                                ; preds = %0
-  store i32 100, ptr %1, align 4
-  br label %7
+if.then:                                          ; preds = %entry
+  store i32 100, ptr %retval, align 4
+  br label %return
 
-6:                                                ; preds = %0
-  store i32 0, ptr %1, align 4
-  br label %7
+if.else:                                          ; preds = %entry
+  store i32 0, ptr %retval, align 4
+  br label %return
 
-7:                                                ; preds = %6, %5
-  %8 = load i32, ptr %1, align 4
-  ret i32 %8
+return:                                           ; preds = %if.else, %if.then
+  %1 = load i32, ptr %retval, align 4
+  ret i32 %1
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  %2 = call i32 @constant_replace()
-  %3 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %2)
+entry:
+  %retval = alloca i32, align 4
+  store i32 0, ptr %retval, align 4
+  %call = call i32 @constant_replace()
+  %call1 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %call)
   ret i32 0
 }
 

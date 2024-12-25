@@ -7,25 +7,27 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @constant_loop() #0 {
-  br label %1
+entry:
+  br label %while.cond
 
-1:                                                ; preds = %3, %0
-  %.0 = phi i32 [ 0, %0 ], [ %4, %3 ]
-  %2 = icmp ne i32 %.0, 3
-  br i1 %2, label %3, label %5
+while.cond:                                       ; preds = %while.body, %entry
+  %i.0 = phi i32 [ 0, %entry ], [ %add, %while.body ]
+  %cmp = icmp ne i32 %i.0, 3
+  br i1 %cmp, label %while.body, label %while.end
 
-3:                                                ; preds = %1
-  %4 = add nsw i32 %.0, 1
-  br label %1, !llvm.loop !6
+while.body:                                       ; preds = %while.cond
+  %add = add nsw i32 %i.0, 1
+  br label %while.cond, !llvm.loop !6
 
-5:                                                ; preds = %1
-  ret i32 %.0
+while.end:                                        ; preds = %while.cond
+  ret i32 %i.0
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = call i32 @constant_loop()
-  %2 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %1)
+entry:
+  %call = call i32 @constant_loop()
+  %call1 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %call)
   ret i32 0
 }
 

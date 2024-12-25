@@ -15,133 +15,136 @@ target triple = "x86_64-unknown-linux-gnu"
 @.str.9 = private unnamed_addr constant [8 x i8] c"Gregory\00", align 1
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local <2 x double> @make_vec(double noundef %0, double noundef %1) #0 {
-  %3 = alloca <2 x double>, align 16
-  store double %0, ptr %3, align 8
-  %4 = getelementptr inbounds double, ptr %3, i64 1
-  store double %1, ptr %4, align 8
-  %5 = load <2 x double>, ptr %3, align 16
-  ret <2 x double> %5
+define dso_local <2 x double> @make_vec(double noundef %a, double noundef %b) #0 {
+entry:
+  %v = alloca <2 x double>, align 16
+  store double %a, ptr %v, align 8
+  %add.ptr = getelementptr inbounds double, ptr %v, i64 1
+  store double %b, ptr %add.ptr, align 8
+  %0 = load <2 x double>, ptr %v, align 16
+  ret <2 x double> %0
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local double @sum_vec(<2 x double> noundef %0) #0 {
-  %2 = alloca <2 x double>, align 16
-  store <2 x double> %0, ptr %2, align 16
-  %3 = load double, ptr %2, align 8
-  %4 = getelementptr inbounds double, ptr %2, i64 1
-  %5 = load double, ptr %4, align 8
-  %6 = fadd double %3, %5
-  ret double %6
+define dso_local double @sum_vec(<2 x double> noundef %x) #0 {
+entry:
+  %x.addr = alloca <2 x double>, align 16
+  store <2 x double> %x, ptr %x.addr, align 16
+  %0 = load double, ptr %x.addr, align 8
+  %add.ptr = getelementptr inbounds double, ptr %x.addr, i64 1
+  %1 = load double, ptr %add.ptr, align 8
+  %add = fadd double %0, %1
+  ret double %add
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @main(i32 noundef %0, ptr noundef %1) #0 {
-  %3 = alloca <2 x double>, align 16
-  %4 = call <2 x double> @make_vec(double noundef 0.000000e+00, double noundef 0.000000e+00)
-  %5 = call <2 x double> @make_vec(double noundef 1.000000e+00, double noundef 1.000000e+00)
-  %6 = call <2 x double> @make_vec(double noundef 2.000000e+00, double noundef 2.000000e+00)
-  %7 = call <2 x double> @make_vec(double noundef -1.000000e+00, double noundef -1.000000e+00)
-  %8 = call <2 x double> @make_vec(double noundef 1.000000e+00, double noundef 2.000000e+00)
-  %9 = call <2 x double> @make_vec(double noundef 1.000000e+00, double noundef -1.000000e+00)
-  br label %10
+define dso_local i32 @main(i32 noundef %argc, ptr noundef %argv) #0 {
+entry:
+  %kv = alloca <2 x double>, align 16
+  %call = call <2 x double> @make_vec(double noundef 0.000000e+00, double noundef 0.000000e+00)
+  %call1 = call <2 x double> @make_vec(double noundef 1.000000e+00, double noundef 1.000000e+00)
+  %call2 = call <2 x double> @make_vec(double noundef 2.000000e+00, double noundef 2.000000e+00)
+  %call3 = call <2 x double> @make_vec(double noundef -1.000000e+00, double noundef -1.000000e+00)
+  %call4 = call <2 x double> @make_vec(double noundef 1.000000e+00, double noundef 2.000000e+00)
+  %call5 = call <2 x double> @make_vec(double noundef 1.000000e+00, double noundef -1.000000e+00)
+  br label %for.cond
 
-10:                                               ; preds = %32, %2
-  %.06 = phi double [ 0.000000e+00, %2 ], [ %31, %32 ]
-  %.05 = phi double [ 0.000000e+00, %2 ], [ %27, %32 ]
-  %.04 = phi double [ 0.000000e+00, %2 ], [ %19, %32 ]
-  %.03 = phi double [ 0.000000e+00, %2 ], [ %16, %32 ]
-  %.0 = phi double [ 1.000000e+00, %2 ], [ %33, %32 ]
-  %11 = sitofp i32 2500000 to double
-  %12 = fcmp ole double %.0, %11
-  br i1 %12, label %13, label %34
+for.cond:                                         ; preds = %for.inc, %entry
+  %Cookson.0 = phi double [ 0.000000e+00, %entry ], [ %add20, %for.inc ]
+  %Flint.0 = phi double [ 0.000000e+00, %entry ], [ %add16, %for.inc ]
+  %sqrts.0 = phi double [ 0.000000e+00, %entry ], [ %add9, %for.inc ]
+  %twoThrd.0 = phi double [ 0.000000e+00, %entry ], [ %add, %for.inc ]
+  %k.0 = phi double [ 1.000000e+00, %entry ], [ %inc, %for.inc ]
+  %conv = sitofp i32 2500000 to double
+  %cmp = fcmp ole double %k.0, %conv
+  br i1 %cmp, label %for.body, label %for.end
 
-13:                                               ; preds = %10
-  %14 = fsub double %.0, 1.000000e+00
-  %15 = call double @pow(double noundef 0x3FE5555555555555, double noundef %14) #4
-  %16 = fadd double %.03, %15
-  %17 = call double @sqrt(double noundef %.0) #4
-  %18 = fdiv double 1.000000e+00, %17
-  %19 = fadd double %.04, %18
-  %20 = fmul double %.0, %.0
-  %21 = fmul double %20, %.0
-  %22 = call double @sin(double noundef %.0) #4
-  %23 = call double @cos(double noundef %.0) #4
-  %24 = fmul double %21, %22
-  %25 = fmul double %24, %22
-  %26 = fdiv double 1.000000e+00, %25
-  %27 = fadd double %.05, %26
-  %28 = fmul double %21, %23
-  %29 = fmul double %28, %23
-  %30 = fdiv double 1.000000e+00, %29
-  %31 = fadd double %.06, %30
-  br label %32
+for.body:                                         ; preds = %for.cond
+  %sub = fsub double %k.0, 1.000000e+00
+  %call7 = call double @pow(double noundef 0x3FE5555555555555, double noundef %sub) #4
+  %add = fadd double %twoThrd.0, %call7
+  %call8 = call double @sqrt(double noundef %k.0) #4
+  %div = fdiv double 1.000000e+00, %call8
+  %add9 = fadd double %sqrts.0, %div
+  %mul = fmul double %k.0, %k.0
+  %mul10 = fmul double %mul, %k.0
+  %call11 = call double @sin(double noundef %k.0) #4
+  %call12 = call double @cos(double noundef %k.0) #4
+  %mul13 = fmul double %mul10, %call11
+  %mul14 = fmul double %mul13, %call11
+  %div15 = fdiv double 1.000000e+00, %mul14
+  %add16 = fadd double %Flint.0, %div15
+  %mul17 = fmul double %mul10, %call12
+  %mul18 = fmul double %mul17, %call12
+  %div19 = fdiv double 1.000000e+00, %mul18
+  %add20 = fadd double %Cookson.0, %div19
+  br label %for.inc
 
-32:                                               ; preds = %13
-  %33 = fadd double %.0, 1.000000e+00
-  br label %10, !llvm.loop !6
+for.inc:                                          ; preds = %for.body
+  %inc = fadd double %k.0, 1.000000e+00
+  br label %for.cond, !llvm.loop !6
 
-34:                                               ; preds = %10
-  store <2 x double> %8, ptr %3, align 16
-  br label %35
+for.end:                                          ; preds = %for.cond
+  store <2 x double> %call4, ptr %kv, align 16
+  br label %for.cond21
 
-35:                                               ; preds = %62, %34
-  %.09 = phi <2 x double> [ %4, %34 ], [ %45, %62 ]
-  %.08 = phi <2 x double> [ %4, %34 ], [ %53, %62 ]
-  %.07 = phi <2 x double> [ %4, %34 ], [ %48, %62 ]
-  %.02 = phi <2 x double> [ %4, %34 ], [ %56, %62 ]
-  %.01 = phi <2 x double> [ %4, %34 ], [ %61, %62 ]
-  %36 = load double, ptr %3, align 16
-  %37 = sitofp i32 2500000 to double
-  %38 = fcmp ole double %36, %37
-  br i1 %38, label %39, label %65
+for.cond21:                                       ; preds = %for.inc40, %for.end
+  %poly.0 = phi <2 x double> [ %call, %for.end ], [ %add29, %for.inc40 ]
+  %zeta.0 = phi <2 x double> [ %call, %for.end ], [ %add34, %for.inc40 ]
+  %Harmonic.0 = phi <2 x double> [ %call, %for.end ], [ %add31, %for.inc40 ]
+  %alt.0 = phi <2 x double> [ %call, %for.end ], [ %add36, %for.inc40 ]
+  %Gregory.0 = phi <2 x double> [ %call, %for.end ], [ %add39, %for.inc40 ]
+  %0 = load double, ptr %kv, align 16
+  %conv22 = sitofp i32 2500000 to double
+  %cmp23 = fcmp ole double %0, %conv22
+  br i1 %cmp23, label %for.body25, label %for.end42
 
-39:                                               ; preds = %35
-  %40 = load <2 x double>, ptr %3, align 16
-  %41 = load <2 x double>, ptr %3, align 16
-  %42 = fadd <2 x double> %41, %5
-  %43 = fmul <2 x double> %40, %42
-  %44 = fdiv <2 x double> %5, %43
-  %45 = fadd <2 x double> %.09, %44
-  %46 = load <2 x double>, ptr %3, align 16
-  %47 = fdiv <2 x double> %5, %46
-  %48 = fadd <2 x double> %.07, %47
-  %49 = load <2 x double>, ptr %3, align 16
-  %50 = load <2 x double>, ptr %3, align 16
-  %51 = fmul <2 x double> %49, %50
-  %52 = fdiv <2 x double> %5, %51
-  %53 = fadd <2 x double> %.08, %52
-  %54 = load <2 x double>, ptr %3, align 16
-  %55 = fdiv <2 x double> %9, %54
-  %56 = fadd <2 x double> %.02, %55
-  %57 = load <2 x double>, ptr %3, align 16
-  %58 = fneg <2 x double> %5
-  %59 = call <2 x double> @llvm.fmuladd.v2f64(<2 x double> %6, <2 x double> %57, <2 x double> %58)
-  %60 = fdiv <2 x double> %9, %59
-  %61 = fadd <2 x double> %.01, %60
-  br label %62
+for.body25:                                       ; preds = %for.cond21
+  %1 = load <2 x double>, ptr %kv, align 16
+  %2 = load <2 x double>, ptr %kv, align 16
+  %add26 = fadd <2 x double> %2, %call1
+  %mul27 = fmul <2 x double> %1, %add26
+  %div28 = fdiv <2 x double> %call1, %mul27
+  %add29 = fadd <2 x double> %poly.0, %div28
+  %3 = load <2 x double>, ptr %kv, align 16
+  %div30 = fdiv <2 x double> %call1, %3
+  %add31 = fadd <2 x double> %Harmonic.0, %div30
+  %4 = load <2 x double>, ptr %kv, align 16
+  %5 = load <2 x double>, ptr %kv, align 16
+  %mul32 = fmul <2 x double> %4, %5
+  %div33 = fdiv <2 x double> %call1, %mul32
+  %add34 = fadd <2 x double> %zeta.0, %div33
+  %6 = load <2 x double>, ptr %kv, align 16
+  %div35 = fdiv <2 x double> %call5, %6
+  %add36 = fadd <2 x double> %alt.0, %div35
+  %7 = load <2 x double>, ptr %kv, align 16
+  %neg = fneg <2 x double> %call1
+  %8 = call <2 x double> @llvm.fmuladd.v2f64(<2 x double> %call2, <2 x double> %7, <2 x double> %neg)
+  %div38 = fdiv <2 x double> %call5, %8
+  %add39 = fadd <2 x double> %Gregory.0, %div38
+  br label %for.inc40
 
-62:                                               ; preds = %39
-  %63 = load <2 x double>, ptr %3, align 16
-  %64 = fadd <2 x double> %63, %6
-  store <2 x double> %64, ptr %3, align 16
-  br label %35, !llvm.loop !8
+for.inc40:                                        ; preds = %for.body25
+  %9 = load <2 x double>, ptr %kv, align 16
+  %add41 = fadd <2 x double> %9, %call2
+  store <2 x double> %add41, ptr %kv, align 16
+  br label %for.cond21, !llvm.loop !8
 
-65:                                               ; preds = %35
-  %66 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %.03, ptr noundef @.str.1)
-  %67 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %.04, ptr noundef @.str.2)
-  %68 = call double @sum_vec(<2 x double> noundef %.09)
-  %69 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %68, ptr noundef @.str.3)
-  %70 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %.05, ptr noundef @.str.4)
-  %71 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %.06, ptr noundef @.str.5)
-  %72 = call double @sum_vec(<2 x double> noundef %.07)
-  %73 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %72, ptr noundef @.str.6)
-  %74 = call double @sum_vec(<2 x double> noundef %.08)
-  %75 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %74, ptr noundef @.str.7)
-  %76 = call double @sum_vec(<2 x double> noundef %.02)
-  %77 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %76, ptr noundef @.str.8)
-  %78 = call double @sum_vec(<2 x double> noundef %.01)
-  %79 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %78, ptr noundef @.str.9)
+for.end42:                                        ; preds = %for.cond21
+  %call43 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %twoThrd.0, ptr noundef @.str.1)
+  %call44 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %sqrts.0, ptr noundef @.str.2)
+  %call45 = call double @sum_vec(<2 x double> noundef %poly.0)
+  %call46 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %call45, ptr noundef @.str.3)
+  %call47 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %Flint.0, ptr noundef @.str.4)
+  %call48 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %Cookson.0, ptr noundef @.str.5)
+  %call49 = call double @sum_vec(<2 x double> noundef %Harmonic.0)
+  %call50 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %call49, ptr noundef @.str.6)
+  %call51 = call double @sum_vec(<2 x double> noundef %zeta.0)
+  %call52 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %call51, ptr noundef @.str.7)
+  %call53 = call double @sum_vec(<2 x double> noundef %alt.0)
+  %call54 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %call53, ptr noundef @.str.8)
+  %call55 = call double @sum_vec(<2 x double> noundef %Gregory.0)
+  %call56 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %call55, ptr noundef @.str.9)
   ret i32 0
 }
 

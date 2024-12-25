@@ -5,39 +5,40 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = add nsw i32 20, 30
-  %2 = sub nsw i32 20, 30
-  %3 = mul nsw i32 20, 30
-  br label %4
+entry:
+  %add = add nsw i32 20, 30
+  %sub = sub nsw i32 20, 30
+  %mul = mul nsw i32 20, 30
+  br label %while.cond
 
-4:                                                ; preds = %15, %0
-  %.01 = phi i32 [ %2, %0 ], [ %.1, %15 ]
-  %.0 = phi i32 [ 20, %0 ], [ %16, %15 ]
-  %5 = icmp slt i32 %.0, 30
-  br i1 %5, label %6, label %17
+while.cond:                                       ; preds = %if.end, %entry
+  %b.0 = phi i32 [ %sub, %entry ], [ %b.1, %if.end ]
+  %x.0 = phi i32 [ 20, %entry ], [ %add7, %if.end ]
+  %cmp = icmp slt i32 %x.0, 30
+  br i1 %cmp, label %while.body, label %while.end
 
-6:                                                ; preds = %4
-  %7 = add nsw i32 %.0, 30
-  %8 = icmp slt i32 %7, %1
-  br i1 %8, label %9, label %12
+while.body:                                       ; preds = %while.cond
+  %add1 = add nsw i32 %x.0, 30
+  %cmp2 = icmp slt i32 %add1, %add
+  br i1 %cmp2, label %if.then, label %if.else
 
-9:                                                ; preds = %6
-  %10 = sub nsw i32 %.0, 30
-  %11 = sub nsw i32 %.0, 30
-  br label %15
+if.then:                                          ; preds = %while.body
+  %sub3 = sub nsw i32 %x.0, 30
+  %sub4 = sub nsw i32 %x.0, 30
+  br label %if.end
 
-12:                                               ; preds = %6
-  %13 = mul nsw i32 %.0, 30
-  %14 = mul nsw i32 %.0, 30
-  br label %15
+if.else:                                          ; preds = %while.body
+  %mul5 = mul nsw i32 %x.0, 30
+  %mul6 = mul nsw i32 %x.0, 30
+  br label %if.end
 
-15:                                               ; preds = %12, %9
-  %.1 = phi i32 [ %11, %9 ], [ %14, %12 ]
-  %16 = add nsw i32 %.0, 1
-  br label %4, !llvm.loop !6
+if.end:                                           ; preds = %if.else, %if.then
+  %b.1 = phi i32 [ %sub4, %if.then ], [ %mul6, %if.else ]
+  %add7 = add nsw i32 %x.0, 1
+  br label %while.cond, !llvm.loop !6
 
-17:                                               ; preds = %4
-  ret i32 %.01
+while.end:                                        ; preds = %while.cond
+  ret i32 %b.0
 }
 
 attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }

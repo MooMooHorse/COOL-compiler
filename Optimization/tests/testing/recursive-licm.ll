@@ -10,148 +10,154 @@ target triple = "x86_64-unknown-linux-gnu"
 @.str.4 = private unnamed_addr constant [24 x i8] c"Tak(3.0,2.0,1.0): %.1f\0A\00", align 1
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @ack(i32 noundef %0, i32 noundef %1) #0 {
-  %3 = icmp eq i32 %0, 0
-  br i1 %3, label %4, label %6
+define dso_local i32 @ack(i32 noundef %x, i32 noundef %y) #0 {
+entry:
+  %cmp = icmp eq i32 %x, 0
+  br i1 %cmp, label %if.then, label %if.end
 
-4:                                                ; preds = %2
-  %5 = add nsw i32 %1, 1
-  br label %17
+if.then:                                          ; preds = %entry
+  %add = add nsw i32 %y, 1
+  br label %return
 
-6:                                                ; preds = %2
-  %7 = sub nsw i32 %0, 1
-  %8 = or i32 %1, 0
-  %9 = icmp ne i32 %8, 0
-  br i1 %9, label %10, label %13
+if.end:                                           ; preds = %entry
+  %sub = sub nsw i32 %x, 1
+  %or = or i32 %y, 0
+  %tobool = icmp ne i32 %or, 0
+  br i1 %tobool, label %cond.true, label %cond.false
 
-10:                                               ; preds = %6
-  %11 = sub nsw i32 %1, 1
-  %12 = call i32 @ack(i32 noundef %0, i32 noundef %11)
-  br label %14
+cond.true:                                        ; preds = %if.end
+  %sub1 = sub nsw i32 %y, 1
+  %call = call i32 @ack(i32 noundef %x, i32 noundef %sub1)
+  br label %cond.end
 
-13:                                               ; preds = %6
-  br label %14
+cond.false:                                       ; preds = %if.end
+  br label %cond.end
 
-14:                                               ; preds = %13, %10
-  %15 = phi i32 [ %12, %10 ], [ 1, %13 ]
-  %16 = call i32 @ack(i32 noundef %7, i32 noundef %15)
-  br label %17
+cond.end:                                         ; preds = %cond.false, %cond.true
+  %cond = phi i32 [ %call, %cond.true ], [ 1, %cond.false ]
+  %call2 = call i32 @ack(i32 noundef %sub, i32 noundef %cond)
+  br label %return
 
-17:                                               ; preds = %14, %4
-  %.0 = phi i32 [ %5, %4 ], [ %16, %14 ]
-  ret i32 %.0
+return:                                           ; preds = %cond.end, %if.then
+  %retval.0 = phi i32 [ %add, %if.then ], [ %call2, %cond.end ]
+  ret i32 %retval.0
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @fib(i32 noundef %0) #0 {
-  %2 = icmp slt i32 %0, 2
-  br i1 %2, label %3, label %4
+define dso_local i32 @fib(i32 noundef %n) #0 {
+entry:
+  %cmp = icmp slt i32 %n, 2
+  br i1 %cmp, label %if.then, label %if.end
 
-3:                                                ; preds = %1
-  br label %10
+if.then:                                          ; preds = %entry
+  br label %return
 
-4:                                                ; preds = %1
-  %5 = sub nsw i32 %0, 2
-  %6 = call i32 @fib(i32 noundef %5)
-  %7 = sub nsw i32 %0, 1
-  %8 = call i32 @fib(i32 noundef %7)
-  %9 = add nsw i32 %6, %8
-  br label %10
+if.end:                                           ; preds = %entry
+  %sub = sub nsw i32 %n, 2
+  %call = call i32 @fib(i32 noundef %sub)
+  %sub1 = sub nsw i32 %n, 1
+  %call2 = call i32 @fib(i32 noundef %sub1)
+  %add = add nsw i32 %call, %call2
+  br label %return
 
-10:                                               ; preds = %4, %3
-  %.0 = phi i32 [ 1, %3 ], [ %9, %4 ]
-  ret i32 %.0
+return:                                           ; preds = %if.end, %if.then
+  %retval.0 = phi i32 [ 1, %if.then ], [ %add, %if.end ]
+  ret i32 %retval.0
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local double @fibFP(double noundef %0) #0 {
-  %2 = fcmp olt double %0, 2.000000e+00
-  br i1 %2, label %3, label %4
+define dso_local double @fibFP(double noundef %n) #0 {
+entry:
+  %cmp = fcmp olt double %n, 2.000000e+00
+  br i1 %cmp, label %if.then, label %if.end
 
-3:                                                ; preds = %1
-  br label %10
+if.then:                                          ; preds = %entry
+  br label %return
 
-4:                                                ; preds = %1
-  %5 = fsub double %0, 2.000000e+00
-  %6 = call double @fibFP(double noundef %5)
-  %7 = fsub double %0, 1.000000e+00
-  %8 = call double @fibFP(double noundef %7)
-  %9 = fadd double %6, %8
-  br label %10
+if.end:                                           ; preds = %entry
+  %sub = fsub double %n, 2.000000e+00
+  %call = call double @fibFP(double noundef %sub)
+  %sub1 = fsub double %n, 1.000000e+00
+  %call2 = call double @fibFP(double noundef %sub1)
+  %add = fadd double %call, %call2
+  br label %return
 
-10:                                               ; preds = %4, %3
-  %.0 = phi double [ 1.000000e+00, %3 ], [ %9, %4 ]
-  ret double %.0
+return:                                           ; preds = %if.end, %if.then
+  %retval.0 = phi double [ 1.000000e+00, %if.then ], [ %add, %if.end ]
+  ret double %retval.0
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @tak(i32 noundef %0, i32 noundef %1, i32 noundef %2) #0 {
-  %4 = icmp slt i32 %1, %0
-  br i1 %4, label %5, label %13
+define dso_local i32 @tak(i32 noundef %x, i32 noundef %y, i32 noundef %z) #0 {
+entry:
+  %cmp = icmp slt i32 %y, %x
+  br i1 %cmp, label %if.then, label %if.end
 
-5:                                                ; preds = %3
-  %6 = sub nsw i32 %0, 1
-  %7 = call i32 @tak(i32 noundef %6, i32 noundef %1, i32 noundef %2)
-  %8 = sub nsw i32 %1, 1
-  %9 = call i32 @tak(i32 noundef %8, i32 noundef %2, i32 noundef %0)
-  %10 = sub nsw i32 %2, 1
-  %11 = call i32 @tak(i32 noundef %10, i32 noundef %0, i32 noundef %1)
-  %12 = call i32 @tak(i32 noundef %7, i32 noundef %9, i32 noundef %11)
-  br label %14
+if.then:                                          ; preds = %entry
+  %sub = sub nsw i32 %x, 1
+  %call = call i32 @tak(i32 noundef %sub, i32 noundef %y, i32 noundef %z)
+  %sub1 = sub nsw i32 %y, 1
+  %call2 = call i32 @tak(i32 noundef %sub1, i32 noundef %z, i32 noundef %x)
+  %sub3 = sub nsw i32 %z, 1
+  %call4 = call i32 @tak(i32 noundef %sub3, i32 noundef %x, i32 noundef %y)
+  %call5 = call i32 @tak(i32 noundef %call, i32 noundef %call2, i32 noundef %call4)
+  br label %return
 
-13:                                               ; preds = %3
-  br label %14
+if.end:                                           ; preds = %entry
+  br label %return
 
-14:                                               ; preds = %13, %5
-  %.0 = phi i32 [ %12, %5 ], [ %2, %13 ]
-  ret i32 %.0
+return:                                           ; preds = %if.end, %if.then
+  %retval.0 = phi i32 [ %call5, %if.then ], [ %z, %if.end ]
+  ret i32 %retval.0
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local double @takFP(double noundef %0, double noundef %1, double noundef %2) #0 {
-  %4 = fcmp olt double %1, %0
-  br i1 %4, label %5, label %13
+define dso_local double @takFP(double noundef %x, double noundef %y, double noundef %z) #0 {
+entry:
+  %cmp = fcmp olt double %y, %x
+  br i1 %cmp, label %if.then, label %if.end
 
-5:                                                ; preds = %3
-  %6 = fsub double %0, 1.000000e+00
-  %7 = call double @takFP(double noundef %6, double noundef %1, double noundef %2)
-  %8 = fsub double %1, 1.000000e+00
-  %9 = call double @takFP(double noundef %8, double noundef %2, double noundef %0)
-  %10 = fsub double %2, 1.000000e+00
-  %11 = call double @takFP(double noundef %10, double noundef %0, double noundef %1)
-  %12 = call double @takFP(double noundef %7, double noundef %9, double noundef %11)
-  br label %14
+if.then:                                          ; preds = %entry
+  %sub = fsub double %x, 1.000000e+00
+  %call = call double @takFP(double noundef %sub, double noundef %y, double noundef %z)
+  %sub1 = fsub double %y, 1.000000e+00
+  %call2 = call double @takFP(double noundef %sub1, double noundef %z, double noundef %x)
+  %sub3 = fsub double %z, 1.000000e+00
+  %call4 = call double @takFP(double noundef %sub3, double noundef %x, double noundef %y)
+  %call5 = call double @takFP(double noundef %call, double noundef %call2, double noundef %call4)
+  br label %return
 
-13:                                               ; preds = %3
-  br label %14
+if.end:                                           ; preds = %entry
+  br label %return
 
-14:                                               ; preds = %13, %5
-  %.0 = phi double [ %12, %5 ], [ %2, %13 ]
-  ret double %.0
+return:                                           ; preds = %if.end, %if.then
+  %retval.0 = phi double [ %call5, %if.then ], [ %z, %if.end ]
+  ret double %retval.0
 }
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @main(i32 noundef %0, ptr noundef %1) #0 {
-  %3 = add nsw i32 10, 1
-  %4 = add nsw i32 10, 1
-  %5 = call i32 @ack(i32 noundef 3, i32 noundef %4)
-  %6 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %3, i32 noundef %5)
-  %7 = sitofp i32 10 to double
-  %8 = fadd double 2.800000e+01, %7
-  %9 = sitofp i32 10 to double
-  %10 = fadd double 2.800000e+01, %9
-  %11 = call double @fibFP(double noundef %10)
-  %12 = call i32 (ptr, ...) @printf(ptr noundef @.str.1, double noundef %8, double noundef %11)
-  %13 = mul nsw i32 3, 10
-  %14 = mul nsw i32 2, 10
-  %15 = mul nsw i32 3, 10
-  %16 = mul nsw i32 2, 10
-  %17 = call i32 @tak(i32 noundef %15, i32 noundef %16, i32 noundef 10)
-  %18 = call i32 (ptr, ...) @printf(ptr noundef @.str.2, i32 noundef %13, i32 noundef %14, i32 noundef 10, i32 noundef %17)
-  %19 = call i32 @fib(i32 noundef 3)
-  %20 = call i32 (ptr, ...) @printf(ptr noundef @.str.3, i32 noundef %19)
-  %21 = call double @takFP(double noundef 3.000000e+00, double noundef 2.000000e+00, double noundef 1.000000e+00)
-  %22 = call i32 (ptr, ...) @printf(ptr noundef @.str.4, double noundef %21)
+define dso_local i32 @main(i32 noundef %argc, ptr noundef %argv) #0 {
+entry:
+  %add = add nsw i32 10, 1
+  %add1 = add nsw i32 10, 1
+  %call = call i32 @ack(i32 noundef 3, i32 noundef %add1)
+  %call2 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %add, i32 noundef %call)
+  %conv = sitofp i32 10 to double
+  %add3 = fadd double 2.800000e+01, %conv
+  %conv4 = sitofp i32 10 to double
+  %add5 = fadd double 2.800000e+01, %conv4
+  %call6 = call double @fibFP(double noundef %add5)
+  %call7 = call i32 (ptr, ...) @printf(ptr noundef @.str.1, double noundef %add3, double noundef %call6)
+  %mul = mul nsw i32 3, 10
+  %mul8 = mul nsw i32 2, 10
+  %mul9 = mul nsw i32 3, 10
+  %mul10 = mul nsw i32 2, 10
+  %call11 = call i32 @tak(i32 noundef %mul9, i32 noundef %mul10, i32 noundef 10)
+  %call12 = call i32 (ptr, ...) @printf(ptr noundef @.str.2, i32 noundef %mul, i32 noundef %mul8, i32 noundef 10, i32 noundef %call11)
+  %call13 = call i32 @fib(i32 noundef 3)
+  %call14 = call i32 (ptr, ...) @printf(ptr noundef @.str.3, i32 noundef %call13)
+  %call15 = call double @takFP(double noundef 3.000000e+00, double noundef 2.000000e+00, double noundef 1.000000e+00)
+  %call16 = call i32 (ptr, ...) @printf(ptr noundef @.str.4, double noundef %call15)
   ret i32 0
 }
 

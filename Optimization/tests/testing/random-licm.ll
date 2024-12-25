@@ -4,33 +4,34 @@ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16
 target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @foo(i32 noundef %0) #0 {
-  br label %2
+define dso_local i32 @foo(i32 noundef %n) #0 {
+entry:
+  br label %while.cond
 
-2:                                                ; preds = %12, %1
-  %.01 = phi i32 [ 1, %1 ], [ %.1, %12 ]
-  %.0 = phi i32 [ %0, %1 ], [ %9, %12 ]
-  %3 = icmp slt i32 0, %.0
-  br i1 %3, label %4, label %13
+while.cond:                                       ; preds = %if.end, %entry
+  %i.0 = phi i32 [ 1, %entry ], [ %i.1, %if.end ]
+  %n.addr.0 = phi i32 [ %n, %entry ], [ %add1, %if.end ]
+  %cmp = icmp slt i32 0, %n.addr.0
+  br i1 %cmp, label %while.body, label %while.end
 
-4:                                                ; preds = %2
-  %5 = call i32 @rand() #2
-  %6 = srem i32 %5, 4
-  %7 = add nsw i32 1, %.01
-  %8 = sub nsw i32 %6, %7
-  %9 = add nsw i32 %.0, %8
-  %10 = icmp sgt i32 %.01, 0
-  br i1 %10, label %11, label %12
+while.body:                                       ; preds = %while.cond
+  %call = call i32 @rand() #2
+  %rem = srem i32 %call, 4
+  %add = add nsw i32 1, %i.0
+  %sub = sub nsw i32 %rem, %add
+  %add1 = add nsw i32 %n.addr.0, %sub
+  %cmp2 = icmp sgt i32 %i.0, 0
+  br i1 %cmp2, label %if.then, label %if.end
 
-11:                                               ; preds = %4
-  br label %12
+if.then:                                          ; preds = %while.body
+  br label %if.end
 
-12:                                               ; preds = %11, %4
-  %.1 = phi i32 [ %.01, %11 ], [ %8, %4 ]
-  br label %2, !llvm.loop !6
+if.end:                                           ; preds = %if.then, %while.body
+  %i.1 = phi i32 [ %i.0, %if.then ], [ %sub, %while.body ]
+  br label %while.cond, !llvm.loop !6
 
-13:                                               ; preds = %2
-  ret i32 %.01
+while.end:                                        ; preds = %while.cond
+  ret i32 %i.0
 }
 
 ; Function Attrs: nounwind

@@ -7,11 +7,12 @@ target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = mul nsw i32 5, 3
-  %2 = add nsw i32 %1, 2
-  %3 = mul nsw i32 5, 3
-  %4 = add nsw i32 %3, 2
-  %5 = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %2, i32 noundef %4)
+entry:
+  %mul = mul nsw i32 5, 3
+  %add = add nsw i32 %mul, 2
+  %mul1 = mul nsw i32 5, 3
+  %add2 = add nsw i32 %mul1, 2
+  %call = call i32 (ptr, ...) @printf(ptr noundef @.str, i32 noundef %add, i32 noundef %add2)
   ret i32 0
 }
 

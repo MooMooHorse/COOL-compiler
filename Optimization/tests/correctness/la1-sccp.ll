@@ -4,66 +4,68 @@ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16
 target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @crazy_loops(i32 noundef %0) #0 {
-  br label %2
+define dso_local i32 @crazy_loops(i32 noundef %p) #0 {
+entry:
+  br label %do.body
 
-2:                                                ; preds = %21, %1
-  %.02 = phi i32 [ 25, %1 ], [ %.13, %21 ]
-  %.01 = phi i32 [ 5, %1 ], [ %.1, %21 ]
-  %.0 = phi i32 [ 5, %1 ], [ %20, %21 ]
-  br label %3
+do.body:                                          ; preds = %do.cond12, %entry
+  %y.0 = phi i32 [ 25, %entry ], [ %y.1, %do.cond12 ]
+  %x.0 = phi i32 [ 5, %entry ], [ %x.1, %do.cond12 ]
+  %z.0 = phi i32 [ 5, %entry ], [ %add11, %do.cond12 ]
+  br label %while.cond
 
-3:                                                ; preds = %18, %2
-  %.13 = phi i32 [ %.02, %2 ], [ %.3, %18 ]
-  %.1 = phi i32 [ %.01, %2 ], [ %10, %18 ]
-  %4 = add nsw i32 %.1, %.13
-  %5 = icmp slt i32 %4, %.0
-  br i1 %5, label %6, label %19
+while.cond:                                       ; preds = %do.end, %do.body
+  %y.1 = phi i32 [ %y.0, %do.body ], [ %y.3, %do.end ]
+  %x.1 = phi i32 [ %x.0, %do.body ], [ %mul6, %do.end ]
+  %add2 = add nsw i32 %x.1, %y.1
+  %cmp = icmp slt i32 %add2, %z.0
+  br i1 %cmp, label %while.body, label %while.end
 
-6:                                                ; preds = %3
-  %7 = add nsw i32 %.1, 1
-  %8 = add nsw i32 %.13, 1
-  br label %9
+while.body:                                       ; preds = %while.cond
+  %add3 = add nsw i32 %x.1, 1
+  %add4 = add nsw i32 %y.1, 1
+  br label %do.body5
 
-9:                                                ; preds = %15, %6
-  %.24 = phi i32 [ %8, %6 ], [ %.3, %15 ]
-  %.2 = phi i32 [ %7, %6 ], [ %10, %15 ]
-  %10 = mul nsw i32 %.2, %.2
-  %11 = icmp sgt i32 %10, 10
-  br i1 %11, label %12, label %14
+do.body5:                                         ; preds = %do.cond, %while.body
+  %y.2 = phi i32 [ %add4, %while.body ], [ %y.3, %do.cond ]
+  %x.2 = phi i32 [ %add3, %while.body ], [ %mul6, %do.cond ]
+  %mul6 = mul nsw i32 %x.2, %x.2
+  %cmp7 = icmp sgt i32 %mul6, 10
+  br i1 %cmp7, label %if.then, label %if.end
 
-12:                                               ; preds = %9
-  %13 = mul nsw i32 %.24, %.24
-  br label %14
+if.then:                                          ; preds = %do.body5
+  %mul8 = mul nsw i32 %y.2, %y.2
+  br label %if.end
 
-14:                                               ; preds = %12, %9
-  %.3 = phi i32 [ %13, %12 ], [ %.24, %9 ]
-  br label %15
+if.end:                                           ; preds = %if.then, %do.body5
+  %y.3 = phi i32 [ %mul8, %if.then ], [ %y.2, %do.body5 ]
+  br label %do.cond
 
-15:                                               ; preds = %14
-  %16 = mul nsw i32 %0, %0
-  %17 = icmp slt i32 %10, %16
-  br i1 %17, label %9, label %18, !llvm.loop !6
+do.cond:                                          ; preds = %if.end
+  %mul9 = mul nsw i32 %p, %p
+  %cmp10 = icmp slt i32 %mul6, %mul9
+  br i1 %cmp10, label %do.body5, label %do.end, !llvm.loop !6
 
-18:                                               ; preds = %15
-  br label %3, !llvm.loop !8
+do.end:                                           ; preds = %do.cond
+  br label %while.cond, !llvm.loop !8
 
-19:                                               ; preds = %3
-  %20 = add nsw i32 %.0, 1
-  br label %21
+while.end:                                        ; preds = %while.cond
+  %add11 = add nsw i32 %z.0, 1
+  br label %do.cond12
 
-21:                                               ; preds = %19
-  %22 = icmp slt i32 %.1, %0
-  br i1 %22, label %2, label %23, !llvm.loop !9
+do.cond12:                                        ; preds = %while.end
+  %cmp13 = icmp slt i32 %x.1, %p
+  br i1 %cmp13, label %do.body, label %do.end14, !llvm.loop !9
 
-23:                                               ; preds = %21
-  ret i32 %20
+do.end14:                                         ; preds = %do.cond12
+  ret i32 %add11
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = call i32 @crazy_loops(i32 noundef 1000)
-  ret i32 %1
+entry:
+  %call = call i32 @crazy_loops(i32 noundef 1000)
+  ret i32 %call
 }
 
 attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }

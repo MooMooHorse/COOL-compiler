@@ -4,33 +4,34 @@ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16
 target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @foo(i32 noundef %0) #0 {
-  br label %2
+define dso_local i32 @foo(i32 noundef %n) #0 {
+entry:
+  br label %do.body
 
-2:                                                ; preds = %12, %1
-  %.0 = phi i32 [ 1, %1 ], [ %.1, %12 ]
-  %3 = add nsw i32 %.0, 1
-  %4 = call i32 @rand() #2
-  %5 = srem i32 %4, 4
-  %6 = add nsw i32 1, %3
-  %7 = sub nsw i32 %5, %6
-  %8 = add nsw i32 %7, %0
-  %9 = icmp sgt i32 %3, 0
-  br i1 %9, label %10, label %11
+do.body:                                          ; preds = %do.cond, %entry
+  %i.0 = phi i32 [ 1, %entry ], [ %i.1, %do.cond ]
+  %add = add nsw i32 %i.0, 1
+  %call = call i32 @rand() #2
+  %rem = srem i32 %call, 4
+  %add1 = add nsw i32 1, %add
+  %sub = sub nsw i32 %rem, %add1
+  %add2 = add nsw i32 %sub, %n
+  %cmp = icmp sgt i32 %add, 0
+  br i1 %cmp, label %if.then, label %if.end
 
-10:                                               ; preds = %2
-  br label %11
+if.then:                                          ; preds = %do.body
+  br label %if.end
 
-11:                                               ; preds = %10, %2
-  %.1 = phi i32 [ %3, %10 ], [ %8, %2 ]
-  br label %12
+if.end:                                           ; preds = %if.then, %do.body
+  %i.1 = phi i32 [ %add, %if.then ], [ %add2, %do.body ]
+  br label %do.cond
 
-12:                                               ; preds = %11
-  %13 = icmp slt i32 %3, 2
-  br i1 %13, label %2, label %14, !llvm.loop !6
+do.cond:                                          ; preds = %if.end
+  %cmp3 = icmp slt i32 %add, 2
+  br i1 %cmp3, label %do.body, label %do.end, !llvm.loop !6
 
-14:                                               ; preds = %12
-  ret i32 %.1
+do.end:                                           ; preds = %do.cond
+  ret i32 %i.1
 }
 
 ; Function Attrs: nounwind

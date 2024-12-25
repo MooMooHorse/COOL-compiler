@@ -4,25 +4,27 @@ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16
 target triple = "x86_64-unknown-linux-gnu"
 
 ; Function Attrs: noinline nounwind uwtable
-define dso_local i32 @do_loop(i32 noundef %0, i32 noundef %1, i32 noundef %2) #0 {
-  %4 = sub nsw i32 %0, %1
-  %5 = icmp slt i32 %0, 0
-  br label %6
+define dso_local i32 @do_loop(i32 noundef %x, i32 noundef %y, i32 noundef %z) #0 {
+entry:
+  %sub = sub nsw i32 %x, %y
+  %cmp = icmp slt i32 %x, 0
+  br label %do.body
 
-6:                                                ; preds = %7, %3
-  br label %7
+do.body:                                          ; preds = %do.cond, %entry
+  br label %do.cond
 
-7:                                                ; preds = %6
-  br i1 %5, label %6, label %8, !llvm.loop !6
+do.cond:                                          ; preds = %do.body
+  br i1 %cmp, label %do.body, label %do.end, !llvm.loop !6
 
-8:                                                ; preds = %7
-  ret i32 %4
+do.end:                                           ; preds = %do.cond
+  ret i32 %sub
 }
 
 ; Function Attrs: noinline nounwind uwtable
 define dso_local i32 @main() #0 {
-  %1 = call i32 @do_loop(i32 noundef 2, i32 noundef 3, i32 noundef 1)
-  ret i32 %1
+entry:
+  %call = call i32 @do_loop(i32 noundef 2, i32 noundef 3, i32 noundef 1)
+  ret i32 %call
 }
 
 attributes #0 = { noinline nounwind uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
