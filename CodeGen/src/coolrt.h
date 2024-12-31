@@ -3,6 +3,7 @@
  * the cool classes in C.  Feel free to change it to match the structure
  * of your code generator.
  */
+extern "C" {
 
 #include <stdbool.h>
 
@@ -133,3 +134,5 @@ IO *IO_out_string(IO *self, String *s);
 IO *IO_out_int(IO *self, int x);
 String *IO_in_string(IO *self);
 int IO_in_int(IO *self);
+
+} // extern "C"

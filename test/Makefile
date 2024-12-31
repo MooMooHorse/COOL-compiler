@@ -1,10 +1,11 @@
-FRONTEND_BIN_DIR = FrontEnd/bin
-REF_BIN_DIR = bin
+FRONTEND_BIN_DIR = ../FrontEnd/bin
+REF_BIN_DIR = ../bin
 LEXER = $(FRONTEND_BIN_DIR)/lexer
 PARSER = $(FRONTEND_BIN_DIR)/parser
 SEMANT = $(REF_BIN_DIR)/semant
-CLANG = $(REF_BIN_DIR)/clang
-OPT = $(REF_BIN_DIR)/opt
+BACKEND = ../llvm-project-15.0.0.src
+CLANG = $(BACKEND)/build/bin/clang
+OPT = $(BACKEND)/build/bin/opt
 
 debug = true
 proj_dir = CodeGen/src
@@ -15,9 +16,9 @@ else
   CGENOPTS =
 endif
 
-CGEN = CodeGen/bin/cgen-2
-CGENREF = CodeGen/reference-binaries/cgen-2
-COOLRT = CodeGen/reference-binaries/coolrt.o
+CGEN = ../CodeGen/bin/cgen-2
+CGENREF = ../CodeGen/reference-binaries/cgen-2
+COOLRT = ../CodeGen/reference-binaries/coolrt.o
 
 SRCS := $(wildcard *.cl)
 
@@ -50,7 +51,7 @@ cgen-2:
 	$(OPT) -O3 -S $< -f -o $*-o3.ll
 
 
-%.bin: %-o3.ll $(COOLRT)
+%.bin: $(COOLRT) %-o3.ll 
 	$(CLANG) -g $+ -o $@
 
 

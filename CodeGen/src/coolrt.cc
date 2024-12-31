@@ -1,3 +1,5 @@
+extern "C" {
+
 #include "coolrt.h"
 #include <assert.h>
 #include <stdio.h>
@@ -18,65 +20,64 @@ const char IO_string[] = "IO";
 const char default_string[] = "";
 
 /* Class vtable prototypes */
-/*
-const Object_vtable _Object_vtable_prototype = {
-        .tag = 0,
-        .size = sizeof(struct Object),
-        .name = Object_string,
 
-        .abort_object     = Object_abort,
-        .type_name_object = Object_type_name,
-        .copy_object      = Object_copy
-};
+// const Object_vtable _Object_vtable_prototype = {
+//         .tag = 0,
+//         .size = sizeof(struct Object),
+//         .name = Object_string,
 
-const Int_vtable _Int_vtable_prototype = {
-        .tag = 1,
-        .size = sizeof(struct Int),
-        .name = Int_string,
+//         .abort_object     = Object_abort,
+//         .type_name_object = Object_type_name,
+//         .copy_object      = Object_copy
+// };
 
-        .abort_int     = Object_abort,
-        .type_name_int = Object_type_name,
-        .copy_int      = Object_copy
-};
+// const Int_vtable _Int_vtable_prototype = {
+//         .tag = 1,
+//         .size = sizeof(struct Int),
+//         .name = Int_string,
 
-const Bool_vtable _Bool_vtable_prototype = {
-        .tag = 2,
-        .size = sizeof(struct Bool),
-        .name = Bool_string,
+//         .abort_int     = Object_abort,
+//         .type_name_int = Object_type_name,
+//         .copy_int      = Object_copy
+// };
 
-        .abort_bool     = Object_abort,
-        .type_name_bool = Object_type_name,
-        .copy_bool      = Object_copy
-};
+// const Bool_vtable _Bool_vtable_prototype = {
+//         .tag = 2,
+//         .size = sizeof(struct Bool),
+//         .name = Bool_string,
 
-const String_vtable _String_vtable_prototype = {
-        .tag = 3,
-        .size = sizeof(struct String),
-        .name = String_string,
+//         .abort_bool     = Object_abort,
+//         .type_name_bool = Object_type_name,
+//         .copy_bool      = Object_copy
+// };
 
-        .abort_string     = Object_abort,
-        .type_name_string = Object_type_name,
-        .copy_string      = Object_copy,
-        .length_string    = String_length,
-        .concat_string    = String_concat,
-        .substr_string    = String_substr
-};
+// const String_vtable _String_vtable_prototype = {
+//         .tag = 3,
+//         .size = sizeof(struct String),
+//         .name = String_string,
 
-const IO_vtable _IO_vtable_prototype = {
-        .tag = 4,
-        .size = sizeof(struct IO),
-        .name = IO_string,
+//         .abort_string     = Object_abort,
+//         .type_name_string = Object_type_name,
+//         .copy_string      = Object_copy,
+//         .length_string    = String_length,
+//         .concat_string    = String_concat,
+//         .substr_string    = String_substr
+// };
 
-        .abort_io      = Object_abort,
-        .type_name_io  = Object_type_name,
-        .copy_io       = Object_copy,
-        .out_string_io = IO_out_string,
-        .out_int_io    = IO_out_int,
-        .in_string_io  = IO_in_string,
-        .in_int_io     = IO_in_int
-};
+// const IO_vtable _IO_vtable_prototype = {
+//         .tag = 4,
+//         .size = sizeof(struct IO),
+//         .name = IO_string,
 
-*/
+//         .abort_io      = Object_abort,
+//         .type_name_io  = Object_type_name,
+//         .copy_io       = Object_copy,
+//         .out_string_io = IO_out_string,
+//         .out_int_io    = IO_out_int,
+//         .in_string_io  = IO_in_string,
+//         .in_int_io     = IO_in_int
+// };
+
 
 /*
 // Methods in class object (only some are provided to you)
@@ -348,3 +349,5 @@ String *String_substr(String *self, int i, int l) {
 
   return s1;
 }
+
+} // extern "C"

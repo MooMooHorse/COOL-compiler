@@ -163,7 +163,8 @@ declare void @Bool_init(%Bool*, i1)
 
 @str.Main = internal constant [5 x i8] c"Main\00"
 %Main = type {
-	%_Main_vtable*
+	%_Main_vtable*,
+	i32
 }
 
 %_Main_vtable = type {
@@ -178,7 +179,6 @@ declare void @Bool_init(%Bool*, i1)
 	%IO* (%IO*,i32) *,
 	%String* (%IO*) *,
 	i32 (%IO*) *,
-	i1 (%Main*) *,
 	%Object* (%Main*) *
 }
 
@@ -194,32 +194,19 @@ declare void @Bool_init(%Bool*, i1)
 	%IO* (%IO*,i32) * @IO_out_int,
 	%String* (%IO*) * @IO_in_string,
 	i32 (%IO*) * @IO_in_int,
-	i1 (%Main*) * @Main_func,
 	%Object* (%Main*) * @Main_main
 }
 
-@str.3 = internal constant [14 x i8] c"<basic class>\00"
-@String.3 = constant %String {
-	%_String_vtable* @_String_vtable_prototype,
-	i8* getelementptr ([14 x i8], [14 x i8]* @str.3, i32 0, i32 0)
-}
-
-@str.2 = internal constant [7 x i8] c"not ok\00"
-@String.2 = constant %String {
-	%_String_vtable* @_String_vtable_prototype,
-	i8* getelementptr ([7 x i8], [7 x i8]* @str.2, i32 0, i32 0)
-}
-
-@str.1 = internal constant [3 x i8] c"ok\00"
+@str.1 = internal constant [14 x i8] c"<basic class>\00"
 @String.1 = constant %String {
 	%_String_vtable* @_String_vtable_prototype,
-	i8* getelementptr ([3 x i8], [3 x i8]* @str.1, i32 0, i32 0)
+	i8* getelementptr ([14 x i8], [14 x i8]* @str.1, i32 0, i32 0)
 }
 
-@str.0 = internal constant [11 x i8] c"equal_o.cl\00"
+@str.0 = internal constant [17 x i8] c"test/assign1o.cl\00"
 @String.0 = constant %String {
 	%_String_vtable* @_String_vtable_prototype,
-	i8* getelementptr ([11 x i8], [11 x i8]* @str.0, i32 0, i32 0)
+	i8* getelementptr ([17 x i8], [17 x i8]* @str.0, i32 0, i32 0)
 }
 
 define i32 @main() {
@@ -310,70 +297,29 @@ abort:
 	unreachable
 }
 
-define i1 @Main_func(%Main* %self) {
+define %Object* @Main_main(%Main* %self) {
 	%vtpm.24 = alloca %Main*
 	store %Main* %self, %Main** %vtpm.24
-	%vtpm.25 = icmp eq i32 2, 5
-	ret i1 %vtpm.25
-
-abort:
-	call void @abort(  )
-	unreachable
-}
-
-define %Object* @Main_main(%Main* %self) {
-	%vtpm.27 = alloca %Main*
-	store %Main* %self, %Main** %vtpm.27
-	%vtpm.28 = load %Main*, %Main** %vtpm.27
-	%vtpm.29 = icmp eq %Main* %vtpm.28, null
-	br i1 %vtpm.29, label %abort, label %ok.0
+	%vtpm.25 = load %Main*, %Main** %vtpm.24
+	%vtpm.26 = getelementptr %Main, %Main* %vtpm.25, i32 0, i32 1
+	store i32 7656, i32* %vtpm.26
+	%vtpm.27 = load %Main*, %Main** %vtpm.24
+	%vtpm.28 = icmp eq %Main* %vtpm.27, null
+	br i1 %vtpm.28, label %abort, label %ok.0
 
 ok.0:
-	%vtpm.30 = getelementptr %Main, %Main* %vtpm.28, i32 0, i32 0
-	%vtpm.31 = load %_Main_vtable*, %_Main_vtable** %vtpm.30
-	%vtpm.32 = getelementptr %_Main_vtable, %_Main_vtable* %vtpm.31, i32 0, i32 11
-	%tmp.0 = load i1 (%Main*) *, i1 (%Main*) ** %vtpm.32
-	%vtpm.33 = call i1(%Main* ) %tmp.0( %Main* %vtpm.28 )
-	%vtpm.34 = alloca %Object*
-	br i1 %vtpm.33, label %then0, label %else1
-
-else1:
-	%vtpm.35 = load %Main*, %Main** %vtpm.27
-	%vtpm.36 = icmp eq %Main* %vtpm.35, null
-	br i1 %vtpm.36, label %abort, label %ok.1
-
-ok.1:
-	%vtpm.37 = getelementptr %Main, %Main* %vtpm.35, i32 0, i32 0
-	%vtpm.38 = load %_Main_vtable*, %_Main_vtable** %vtpm.37
-	%vtpm.39 = bitcast %Main* %vtpm.35 to %IO*
-	%vtpm.40 = getelementptr %_Main_vtable, %_Main_vtable* %vtpm.38, i32 0, i32 7
-	%tmp.1 = load %IO* (%IO*,%String*) *, %IO* (%IO*,%String*) ** %vtpm.40
-	%vtpm.41 = call %IO*(%IO*, %String* ) %tmp.1( %IO* %vtpm.39, %String* @String.2 )
-	%vtpm.42 = bitcast %IO* %vtpm.41 to %Object*
-	store %Object* %vtpm.42, %Object** %vtpm.34
-	br label %ifcont2
-
-then0:
-	%vtpm.43 = load %Main*, %Main** %vtpm.27
-	%vtpm.44 = icmp eq %Main* %vtpm.43, null
-	br i1 %vtpm.44, label %abort, label %ok.2
-
-ok.2:
-	%vtpm.45 = getelementptr %Main, %Main* %vtpm.43, i32 0, i32 0
-	%vtpm.46 = load %_Main_vtable*, %_Main_vtable** %vtpm.45
-	%vtpm.47 = bitcast %Main* %vtpm.43 to %IO*
-	%vtpm.48 = getelementptr %_Main_vtable, %_Main_vtable* %vtpm.46, i32 0, i32 7
-	%tmp.2 = load %IO* (%IO*,%String*) *, %IO* (%IO*,%String*) ** %vtpm.48
-	%vtpm.49 = call %IO*(%IO*, %String* ) %tmp.2( %IO* %vtpm.47, %String* @String.1 )
-	%vtpm.50 = bitcast %IO* %vtpm.49 to %Object*
-	store %Object* %vtpm.50, %Object** %vtpm.34
-	br label %ifcont2
-
-ifcont2:
-	%vtpm.51 = load %Object*, %Object** %vtpm.34
-	%vtpm.52 = load %Main*, %Main** %vtpm.27
-	%vtpm.53 = bitcast %Main* %vtpm.52 to %Object*
-	ret %Object* %vtpm.53
+	%vtpm.29 = getelementptr %Main, %Main* %vtpm.27, i32 0, i32 0
+	%vtpm.30 = load %_Main_vtable*, %_Main_vtable** %vtpm.29
+	%vtpm.31 = load %Main*, %Main** %vtpm.24
+	%vtpm.32 = getelementptr %Main, %Main* %vtpm.31, i32 0, i32 1
+	%vtpm.33 = load i32, i32* %vtpm.32
+	%vtpm.34 = bitcast %Main* %vtpm.27 to %IO*
+	%vtpm.35 = getelementptr %_Main_vtable, %_Main_vtable* %vtpm.30, i32 0, i32 8
+	%tmp.0 = load %IO* (%IO*,i32) *, %IO* (%IO*,i32) ** %vtpm.35
+	%vtpm.36 = call %IO*(%IO*, i32 ) %tmp.0( %IO* %vtpm.34, i32 %vtpm.33 )
+	%vtpm.37 = load %Main*, %Main** %vtpm.24
+	%vtpm.38 = bitcast %Main* %vtpm.37 to %Object*
+	ret %Object* %vtpm.38
 
 abort:
 	call void @abort(  )
@@ -383,19 +329,21 @@ abort:
 define %Main* @Main_new() {
 
 entry:
-	%vtpm.55 = alloca %Main*
-	%vtpm.56 = getelementptr %_Main_vtable, %_Main_vtable* @_Main_vtable_prototype, i32 0, i32 1
-	%vtpm.57 = load i32, i32* %vtpm.56
-	%vtpm.58 = call i8* @malloc(i32 %vtpm.57)
-	%vtpm.59 = bitcast i8* %vtpm.58 to %Main*
-	%vtpm.60 = icmp eq %Main* %vtpm.59, null
-	br i1 %vtpm.60, label %abort, label %ok.3
+	%vtpm.40 = alloca %Main*
+	%vtpm.41 = getelementptr %_Main_vtable, %_Main_vtable* @_Main_vtable_prototype, i32 0, i32 1
+	%vtpm.42 = load i32, i32* %vtpm.41
+	%vtpm.43 = call i8* @malloc(i32 %vtpm.42)
+	%vtpm.44 = bitcast i8* %vtpm.43 to %Main*
+	%vtpm.45 = icmp eq %Main* %vtpm.44, null
+	br i1 %vtpm.45, label %abort, label %ok.1
 
-ok.3:
-	%vtpm.61 = getelementptr %Main, %Main* %vtpm.59, i32 0, i32 0
-	store %_Main_vtable* @_Main_vtable_prototype, %_Main_vtable** %vtpm.61
-	store %Main* %vtpm.59, %Main** %vtpm.55
-	ret %Main* %vtpm.59
+ok.1:
+	%vtpm.46 = getelementptr %Main, %Main* %vtpm.44, i32 0, i32 0
+	store %_Main_vtable* @_Main_vtable_prototype, %_Main_vtable** %vtpm.46
+	store %Main* %vtpm.44, %Main** %vtpm.40
+	%vtpm.47 = getelementptr %Main, %Main* %vtpm.44, i32 0, i32 1
+	store i32 5, i32* %vtpm.47
+	ret %Main* %vtpm.44
 
 abort:
 	call void @abort(  )

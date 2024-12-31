@@ -16,7 +16,7 @@
 #include "llvm/CodeGen/RegisterClassInfo.h"
 #include "llvm/CodeGen/TargetInstrInfo.h"
 #include "llvm/InitializePasses.h"
-#include "llvm/Pass.h"
+#include "RegAllocSimple.h"
 
 
 

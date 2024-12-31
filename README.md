@@ -10,7 +10,7 @@
 wget https://github.com/llvm/llvm-project/releases/download/llvmorg-15.0.0/llvm-project-15.0.0.src.tar.xz
 tar xvf llvm-project-15.0.0.src.tar.xz
 cd llvm-project-15.0.0.src; mkdir build;
-cmake -B build/ -S llvm/ -DCMAKE_C_COMPILER="clang" -DCMAKE_CXX_COMPILER="clang++" -DLLVM_USE_LINKER=lld -DCMAKE_BUILD_TYPE="Debug" -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_INCLUDE_BENCHMARKS=Off -DLLVM_FORCE_ENABLE_STATS=ON
+cmake -B build/ -S llvm/ -DCMAKE_C_COMPILER="clang" -DCMAKE_CXX_COMPILER="clang++" -DLLVM_USE_LINKER=lld -DCMAKE_BUILD_TYPE="Debug" -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_INCLUDE_BENCHMARKS=Off -DLLVM_FORCE_ENABLE_STATS=ON -DLLVM_ENABLE_PROJECTS="clang" -DLLVM_FORCE_ENABLE_STATS=ON 
 ```
 
 The README.md is still **under written**. It will be completed by Dec 31th. (Including the whole end-to-end pipeline of the project).
