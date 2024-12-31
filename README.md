@@ -1,124 +1,129 @@
+# COOL Compiler Project Documentation
 
-
-
-## Usage
-
-
+## 1. Usage
 ### Install LLVM 15.0
+To set up the project, ensure LLVM 15.0 is installed on your machine:
 
 ```bash
 wget https://github.com/llvm/llvm-project/releases/download/llvmorg-15.0.0/llvm-project-15.0.0.src.tar.xz
 tar xvf llvm-project-15.0.0.src.tar.xz
 cd llvm-project-15.0.0.src; mkdir build;
-cmake -B build/ -S llvm/ -DCMAKE_C_COMPILER="clang" -DCMAKE_CXX_COMPILER="clang++" -DLLVM_USE_LINKER=lld -DCMAKE_BUILD_TYPE="Debug" -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_INCLUDE_BENCHMARKS=Off -DLLVM_FORCE_ENABLE_STATS=ON -DLLVM_ENABLE_PROJECTS="clang" -DLLVM_FORCE_ENABLE_STATS=ON 
+cmake -B build/ -S llvm/ -DCMAKE_C_COMPILER="clang" -DCMAKE_CXX_COMPILER="clang++" \
+    -DLLVM_USE_LINKER=lld -DCMAKE_BUILD_TYPE="Debug" -DLLVM_TARGETS_TO_BUILD="X86" \
+    -DLLVM_INCLUDE_BENCHMARKS=Off -DLLVM_FORCE_ENABLE_STATS=ON \
+    -DLLVM_ENABLE_PROJECTS="clang" -DLLVM_FORCE_ENABLE_STATS=ON 
 ```
 
-The README.md is still **under written**. It will be completed by Dec 31th. (Including the whole end-to-end pipeline of the project).
+### Build the Compiler
+To compile the project and fully test the pipeline, run:
 
----
-
-
-
-
-In project directory, do
-
-```
-make clean && make
+```bash
+make
 ```
 
-this will compile the passes into `.so` file placed in `build/` directory.
+### Run a COOL Program
+To compile and run a COOL program:
 
-Then, to run the optimization sequence, do
-
-```
-make optimize PROGRAM=<your_program_name>
-```
-
-where `<your_program_name>` is the name of the program you want to optimize in `test/` directory in `.ll` format.
-
-Also you can directly optimize from `C++` source code by doing
-
-```
-make optimize-real PROGRAM=<your_program_name>
+```bash
+make run PROGRAM=<program_name>
 ```
 
-where `<your_program_name>` is the name of the program you want to optimize in `test/` directory in `.cpp` format.
+For example, to run the `assign1o` program in the `test/` directory:
 
+```bash
+make run PROGRAM=assign1o
+```
 
+This will execute the following pipeline:
 
-Then you will see an analysis printed out, the `LA_test.ll` with the following CFG (For the LLVM IR)
+```bash
+FrontEnd/bin/lexer test/assign1o.cl | FrontEnd/bin/parser | ./bin/semant | CodeGen/bin/cgen-2 > Optimization/tests/testing/assign1o.ll 2>/dev/null && \
+make -C Optimization optimize PROGRAM=assign1o && \
+cp Optimization/result.ll ./assign1o.ll && \
+llvm-project-15.0.0.src/build/bin/llc -verify-machineinstrs -O0 assign1o.ll -o assign1o.s && \
+llvm-project-15.0.0.src/build/bin/clang -c -o assign1o.o assign1o.s && \
+llvm-project-15.0.0.src/build/bin/clang -o assign1o assign1o.o coolrt.o && \
+./assign1o
+```
+
+## 2. Overview
+This compiler project implements a COOL compilation pipeline with multiple stages for front-end parsing, intermediate representation generation, optimization, and backend code generation. The overall workflow is illustrated below:
 
 ```mermaid
 graph TD;
-    entry[entry]
-    for_cond1[for.cond1]
-    for_body1[for.body1]
-    for_cond2[for.cond2]
-    for_body2[for.body2]
-    for_end2[for.end2]
-    for_end1[for.end1]
-    for_cond3[for.cond3]
-    for_body3[for.body3]
-    for_end3[for.end3]
-
-    entry --> for_cond1
-    for_cond1 -->|%cmp1 true| for_body1
-    for_cond1 -->|%cmp1 false| for_end1
-    for_body1 --> for_cond2
-    for_cond2 -->|%cmp2 true| for_body2
-    for_cond2 -->|%cmp2 false| for_end2
-    for_body2 --> for_cond2
-    for_end2 --> for_cond1
-    for_end1 --> for_cond3
-    for_cond3 -->|%cmp3 true| for_body3
-    for_cond3 -->|%cmp3 false| for_end3
-    for_body3 --> for_cond3
-    for_end3 --> for_end1
+    A[COOL Source Code] --> B[Lexing and Parsing];
+    B --> C[Abstract Syntax Tree (AST)];
+    C --> D[Semantic Analysis];
+    D --> E[Intermediate Code Generation];
+    E --> F[Optimization Passes];
+    F --> G[Machine Code Generation];
+    G --> H[Executable];
 ```
 
-However, we must know that when we run the Loop analysis, we're running on Machine IR, so the CFG will be different from the above one.
+## 3. Pipeline Components
+### Lexing and Parsing (MP1)
+Implemented using Flex and Bison, this phase converts COOL source code into tokens and constructs the AST.
+
+### Semantic Analysis (MP2)
+Validates the AST for type safety and semantic correctness. Outputs a typed AST ready for code generation.
+
+### Intermediate Code Generation (MP3)
+Generates code that can be fed into the optimizer and backend. Highlights include:
+- Support for classes, inheritance, and method dispatch.
+- Efficient representation of primitive types using boxing/unboxing.
 
 ```mermaid
 graph TD;
-    entry[entry]
-    for_cond1[for.cond1]
-    for_cond2[for.cond2]
-    for_body2[for.body2]
-    for_end2[for.end2]
-    for_cond3[for.cond3]
-    for_body3[for.body3]
-    for_end3[for.end3]
-
-    entry --> for_cond1
-    for_cond1 -->|%cmp1 true| for_cond2
-    for_cond1 -->|%cmp1 false| for_cond3
-    for_cond2 -->|%cmp2 true| for_body2
-    for_cond2 -->|%cmp2 false| for_end2
-    for_body2 --> for_cond2
-    for_end2 --> for_cond1
-    for_cond3 -->|%cmp3 true| for_body3
-    for_cond3 -->|%cmp3 false| for_end3
-    for_body3 --> for_cond3
-    for_end3 --> for_end2
-
+    A[Typed AST] --> B[Class Layout Analysis];
+    B --> C[Intermediate Code Generation];
+    C --> D[Runtime Code Integration];
 ```
 
+### Optimization Passes (MP5)
+Implements key optimizations, including:
+1. Loop-Invariant Code Motion (LICM).
+2. Sparse Conditional Constant Propagation (SCCP).
+3. Common Subexpression Elimination (CSE).
 
+### Register Allocation (MP4)
+Employs a greedy local register allocation strategy:
+- Assigns virtual registers to physical registers within basic blocks.
+- Manages spills and reloads efficiently.
 
-
-
-
-## Following are given
-From the directory containing this file, execute the following commands
+```mermaid
+graph TD;
+    A[Intermediate Code] --> B[Basic Block Analysis];
+    B --> C[Register Assignment];
+    C --> D[Spill Code Generation];
 ```
-mkdir build; cd build; cmake ..; make -j
-```
-This should configure and then build the four passes into a single file ``
-which you'll then need to run with LLVM `opt`.
-Note that you should use the `opt` of LLVM installation that `cmake` found.
-If you're not certain which LLVM that is, search for `LLVM_DIR` in `build/CMakeCache.txt`.
-You can run _just_ your passes like this:
-```
-opt -load-pass-plugin=build/libUnitProject.so -passes="unit-licm,unit-sccp" <input> -o <output>
-```
-which will probably not do much on their own; or use the full optimization sequence given in the PDF.
+
+## 4. Implementation Details
+### MP1: Lexing and Parsing
+- Tools: Flex and Bison.
+- Features added: Support for COOL grammar extensions like multi-line strings and `for` loops.
+
+### MP2: Semantic Analysis
+- Enhancements: Custom semantic checks for COOL constructs.
+- Output: Typed AST with type information for all nodes.
+
+### MP3: Intermediate Code Generation
+- Output: Intermediate code that adheres to COOL runtime semantics.
+- Includes: Boxing/unboxing for primitive types and object layout management.
+
+### MP4: Register Allocation
+- Algorithm: Local greedy allocation.
+- Optimized for X86 architecture with handling for caller-saved and callee-saved registers.
+- Performance metrics:
+    - Reduced spills and reloads.
+    - Improved register reuse efficiency.
+
+### MP5: Optimization Passes
+- LICM: Hoists loop-invariant instructions out of loops.
+- SCCP: Prunes unreachable blocks and simplifies branches.
+- CSE: Eliminates redundant computations within basic blocks.
+
+## 5. Conclusion
+This COOL compiler provides an end-to-end pipeline from COOL source code to optimized machine code. By leveraging modular design, it integrates advanced features such as dynamic dispatch, runtime type checking, and efficient register allocation.
+
+The project supports further extensions, such as garbage collection and enhanced optimizations, making it a flexible and powerful compiler framework.
+
