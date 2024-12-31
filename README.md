@@ -52,8 +52,7 @@ This compiler project implements a COOL compilation pipeline with multiple stage
 ```mermaid
 graph TD;
     A[COOL Source Code] --> B[Lexing and Parsing];
-    B --> C[AST];
-    C --> D[Semantic Analysis];
+    B --> D[Semantic Analysis];
     D --> E[Intermediate Code Generation];
     E --> F[Optimization Passes];
     F --> G[Machine Code Generation];
