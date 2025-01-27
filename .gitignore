@@ -19,4 +19,8 @@ mp2_handout/src/cgen-1
 mp2_handout/src/cgen-2
 
 llvm-project-15.0.0.src/
-llvm15/
+!llvm15/mlir/
+!llvm15/mlir/examples/
+!llvm15/mlir/examples/toy/
+!llvm15/mlir/examples/toy/Ch7/
+!llvm15/mlir/examples/toy/Ch7/**
