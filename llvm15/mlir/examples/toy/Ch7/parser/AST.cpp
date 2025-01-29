@@ -85,7 +85,7 @@ void ASTDumper::dump(ExprAST *expr) {
   llvm::TypeSwitch<ExprAST *>(expr)
       .Case<BinaryExprAST, CallExprAST, LiteralExprAST, NumberExprAST,
             PrintExprAST, ReturnExprAST, StructLiteralExprAST, VarDeclExprAST,
-            VariableExprAST>([&](auto *node) { this->dump(node); })
+            VariableExprAST, LetExprAST>([&](auto *node) { this->dump(node); })
       .Default([&](ExprAST *) {
         // No match, fallback to a generic message
         INDENT();
@@ -257,10 +257,8 @@ void ASTDumper::dump(StructAST *node) {
 void ASTDumper::dump(LetExprAST *node) {
   INDENT();
   llvm::errs() << "Let: " << loc(node) << "\n";
-  for (auto &binding : node->getBindings()) {
-    INDENT();
-    llvm::errs() << "Binding: " << binding.name << "\n";
-    dump(binding.value.get());
+  for (auto& binding : node->getBindings()) {
+    dump(binding.get());
   }
   indent();
   llvm::errs() << "Body:\n";

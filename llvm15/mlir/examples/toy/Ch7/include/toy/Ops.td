@@ -453,14 +453,42 @@ def TransposeOp : Toy_Op<"transpose",
 //===----------------------------------------------------------------------===//
 // LetOp
 //===----------------------------------------------------------------------===//
-def LetOp : Toy_Op<"let", [Pure]> {
-  let summary = "let expression for scoped variable declarations";
-  let description = [{
-    A `let` expression declares variables and provides a scope for their use.
-  }];
-  let arguments = (ins Variadic<AnyType>:$inputs);
-  let results = (outs Variadic<AnyType>:$outputs);
-  let regions = (region AnyRegion:$body);
-}
+
+// def LetOp : Toy_Op<"let",
+//     // Traits that control how the region is structured:
+//     //   - SingleBlockImplicitTerminator<"toy.return">:
+//     //       The region must have exactly one block, which implicitly ends
+//     //       with a `toy.return` if missing.
+//     //   - (Optional) IsolatedFromAbove: the region can't capture outside values
+//     //       unless you pass them in as arguments. Omit if you *do* allow captures.
+//     [ SingleBlockImplicitTerminator<"toy.return"> /*, IsolatedFromAbove */ ]
+// > {
+//   let summary = "Toy 'let' operation that introduces a new scope/region";
+//   let description = [{
+//     The 'toy.let' operation introduces a new lexical scope in the Toy dialect by
+//     containing a single-block region. All variables defined within that block
+//     are local to this scope.
+// 
+//     Example pseudo-assembly:
+// 
+//       toy.let {
+//         ^entry:
+//           // Your Toy ops go here, e.g. var declarations, prints, etc.
+//           toy.return
+//       }
+// 
+//     If SingleBlockImplicitTerminator<"toy.return"> is used, you do not
+//     need an explicit `toy.return` at the end in the printed form; one
+//     is implicitly inserted if missing.
+//   }];
+// 
+//   // If you want custom assembly, you can declare `let hasCustomAssemblyFormat = 1;`
+//   // and define `assemblyFormat` here. But for a minimal example, just rely on
+//   // default/generic assembly for now.
+// 
+//   let regions = (region AnyRegion:$body);
+// }
+
+
 
 #endif // TOY_OPS

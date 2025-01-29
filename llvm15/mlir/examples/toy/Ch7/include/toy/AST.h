@@ -303,15 +303,16 @@ public:
     LetExprAST(Location location,
       std::vector<std::unique_ptr<VarDeclExprAST>> bindings, std::unique_ptr<ExprASTList> body)
         : ExprAST(Expr_Let, std::move(location)), bindings(std::move(bindings)), body(std::move(body)) {}
-
-    const Location &loc() const { return location; }
-    const std::vector<std::unique_ptr<VarDeclExprAST>> &getBindings() const { return bindings; }
-    const ExprASTList *getBody() const { return body.get(); }
+        
+    std::vector<std::unique_ptr<VarDeclExprAST>> &getBindings() { 
+      return bindings; 
+    }
+    
+    ExprASTList *getBody() const { return body.get(); }
 
     /// LLVM style RTTI
     static bool classof(const ExprAST *c) { return c->getKind() == Expr_Let; }
 private:
-    Location location;
     std::vector<std::unique_ptr<VarDeclExprAST>> bindings;
     std::unique_ptr<ExprASTList> body;
 };

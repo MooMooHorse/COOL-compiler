@@ -579,28 +579,28 @@ private:
     }
   }
 
-mlir::LogicalResult MLIRGenImpl::mlirGen(LetExprAST &letExpr) {
-  auto loc = this->loc(letExpr.loc());
+  mlir::LogicalResult mlirGen(LetExprAST &letExpr) {
+    auto loc = this->loc(letExpr.loc());
 
-  // Start a new symbol table scope for the let block.
-  SymbolTableScopeT varScope(symbolTable);
+    // Start a new symbol table scope for the let block.
+    SymbolTableScopeT varScope(symbolTable);
 
-  // Process each variable declaration in the let expression.
-  for (auto &decl : letExpr.getDeclarations()) {
-    if (!mlirGen(*decl)) {
-      emitError(loc, "error generating MLIR for let variable declaration");
+    // Process each variable declaration in the let expression.
+    for (auto &decl : letExpr.getBindings()) {
+      if (!mlirGen(*decl)) {
+        emitError(loc, "error generating MLIR for let variable declaration");
+        return mlir::failure();
+      }
+    }
+
+    // Generate MLIR for the body of the let block.
+    if (mlir::failed(mlirGen(*letExpr.getBody()))) {
+      emitError(loc, "error generating MLIR for let block body");
       return mlir::failure();
     }
-  }
 
-  // Generate MLIR for the body of the let block.
-  if (mlir::failed(mlirGen(*letExpr.getBody()))) {
-    emitError(loc, "error generating MLIR for let block body");
-    return mlir::failure();
+    return mlir::success();
   }
-
-  return mlir::success();
-}
 
 
   /// Handle a variable declaration, we'll codegen the expression that forms the
@@ -666,6 +666,12 @@ mlir::LogicalResult MLIRGenImpl::mlirGen(LetExprAST &letExpr) {
       if (auto *print = dyn_cast<PrintExprAST>(expr.get())) {
         if (mlir::failed(mlirGen(*print)))
           return mlir::success();
+        continue;
+      }
+
+      if(auto *let = dyn_cast<LetExprAST>(expr.get())) {
+        if (mlir::failed(mlirGen(*let)))
+          return mlir::failure();
         continue;
       }
 

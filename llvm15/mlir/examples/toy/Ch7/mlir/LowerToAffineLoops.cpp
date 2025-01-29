@@ -358,10 +358,22 @@ void ToyToAffineLoweringPass::runOnOperation() {
   // to be updated though (as we convert from TensorType to MemRefType), so we
   // only treat it as `legal` if its operands are legal.
   target.addIllegalDialect<toy::ToyDialect>();
+  //   1) toy.print (with memref operands), as in the tutorial
   target.addDynamicallyLegalOp<toy::PrintOp>([](toy::PrintOp op) {
     return llvm::none_of(op->getOperandTypes(),
-                         [](Type type) { return llvm::isa<TensorType>(type); });
+                         [](mlir::Type type) { return type.isa<mlir::TensorType>(); });
   });
+
+  //   2) toy.return is legal **if** it belongs to a toy.let region,
+  //      i.e., the parent op is a `toy.let`. Otherwise (in toy.func) it's illegal.
+  // target.addDynamicallyLegalOp<toy::ReturnOp>([](toy::ReturnOp op) {
+  //   mlir::Operation *parentOp = op->getParentOp();
+  //   // If parent is a toy.func, we want to lower it => "illegal"
+  //   if (llvm::isa<toy::FuncOp>(parentOp))
+  //     return false; 
+  //   // Otherwise (e.g. inside toy.let), keep it => "legal"
+  //   return true;
+  // });
 
   // Now that the conversion target has been defined, we just need to provide
   // the set of patterns that will lower the Toy operations.

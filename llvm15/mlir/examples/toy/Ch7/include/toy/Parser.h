@@ -83,7 +83,7 @@ private:
     // Parse the variable declarations
     std::vector<std::unique_ptr<VarDeclExprAST>> decls;
     while (true) {
-      auto decl = parseVarDeclaration(/*requireInitializer=*/true);
+      auto decl = parseDeclaration(/*requireInitializer=*/true);
       if (!decl)
         return nullptr;
       decls.push_back(std::move(decl));
