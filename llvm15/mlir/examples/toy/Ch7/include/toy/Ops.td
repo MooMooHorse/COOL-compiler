@@ -492,64 +492,66 @@ def TransposeOp : Toy_Op<"transpose",
 // }
 
 
-// def LetOp : Toy_Op<"let",
-//     [Pure]  // Ensures exactly 1 block + yield
-// > {
-//   let summary = "A 'toy.let' op introducing a scoped region with no block args";
-//   let description = [{
-//     'toy.let' introduces a new lexical scope in the Toy dialect. It holds a
-//     single-block region that does not take any block arguments, and must end
-//     with a `toy.yield` op (implicitly inserted if missing).
-// 
-//     Example in generic form:
-// 
-//       // Zero results:
-//       "toy.let"() ({
-//         ^bb0:
-//           // statements...
-//           // 'toy.yield' automatically inserted if missing
-//       }) : () -> ()
-// 
-//       // One or more results:
-//       %res = "toy.let"() ({
-//         ^bb0:
-//           // ...
-//           toy.yield %val : f64
-//       }) : () -> f64
-//   }];
-// 
-//   // No block arguments => no operand -> block arg relationship.
-//   let arguments = (ins /* none */);
-//   
-//   // We can still produce zero or more results, depending on yield.
-//   let results = (outs Variadic<AnyType>:$results);
-// 
-//   // The region is explicitly declared. It has exactly 1 block due to the trait.
-//   let regions = (region AnyRegion:$body);
-// }
-// 
-// 
-// 
-// // ===----------------------------------------------------------------------===//
-// // YieldOp
-// //===----------------------------------------------------------------------===//
-// 
-// def YieldOp : Toy_Op<"yield", [Terminator]> {
-//   let summary = "Yield values from a toy.let region to the parent op";
-//   let description = [{
-//     'toy.yield' terminates the single block of a 'toy.let' region, returning
-//     zero or more values to become the let op's results.
-// 
-//     Example:
-//       toy.yield %val : f64
-// 
-//     or 
-//       toy.yield %val1, %val2 : i32, f64
-//   }];
-// 
-//   // The 'toy.yield' op takes zero or more operands, and produces no results.
-//   let arguments = (ins Variadic<AnyType>:$values);
-// }
+ 
+ // ===----------------------------------------------------------------------===//
+ // YieldOp
+ //===----------------------------------------------------------------------===//
+ 
+ def YieldOp : Toy_Op<"yield", [Pure, HasParent<"LetOp">, Terminator]> {
+   let summary = "Yield values from a toy.let region to the parent op";
+   let description = [{
+     'toy.yield' terminates the single block of a 'toy.let' region, returning
+     zero or more values to become the let op's results.
+ 
+     Example:
+       toy.yield %val : f64
+ 
+     or 
+       toy.yield %val1, %val2 : i32, f64
+   }];
+ 
+   // The 'toy.yield' op takes zero or more operands, and produces no results.
+   let arguments = (ins Variadic<AnyType>:$values);
+ }
+
+
+ def LetOp : Toy_Op<"let",
+     [ SingleBlockImplicitTerminator<"YieldOp">]  // Ensures exactly 1 block + yield
+ > {
+   let summary = "A 'toy.let' op introducing a scoped region with no block args";
+   let description = [{
+     'toy.let' introduces a new lexical scope in the Toy dialect. It holds a
+     single-block region that does not take any block arguments, and must end
+     with a `toy.yield` op (implicitly inserted if missing).
+ 
+     Example in generic form:
+ 
+       // Zero results:
+       "toy.let"() ({
+         ^bb0:
+           // statements...
+           // 'toy.yield' automatically inserted if missing
+       }) : () -> ()
+ 
+       // One or more results:
+       %res = "toy.let"() ({
+         ^bb0:
+           // ...
+           toy.yield %val : f64
+       }) : () -> f64
+   }];
+ 
+   // No block arguments => no operand -> block arg relationship.
+   let arguments = (ins /* none */);
+   
+   // We can still produce zero or more results, depending on yield.
+   // let results = (outs Variadic<AnyType>:$results);
+   let results = (outs /* none */);
+   // The region is explicitly declared. It has exactly 1 block due to the trait.
+   let regions = (region AnyRegion:$body);
+ }
+ 
+ 
 
 
 

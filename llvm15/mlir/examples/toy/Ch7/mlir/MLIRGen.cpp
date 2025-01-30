@@ -88,6 +88,8 @@ public:
         llvm_unreachable("unknown record type");
       }
     }
+
+    theModule.dump();
     // Verify the module after we have finished constructing it, this will check
     // the structural properties of the IR and invoke any specific verifiers we
     // have on the Toy operations.
@@ -223,6 +225,8 @@ private:
       function.erase();
       return nullptr;
     }
+
+    // entryBlock.dump();
 
     // Implicitly return void if no return statement was emitted.
     // FIXME: we may fix the parser instead to always return the last expression
@@ -574,8 +578,8 @@ private:
       return mlirGen(cast<CallExprAST>(expr));
     case toy::ExprAST::Expr_Num:
       return mlirGen(cast<NumberExprAST>(expr));
-    case toy::ExprAST::Expr_Let:
-      return mlirGen(cast<LetExprAST>(expr));
+    // case toy::ExprAST::Expr_Let:
+    //   return mlirGen(cast<LetExprAST>(expr));
     default:
       emitError(loc(expr.loc()))
           << "MLIR codegen encountered an unhandled expr kind '"
@@ -584,7 +588,7 @@ private:
     }
   }
 
-  // mlir::LogicalResult mlirGen(LetExprAST &letExpr) {
+  // mlir::Value mlirGen(LetExprAST &letExpr) {
   //   auto loc = this->loc(letExpr.loc());
 
   //   // Start a new symbol table scope for the let block.
@@ -594,61 +598,70 @@ private:
   //   for (auto &decl : letExpr.getBindings()) {
   //     if (!mlirGen(*decl)) {
   //       emitError(loc, "error generating MLIR for let variable declaration");
-  //       return mlir::failure();
+  //       return nullptr;
   //     }
   //   }
 
   //   // Generate MLIR for the body of the let block.
   //   if (mlir::failed(mlirGen(*letExpr.getBody()))) {
   //     emitError(loc, "error generating MLIR for let block body");
-  //     return mlir::failure();
+  //     return nullptr;
   //   }
 
-  //   return mlir::success();
+  //   return mlir::Value();
   // }
-  mlir::Value mlirGenLetExpr(LetExprAST &letExpr) {
+  mlir::Value mlirGen(LetExprAST &letExpr) {
     auto loc = this->loc(letExpr.loc());
-    letExpr.dump();
     mlir::LogicalResult success = mlir::failure();
     
+    // 1) Create the `toy.let` with result being void
+    auto letOp = builder.create<mlir::toy::LetOp>(loc);
 
-    // 1) Create the `toy.let` with no operands or result types (we'll fix the
-    //    result types later if needed).
-    // auto letOp = builder.create<mlir::toy::LetOp>(loc, /*resultTypes=*/llvm::SmallVector<mlir::Type, 1>{});
-
-    // // 2) Get the let's region. We rely on SingleBlockImplicitTerminator<"toy.yield">
-    // //    to enforce one block + yield terminator.
-    // mlir::Region &bodyRegion = letOp.getBody();
+    // 2) Get the let's region. We rely on SingleBlockImplicitTerminator<"toy.yield">
+    //    to enforce one block + yield terminator.
+    mlir::Region &bodyRegion = letOp.getBody();
     
-    // // 3) get the block of the region.
-    // mlir::Block *bodyBlock = builder.createBlock(&bodyRegion);
+    auto prevInsertionPoint = builder.saveInsertionPoint();
 
-    // // 4) Introduce a local variable scope so new var declarations won't conflict
-    // //    with outer scopes.
-    // SymbolTableScopeT varScope(symbolTable);
+    // 3) get the block of the region.
+    mlir::Block *bodyBlock = builder.createBlock(&bodyRegion);
 
-    // // 5) Emit each variable declaration in letExpr.getBindings().
-    // builder.setInsertionPointToStart(bodyBlock);
-    // for (auto &decl : letExpr.getBindings()) {
-    //   if (!mlirGen(*decl)) {
-    //     emitError(loc, "error generating MLIR for let variable declaration");
-    //     return mlir::Value();
-    //   }
-    // }
 
-    // mlir::Value bodyVal = mlirGen(*letExpr.getBody(), success);
-    // if (!bodyVal) {
-    //   emitError(loc, "error generating MLIR for let body expression");
-    //   return mlir::Value();
-    // }
+    // 4) Introduce a local variable scope so new var declarations won't conflict
+    //    with outer scopes.
+    SymbolTableScopeT varScope(symbolTable);
+
+    // 5) Emit each variable declaration in letExpr.getBindings().
+    builder.setInsertionPointToStart(bodyBlock);
+    for (auto &decl : letExpr.getBindings()) {
+      if (!mlirGen(*decl)) {
+        emitError(loc, "error generating MLIR for let variable declaration");
+        return mlir::Value();
+      }
+    }
 
     // 6) Emit the let body expression. Suppose it yields exactly one value. If your
     //    language has no concept of "the value of a let", just do no yield or yield
     //    zero values.
+    mlir::Value bodyVal = mlirGen(*letExpr.getBody(), success);
+    if (mlir::failed(success)) {
+      emitError(loc, "error generating MLIR for let body expression");
+      return mlir::Value();
+    }
+
     
 
     // 7) Insert a toy.yield that yields `bodyVal` back to toy.let.
-    // builder.create<mlir::toy::YieldOp>(loc, bodyVal);
+    if(!bodyVal) {
+      builder.create<mlir::toy::YieldOp>(loc, ArrayRef<mlir::Value>());
+    } else {
+      builder.create<mlir::toy::YieldOp>(loc, bodyVal);
+    }
+    
+    // letOp.dump();
+
+    // Restore the previous insertion point.
+    builder.restoreInsertionPoint(prevInsertionPoint);
 
     // 8) Optionally set the letOp's result type to match the yielded value.
     //    Now letOp has exactly 1 result of that type.
@@ -656,8 +669,7 @@ private:
 
     // Return the `toy.let` op's result if you want the let to be an expression
     // in your language. If your language has a void let, you'd return mlir::Value().
-    // return letOp.getResult(0);
-    return nullptr;
+    return mlir::Value();
   }
 
 
@@ -710,13 +722,13 @@ private:
 
   mlir::Value mlirGen(ExprASTList &blockAST, mlir::LogicalResult &success) {
     SymbolTableScopeT varScope(symbolTable);
-    mlir::Value lastValue;
+    mlir::Value lastValue = nullptr;
     for (auto &expr : blockAST) {
       // Specific handling for variable declarations, return statement, and
       // print. These can only appear in block list and not in nested
       // expressions.
       if (auto *vardecl = dyn_cast<VarDeclExprAST>(expr.get())) {
-        if (!mlirGen(*vardecl)) {
+        if (!(lastValue = mlirGen(*vardecl))) {
           success = mlir::failure();
           return nullptr;
         }
@@ -736,11 +748,10 @@ private:
         continue;
       }
 
-      // if(auto *let = dyn_cast<LetExprAST>(expr.get())) {
-      //   if (mlir::failed(mlirGen(*let)))
-      //     return mlir::failure();
-      //   continue;
-      // }
+      if(auto *let = dyn_cast<LetExprAST>(expr.get())) {
+        mlirGen(*let);
+        continue;
+      }
 
       // Generic expression dispatch codegen.
       if (!(lastValue = mlirGen(*expr))) {
@@ -772,12 +783,11 @@ private:
         continue;
       }
 
-      // if(auto *let = dyn_cast<LetExprAST>(expr.get())) {
-      //   if (mlir::failed(mlirGen(*let)))
-      //     return mlir::failure();
-      //   continue;
-      // }
-
+      if(auto *let = dyn_cast<LetExprAST>(expr.get())) {
+        mlirGen(*let);
+        
+        continue;
+      }
       // Generic expression dispatch codegen.
       if (!mlirGen(*expr))
         return mlir::failure();
@@ -801,8 +811,8 @@ private:
     if (!type.name.empty()) {
       auto it = structMap.find(type.name);
       if (it == structMap.end()) {
-        emitError(loc(location))
-            << "error: unknown struct type '" << type.name << "'";
+        // emitError(loc(location))
+        //     << "error: unknown struct type '" << type.name << "'";
         return nullptr;
       }
       return it->second.first;
