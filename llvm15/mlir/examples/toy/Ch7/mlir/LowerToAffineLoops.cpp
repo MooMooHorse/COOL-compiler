@@ -364,16 +364,11 @@ void ToyToAffineLoweringPass::runOnOperation() {
                          [](mlir::Type type) { return type.isa<mlir::TensorType>(); });
   });
 
-  //   2) toy.return is legal **if** it belongs to a toy.let region,
-  //      i.e., the parent op is a `toy.let`. Otherwise (in toy.func) it's illegal.
-  // target.addDynamicallyLegalOp<toy::ReturnOp>([](toy::ReturnOp op) {
-  //   mlir::Operation *parentOp = op->getParentOp();
-  //   // If parent is a toy.func, we want to lower it => "illegal"
-  //   if (llvm::isa<toy::FuncOp>(parentOp))
-  //     return false; 
-  //   // Otherwise (e.g. inside toy.let), keep it => "legal"
-  //   return true;
-  // });
+  // 2) toy.yield legal
+  // target.addLegalOp<toy::YieldOp>();
+
+  // 3) toy.let
+  // target.addLegalOp<toy::LetOp>();
 
   // Now that the conversion target has been defined, we just need to provide
   // the set of patterns that will lower the Toy operations.
