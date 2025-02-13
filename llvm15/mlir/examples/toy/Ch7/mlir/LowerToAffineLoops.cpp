@@ -244,6 +244,7 @@ struct FuncOpLowering : public OpConversionPattern<toy::FuncOp> {
                                                     op.getFunctionType());
     rewriter.inlineRegionBefore(op.getRegion(), func.getBody(), func.end());
     rewriter.eraseOp(op);
+    
     return success();
   }
 };
@@ -262,6 +263,71 @@ struct PrintOpLowering : public OpConversionPattern<toy::PrintOp> {
     // operands.
     rewriter.modifyOpInPlace(op,
                              [&] { op->setOperands(adaptor.getOperands()); });
+    return success();
+  }
+};
+
+//==----------------------------------------------------------------------===//
+// ToyToAffine RewritePatterns: Let operations
+//===----------------------------------------------------------------------===//
+
+struct LetOpLowering : public OpConversionPattern<toy::LetOp> {
+  using OpConversionPattern<toy::LetOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(toy::LetOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const final {
+    // reference SPIRVToLLVM, we first split the block, then inline the body of the letOp to the splitted "end block"
+    // and finally erase the letOp.
+
+    Block* currBlock = rewriter.getBlock();
+    auto position = Block::iterator(op);
+    Block* endBlock = rewriter.splitBlock(currBlock, position);
+    Region& letRegion = op.getRegion();
+    Region& funcRegion = *endBlock->getParent();
+    // use a list to store the blocks to be inlined
+    SmallVector<Block*, 4> blocksToInline;
+
+    
+    for(Block& block: letRegion) {
+      blocksToInline.push_back(&block);
+    }
+    // inline the blocks to the endBlock
+    for(Block* block: blocksToInline) {
+        rewriter.mergeBlocks(block, currBlock);
+    }
+
+    rewriter.mergeBlocks(endBlock, currBlock);
+
+    // rewriter.setInsertionPointToEnd(currBlock);
+    // rewriter.create<toy::YieldOp>(op.getLoc(), ArrayRef<mlir::Value>());
+    
+    rewriter.eraseOp(op);
+
+    for(Block& block: funcRegion) {
+      block.dump();
+    }
+
+    // Block* dbgBlock = rewriter.getBlock();
+    // dbgBlock->dump();
+
+    return success();
+  }
+};
+
+//===----------------------------------------------------------------------===//
+// ToyToAffine RewritePatterns: Yield operations
+//===----------------------------------------------------------------------===//
+
+struct YieldOpLowering : public OpConversionPattern<toy::YieldOp> {
+  using OpConversionPattern<toy::YieldOp>::OpConversionPattern;
+
+  LogicalResult
+  matchAndRewrite(toy::YieldOp op, OpAdaptor adaptor,
+                  ConversionPatternRewriter &rewriter) const final {
+    // Because we've inlined the "toy.let" op, we no longer need the "toy.yield"
+    // op. We can just erase it.
+    rewriter.eraseOp(op);
     return success();
   }
 };
@@ -374,7 +440,8 @@ void ToyToAffineLoweringPass::runOnOperation() {
   // the set of patterns that will lower the Toy operations.
   RewritePatternSet patterns(&getContext());
   patterns.add<AddOpLowering, ConstantOpLowering, FuncOpLowering, MulOpLowering,
-               PrintOpLowering, ReturnOpLowering, TransposeOpLowering>(
+               PrintOpLowering, ReturnOpLowering, TransposeOpLowering, 
+               LetOpLowering, YieldOpLowering>(
       &getContext());
 
   // With the target and rewrite patterns defined, we can now attempt the

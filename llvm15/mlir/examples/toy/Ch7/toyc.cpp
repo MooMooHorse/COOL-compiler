@@ -148,15 +148,17 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   // Apply any generic pass manager command line options and run the pipeline.
   if (mlir::failed(mlir::applyPassManagerCLOptions(pm)))
     return 4;
-
+    
+  // pm.enableCrashReproducerGeneration("dbg-toy.mlir");
+    
   // Check to see what granularity of MLIR we are compiling to.
   bool isLoweringToAffine = emitAction >= Action::DumpMLIRAffine;
   bool isLoweringToLLVM = emitAction >= Action::DumpMLIRLLVM;
-
+  
   if (enableOpt || isLoweringToAffine) {
     // Inline all functions into main and then delete them.
     pm.addPass(mlir::createInlinerPass());
-
+    
     // Now that there is only one function, we can infer the shapes of each of
     // the operations.
     mlir::OpPassManager &optPM = pm.nest<mlir::toy::FuncOp>();
@@ -190,6 +192,7 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
     // emission directly from our frontend.
     pm.addPass(mlir::LLVM::createDIScopeForLLVMFuncOpPass());
   }
+
 
   if (mlir::failed(pm.run(*module)))
     return 4;

@@ -497,7 +497,7 @@ def TransposeOp : Toy_Op<"transpose",
  // YieldOp
  //===----------------------------------------------------------------------===//
  
- def YieldOp : Toy_Op<"yield", [Pure, HasParent<"LetOp">, Terminator]> {
+ def YieldOp : Toy_Op<"yield", [Pure, Terminator]> {
    let summary = "Yield values from a toy.let region to the parent op";
    let description = [{
      'toy.yield' terminates the single block of a 'toy.let' region, returning
