@@ -590,163 +590,117 @@ private:
 
   // mlir::Value mlirGen(LetExprAST &letExpr) {
   //   auto loc = this->loc(letExpr.loc());
-
-  //   // Start a new symbol table scope for the let block.
-  //   SymbolTableScopeT varScope(symbolTable);
-
-  //   // Process each variable declaration in the let expression.
-  //   for (auto &decl : letExpr.getBindings()) {
-  //     if (!mlirGen(*decl)) {
-  //       emitError(loc, "error generating MLIR for let variable declaration");
-  //       return nullptr;
-  //     }
-  //   }
-
-  //   // Generate MLIR for the body of the let block.
-  //   if (mlir::failed(mlirGen(*letExpr.getBody()))) {
-  //     emitError(loc, "error generating MLIR for let block body");
-  //     return nullptr;
-  //   }
-
-  //   return mlir::Value();
-  // }
-  mlir::Value mlirGen(LetExprAST &letExpr) {
-    auto loc = this->loc(letExpr.loc());
-    mlir::LogicalResult success = mlir::failure();
+  //   mlir::LogicalResult success = mlir::failure();
     
-    // 1) Create the `toy.let` with result being void
-    auto letOp = builder.create<mlir::toy::LetOp>(loc);
+  //   // 1) Create the `toy.let` with result being void
+  //   auto letOp = builder.create<mlir::toy::LetOp>(loc);
 
-    // 2) Get the let's region. We rely on SingleBlockImplicitTerminator<"toy.yield">
-    //    to enforce one block + yield terminator.
-    mlir::Region &bodyRegion = letOp.getBody();
+  //   // 2) Get the let's region. We rely on SingleBlockImplicitTerminator<"toy.yield">
+  //   //    to enforce one block + yield terminator.
+  //   mlir::Region &bodyRegion = letOp.getBody();
     
-    auto prevInsertionPoint = builder.saveInsertionPoint();
-
-    // 3) get the block of the region.
-    mlir::Block *bodyBlock = builder.createBlock(&bodyRegion);
-
-
-    // 4) Introduce a local variable scope so new var declarations won't conflict
-    //    with outer scopes.
-    SymbolTableScopeT varScope(symbolTable);
-
-    // 5) Emit each variable declaration in letExpr.getBindings().
-    builder.setInsertionPointToStart(bodyBlock);
-    for (auto &decl : letExpr.getBindings()) {
-      if (!mlirGen(*decl)) {
-        emitError(loc, "error generating MLIR for let variable declaration");
-        return mlir::Value();
-      }
-    }
-
-    // 6) Emit the let body expression. Suppose it yields exactly one value. If your
-    //    language has no concept of "the value of a let", just do no yield or yield
-    //    zero values.
-    mlir::Value bodyVal = mlirGen(*letExpr.getBody(), success);
-    if (mlir::failed(success)) {
-      emitError(loc, "error generating MLIR for let body expression");
-      return mlir::Value();
-    }
-
-    
-
-    // 7) Insert a toy.yield that yields `bodyVal` back to toy.let.
-    if(!bodyVal) {
-      builder.create<mlir::toy::YieldOp>(loc, ArrayRef<mlir::Value>());
-    } else {
-      builder.create<mlir::toy::YieldOp>(loc, ArrayRef<mlir::Value>());
-    }
-    
-    // letOp.dump();
-
-    // Restore the previous insertion point.
-    builder.restoreInsertionPoint(prevInsertionPoint);
-
-    // Return the `toy.let` op's result if you want the let to be an expression
-    // in your language. If your language has a void let, you'd return mlir::Value().
-    return bodyVal;
-  }
-
-  // mlir::Value mlirGen(LetExprAST &letExpr, mlir::LogicalResult &success) {
-  //   auto loc = this->loc(letExpr.loc());
-  
-  //   //===--------------------------------------------------------------------===//
-  //   // 1) Create a temporary region and block for building the let body.
-  //   //===--------------------------------------------------------------------===//
-  //   auto tempRegion = std::make_unique<mlir::Region>();
-  //   mlir::Block *tempBlock = new mlir::Block();
-  //   tempRegion->getBlocks().push_back(tempBlock);
-  
-  //   // Save the current insertion point.
   //   auto prevInsertionPoint = builder.saveInsertionPoint();
-  
-  //   // Set insertion point to the start of the temporary block.
-  //   builder.setInsertionPointToStart(tempBlock);
-  
-  //   //===--------------------------------------------------------------------===//
-  //   // 2) Introduce a local variable scope so new var declarations don't conflict.
-  //   //===--------------------------------------------------------------------===//
+
+  //   // 3) get the block of the region.
+  //   mlir::Block *bodyBlock = builder.createBlock(&bodyRegion);
+
+
+  //   // 4) Introduce a local variable scope so new var declarations won't conflict
+  //   //    with outer scopes.
   //   SymbolTableScopeT varScope(symbolTable);
-  
-  //   //===--------------------------------------------------------------------===//
-  //   // 3) Emit each variable declaration in letExpr.getBindings().
-  //   //===--------------------------------------------------------------------===//
+
+  //   // 5) Emit each variable declaration in letExpr.getBindings().
+  //   builder.setInsertionPointToStart(bodyBlock);
   //   for (auto &decl : letExpr.getBindings()) {
   //     if (!mlirGen(*decl)) {
   //       emitError(loc, "error generating MLIR for let variable declaration");
   //       return mlir::Value();
   //     }
   //   }
-  
-  //   //===--------------------------------------------------------------------===//
-  //   // 4) Emit the let body expression.
-  //   // Assume it yields exactly one value.
-  //   //===--------------------------------------------------------------------===//
+
+  //   // 6) Emit the let body expression. Suppose it yields exactly one value. If your
+  //   //    language has no concept of "the value of a let", just do no yield or yield
+  //   //    zero values.
   //   mlir::Value bodyVal = mlirGen(*letExpr.getBody(), success);
   //   if (mlir::failed(success)) {
   //     emitError(loc, "error generating MLIR for let body expression");
   //     return mlir::Value();
   //   }
-  
-  //   //===--------------------------------------------------------------------===//
-  //   // 5) Insert a toy.yield op to yield bodyVal (if any) at the end of the block.
-  //   //===--------------------------------------------------------------------===//
-  //   if (!bodyVal)
+
+    
+
+  //   // 7) Insert a toy.yield that yields `bodyVal` back to toy.let.
+  //   if(!bodyVal) {
   //     builder.create<mlir::toy::YieldOp>(loc, ArrayRef<mlir::Value>());
-  //   else
+  //   } else {
   //     builder.create<mlir::toy::YieldOp>(loc, bodyVal);
-  
+  //   }
+    
+  //   // letOp.dump();
+
   //   // Restore the previous insertion point.
   //   builder.restoreInsertionPoint(prevInsertionPoint);
-  
-  //   //===--------------------------------------------------------------------===//
-  //   // 6) Inspect the temporary block's terminator (yield op) to compute result type.
-  //   //===--------------------------------------------------------------------===//
-  //   mlir::Operation *terminator = tempBlock->getTerminator();
-  //   auto yieldOp = llvm::dyn_cast<mlir::toy::YieldOp>(terminator);
-  //   SmallVector<mlir::Type, 1> resultTypes;
-  //   if (yieldOp) {
-  //     // If toy.yield yields no operands, we leave resultTypes empty (void).
-  //     for (mlir::Value operand : yieldOp.getOperands())
-  //       resultTypes.push_back(operand.getType());
-  //   }
-  
-  //   //===--------------------------------------------------------------------===//
-  //   // 7) Create the final toy.let op with the computed result type.
-  //   //===--------------------------------------------------------------------===//
-  //   auto letOp = builder.create<mlir::toy::LetOp>(loc, resultTypes);
-  
-  //   // Splice the temporary region into the toy.let op.
-  //   letOp.getBody().takeBody(*tempRegion);
-  
-  //   //===--------------------------------------------------------------------===//
-  //   // 8) Return the toy.let op's result if available (e.g. for a let as an expression).
-  //   //===--------------------------------------------------------------------===//
-  //   if (!resultTypes.empty())
-  //     return letOp.getResult(0);
-  //   return mlir::Value();
+
+  //   // Return the `toy.let` op's result if you want the let to be an expression
+  //   // in your language. If your language has a void let, you'd return mlir::Value().
+  //   return bodyVal;
   // }
+
+  mlir::Value mlirGen(LetExprAST &letExpr) {
+    auto loc = this->loc(letExpr.loc());
+    mlir::LogicalResult success = mlir::failure();
+    
+    // Save the current insertion point.
+    
+    auto prevInsertionPoint = builder.saveInsertionPoint();
+    mlir::Block *curBlock = builder.getBlock();
+    mlir::Region *parentRegion = new mlir::Region();
+    mlir::Block *tempBlock = builder.createBlock(parentRegion);
+    
+    
+  
+    builder.setInsertionPointToStart(tempBlock);
+
+    SymbolTableScopeT varScope(symbolTable);
+  
+    for (auto &decl : letExpr.getBindings()) {
+      if (!mlirGen(*decl)) {
+        emitError(loc, "error generating MLIR for let variable declaration");
+        return mlir::Value();
+      }
+    }
+  
+    mlir::Value bodyVal = mlirGen(*letExpr.getBody(), success);
+    if (mlir::failed(success)) {
+      emitError(loc, "error generating MLIR for let body expression");
+      return mlir::Value();
+    }
+    if (!bodyVal)
+      builder.create<mlir::toy::YieldOp>(loc, ArrayRef<mlir::Value>());
+    else
+      builder.create<mlir::toy::YieldOp>(loc, bodyVal);
+      
+      
+    builder.restoreInsertionPoint(prevInsertionPoint);
+
+    // mlir::Block* dbg_block = builder.getBlock();
+    // dbg_block->dump();
+      
+    auto letOp = builder.create<mlir::toy::LetOp>(loc, bodyVal.getType());
+    // emitError(loc, "error generating MLIR for let body expression");
+    
+    mlir::Region &letRegion = letOp.getBody();
+    mlir::Block *insertBeforeBlock = builder.createBlock(&letRegion);
+    tempBlock->moveBefore(insertBeforeBlock);
+    
+    insertBeforeBlock->erase();
+
+    builder.restoreInsertionPoint(prevInsertionPoint);
+    
+  
+    return bodyVal;
+
+  }
 
 
 
